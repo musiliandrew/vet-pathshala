@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "116294954906",
+    "firebase_url": "https://vet-pathshala-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "vet-pathshala",
+    "storage_bucket": "vet-pathshala.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:116294954906:android:128826c99672d1d6f5d423",
+        "android_client_info": {
+          "package_name": "in.vetpathshalabooks.vetapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "116294954906-5f09jqgkveepu97onusml936gu7j72rn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.vetpathshalabooks.vetapp",
+            "certificate_hash": "4859ada1f90b289c53efd036e75badfdcd3174ac"
+          }
+        },
+        {
+          "client_id": "116294954906-d71mjs7mk9jg3a8h0jbgjrui65fcqrd0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlJlzuELWLJ2N7fL0OlBsjfk-KR_MmvkM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "116294954906-d71mjs7mk9jg3a8h0jbgjrui65fcqrd0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "116294954906-bfbse1lvk4ohbbpi4g1eibh5dnbu5ejh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "in.vetpathshalabooks.vetapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

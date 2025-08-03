@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drugs - Medical App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            min-height: 100vh;
+            color: #2d5016;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(74, 124, 89, 0.15);
+            border: 1px solid #e0f2e0;
+        }
+
+        .header {
+            padding: 32px 24px 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fef8 100%);
+            border-bottom: 2px solid #e0f2e0;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+        }
+
+        .app-name {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2d5016;
+        }
+
+        .coins-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #f8fef8 0%, #f0f9f0 100%);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 2px solid #e0f2e0;
+        }
+
+        .coins-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .coin-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .coins-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d5016;
+        }
+
+        .get-more-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .get-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        .content {
+            padding: 32px 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d5016;
+            margin-bottom: 20px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fef8 100%);
+            border: 2px solid #e0f2e0;
+            border-radius: 20px;
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.08);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: #4a7c59;
+            box-shadow: 0 8px 24px rgba(74, 124, 89, 0.15);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .vet-drug-icon {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .calculator-icon {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d5016;
+            margin-bottom: 8px;
+        }
+
+        .feature-description {
+            font-size: 14px;
+            color: #6b9270;
+            line-height: 1.4;
+        }
+
+        .earn-section {
+            margin-bottom: 40px;
+        }
+
+        .earn-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fef8 100%);
+            border: 2px solid #e0f2e0;
+            border-radius: 20px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.08);
+        }
+
+        .earn-card:hover {
+            transform: translateY(-2px);
+            border-color: #4a7c59;
+            box-shadow: 0 8px 24px rgba(74, 124, 89, 0.15);
+        }
+
+        .earn-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .play-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.3);
+            flex-shrink: 0;
+        }
+
+        .earn-text {
+            flex: 1;
+        }
+
+        .earn-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d5016;
+            margin-bottom: 8px;
+        }
+
+        .earn-description {
+            font-size: 14px;
+            color: #6b9270;
+            line-height: 1.5;
+        }
+
+        .store-section {
+            margin-bottom: 20px;
+        }
+
+        .store-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fef8 100%);
+            border: 2px solid #e0f2e0;
+            border-radius: 20px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.08);
+        }
+
+        .store-card:hover {
+            transform: translateY(-2px);
+            border-color: #4a7c59;
+            box-shadow: 0 8px 24px rgba(74, 124, 89, 0.15);
+        }
+
+        .store-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .diamond-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+            flex-shrink: 0;
+        }
+
+        .store-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d5016;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+            
+            body {
+                padding: 0;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .app-name {
+                font-size: 28px;
+            }
+            
+            .content {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="app-title">
+                <div class="app-icon">🧪</div>
+                <h1 class="app-name">Drugs</h1>
+            </div>
+            
+            <div class="coins-section">
+                <div class="coins-info">
+                    <div class="coin-icon">$</div>
+                    <span class="coins-text">Drug Coins: 120</span>
+                </div>
+                <button class="get-more-btn" onclick="getMoreCoins()">Get More</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2 class="section-title">Features</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card" onclick="openVetDrugIndex()">
+                    <div class="feature-icon vet-drug-icon">💊</div>
+                    <h3 class="feature-title">Vet Drug Index</h3>
+                    <p class="feature-description">All medicines listed</p>
+                </div>
+                
+                <div class="feature-card" onclick="openDrugCalculator()">
+                    <div class="feature-icon calculator-icon">🧮</div>
+                    <h3 class="feature-title">Drug Calculator</h3>
+                    <p class="feature-description">Dose & conversion tool</p>
+                </div>
+            </div>
+
+            <h2 class="section-title">Earn Drug Coins</h2>
+            
+            <div class="earn-section">
+                <div class="earn-card" onclick="watchVideoToEarn()">
+                    <div class="earn-content">
+                        <div class="play-icon">▶</div>
+                        <div class="earn-text">
+                            <h3 class="earn-title">Watch Video to Earn Coins</h3>
+                            <p class="earn-description">Watch & earn instant coins to unlock features</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">Coin Store</h2>
+            
+            <div class="store-section">
+                <div class="store-card" onclick="buyCoins()">
+                    <div class="store-content">
+                        <div class="diamond-icon">💎</div>
+                        <div class="store-title">Buy Coins</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getMoreCoins() {
+            const btn = event.target;
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+                showNotification('Opening coin earning options...', '#3b82f6');
+            }, 150);
+        }
+
+        function openVetDrugIndex() {
+            const card = event.currentTarget;
+            animateCard(card);
+            setTimeout(() => {
+                showNotification('Opening Veterinary Drug Index...', '#4a7c59');
+            }, 150);
+        }
+
+        function openDrugCalculator() {
+            const card = event.currentTarget;
+            animateCard(card);
+            setTimeout(() => {
+                showNotification('Opening Drug Calculator...', '#4a7c59');
+            }, 150);
+        }
+
+        function watchVideoToEarn() {
+            const card = event.currentTarget;
+            animateCard(card);
+            setTimeout(() => {
+                showNotification('Starting video to earn coins...', '#f59e0b');
+                // Simulate earning coins
+                setTimeout(() => {
+                    updateCoins(5);
+                    showNotification('You earned 5 coins!', '#22c55e');
+                }, 2000);
+            }, 150);
+        }
+
+        function buyCoins() {
+            const card = event.currentTarget;
+            animateCard(card);
+            setTimeout(() => {
+                showNotification('Opening coin store...', '#10b981');
+            }, 150);
+        }
+
+        function animateCard(card) {
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                card.style.transform = '';
+            }, 150);
+        }
+
+        function updateCoins(amount) {
+            const coinsText = document.querySelector('.coins-text');
+            const currentCoins = parseInt(coinsText.textContent.split(': ')[1]);
+            const newCoins = currentCoins + amount;
+            coinsText.textContent = `Drug Coins: ${newCoins}`;
+            
+            // Animate coin icon
+            const coinIcon = document.querySelector('.coin-icon');
+            coinIcon.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                coinIcon.style.transform = '';
+            }, 300);
+        }
+
+        function showNotification(message, color) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${color};
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideDown 0.3s ease-out;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                max-width: 90%;
+                text-align: center;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { 
+                    opacity: 0; 
+                    transform: translateX(-50%) translateY(-20px); 
+                }
+                to { 
+                    opacity: 1; 
+                    transform: translateX(-50%) translateY(0); 
+                }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add hover effects for touch devices
+        document.querySelectorAll('.feature-card, .earn-card, .store-card').forEach(card => {
+            card.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            card.addEventListener('touchend', function() {
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

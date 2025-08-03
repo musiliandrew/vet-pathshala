@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sutra Sthana - Subtopics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            min-height: 100vh;
+            color: #2d5016;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            background: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .time {
+            color: #2d5016;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #4a7c59;
+            font-size: 12px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #4a7c59;
+            border-radius: 12px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #4a7c59;
+            color: white;
+        }
+
+        .back-btn::before {
+            content: '←';
+            font-size: 18px;
+            font-weight: bold;
+            color: #4a7c59;
+        }
+
+        .back-btn:hover::before {
+            color: white;
+        }
+
+        .title {
+            flex: 1;
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d5016;
+            text-align: center;
+        }
+
+        .translate-btn {
+            width: 40px;
+            height: 40px;
+            background: #4a7c59;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .translate-btn:hover {
+            background: #3d6b4a;
+            transform: scale(1.05);
+        }
+
+        .breadcrumb {
+            padding: 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .breadcrumb-text {
+            color: #4a7c59;
+            font-size: 14px;
+        }
+
+        .breadcrumb-text .current {
+            color: #6b46c1;
+        }
+
+        .content {
+            padding: 20px 16px;
+            max-width: 100%;
+            padding-bottom: 100px;
+        }
+
+        .section-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fef8 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e0f2e0;
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(74, 124, 89, 0.12);
+            border-color: #4a7c59;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .section-number {
+            background: #4a7c59;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d5016;
+            flex: 1;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .shield-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-left: 12px;
+            flex-shrink: 0;
+        }
+
+        .shield-icon::before {
+            content: '🛡️';
+        }
+
+        .section-description {
+            color: #4a7c59;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .section-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .guess-score {
+            color: #8b5cf6;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .question-count {
+            color: #8b5cf6;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            border-top: 1px solid #e0f2e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .nav-item {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background: #f0f9f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: #4a7c59;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .nav-item.home {
+            background: #4a7c59;
+            color: white;
+        }
+
+        .nav-item::before {
+            font-size: 20px;
+        }
+
+        .nav-item.square::before {
+            content: '⏹️';
+        }
+
+        .nav-item.home::before {
+            content: '🏠';
+        }
+
+        .nav-item.back-nav::before {
+            content: '◀️';
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding-bottom: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <div class="time">9:09</div>
+        <div class="status-icons">
+            <span>262 KB/s</span>
+            <span>5G+</span>
+            <span>📶</span>
+            <span>37%</span>
+        </div>
+    </div>
+
+    <div class="header">
+        <button class="back-btn" onclick="goBack()"></button>
+        <div class="title">Sutra Sthana</div>
+        <button class="translate-btn">TE</button>
+    </div>
+
+    <div class="breadcrumb">
+        <div class="breadcrumb-text">Himachal Pradesh / Question Bank / <span class="current">Sub Topics</span></div>
+    </div>
+
+    <div class="content">
+        <div class="section-card" onclick="openChapter(1)">
+            <div class="section-header">
+                <div style="display: flex; align-items: flex-start; flex: 1;">
+                    <div class="section-number">01</div>
+                    <div>
+                        <div class="section-title">Sutra Sthana</div>
+                        <div class="section-description">The Sutra Sthana is a crucial section of the ancient Ayurvedic texts known as Samhita...</div>
+                    </div>
+                </div>
+                <div class="shield-icon"></div>
+            </div>
+            <div class="section-stats">
+                <div class="guess-score">Guess Score : 0.00%</div>
+                <div class="question-count">0/1 Questions</div>
+            </div>
+        </div>
+
+        <div class="section-card" onclick="openChapter(2)">
+            <div class="section-header">
+                <div style="display: flex; align-items: flex-start; flex: 1;">
+                    <div class="section-number">02</div>
+                    <div>
+                        <div class="section-title">Deergham Jeeviteeya Adhyaya</div>
+                        <div class="section-description">The "Deergham Jeeviteeya Adhyaya" of the Charaka Samhita is a crucial chapter that ...</div>
+                    </div>
+                </div>
+                <div class="shield-icon"></div>
+            </div>
+            <div class="section-stats">
+                <div class="guess-score">Guess Score : 0.00%</div>
+                <div class="question-count">0/191 Questions</div>
+            </div>
+        </div>
+
+        <div class="section-card" onclick="openChapter(3)">
+            <div class="section-header">
+                <div style="display: flex; align-items: flex-start; flex: 1;">
+                    <div class="section-number">03</div>
+                    <div>
+                        <div class="section-title">Apamarga Tanduliya Adhyaya</div>
+                        <div class="section-description">The Apamarga Tanduliya Adhyaya of the Charaka Samhita is a key section of this a...</div>
+                    </div>
+                </div>
+                <div class="shield-icon"></div>
+            </div>
+            <div class="section-stats">
+                <div class="guess-score">Guess Score : 0.00%</div>
+                <div class="question-count">0/92 Questions</div>
+            </div>
+        </div>
+
+        <div class="section-card" onclick="openChapter(4)">
+            <div class="section-header">
+                <div style="display: flex; align-items: flex-start; flex: 1;">
+                    <div class="section-number">04</div>
+                    <div>
+                        <div class="section-title">Aragvadhiya Adhyaya</div>
+                        <div class="section-description">Aragvadhiya Adhyaya is a chapter in the ancient Ayurvedic text, Charaka Samhita, f...</div>
+                    </div>
+                </div>
+                <div class="shield-icon"></div>
+            </div>
+            <div class="section-stats">
+                <div class="guess-score">Guess Score : 0.00%</div>
+                <div class="question-count">0/24 Questions</div>
+            </div>
+        </div>
+
+        <div class="section-card" onclick="openChapter(5)">
+            <div class="section-header">
+                <div style="display: flex; align-items: flex-start; flex: 1;">
+                    <div class="section-number">05</div>
+                    <div>
+                        <div class="section-title">Shadvirechanashatashritiya Adhyaya</div>
+                        <div class="section-description">The Shadvirechanashatashritiya Adhyaya is a critical chapter in the Charaka Samhita, f...</div>
+                    </div>
+                </div>
+                <div class="shield-icon"></div>
+            </div>
+            <div class="section-stats">
+                <div class="guess-score">Guess Score : 0.00%</div>
+                <div class="question-count">0/169 Questions</div>
+            </div>
+        </div>
+
+        <div class="section-card" onclick="openChapter(6)">
+            <div class="section-header">
+                <div style="display: flex; align-items: flex-start; flex: 1;">
+                    <div class="section-number">06</div>
+                    <div>
+                        <div class="section-title">Matrashiteeya Adhyaya</div>
+                        <div class="section-description">The Matrashiteeya Adhyaya is an important chapter in the Charaka Samhita that ...</div>
+                    </div>
+                </div>
+                <div class="shield-icon"></div>
+            </div>
+            <div class="section-stats">
+                <div class="guess-score">Guess Score : 0.00%</div>
+                <div class="question-count">0/76 Questions</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item square"></div>
+        <div class="nav-item home"></div>
+        <div class="nav-item back-nav"></div>
+    </div>
+
+    <script>
+        function goBack() {
+            // Add click animation
+            document.querySelector('.back-btn').style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                document.querySelector('.back-btn').style.transform = '';
+                alert('Going back to main topics');
+            }, 150);
+        }
+
+        function openChapter(chapterNumber) {
+            // Add click animation
+            event.currentTarget.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                event.currentTarget.style.transform = '';
+            }, 150);
+            
+            const chapterNames = [
+                '',
+                'Sutra Sthana',
+                'Deergham Jeeviteeya Adhyaya',
+                'Apamarga Tanduliya Adhyaya',
+                'Aragvadhiya Adhyaya',
+                'Shadvirechanashatashritiya Adhyaya',
+                'Matrashiteeya Adhyaya'
+            ];
+            
+            alert(`Opening Chapter ${chapterNumber}: ${chapterNames[chapterNumber]}`);
+        }
+
+        // Add touch feedback for mobile
+        document.querySelectorAll('.section-card').forEach(card => {
+            card.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            card.addEventListener('touchend', function() {
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

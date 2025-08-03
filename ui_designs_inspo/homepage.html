@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ebook App - Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #2d3748;
+            padding-bottom: 80px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: white;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .greeting {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .notification-btn, .brightness-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f7fafc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notification-btn:hover, .brightness-btn:hover {
+            background: #edf2f7;
+            transform: scale(1.05);
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 0 20px 20px;
+            background: white;
+        }
+
+        .search-bar {
+            background: #2d3748;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #a0aec0;
+        }
+
+        /* Banner/Ad Section */
+        .banner-section {
+            padding: 20px;
+        }
+
+        .banner {
+            background: linear-gradient(135deg, #8b7355, #6b5b47);
+            border-radius: 16px;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+            height: 200px;
+            cursor: pointer;
+        }
+
+        .banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .banner-text {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Performance Tracker */
+        .performance-section {
+            padding: 0 20px 20px;
+        }
+
+        .performance-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .performance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .performance-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4299e1;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .show-all {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #4299e1;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Categories */
+        .categories-container {
+            padding: 0 20px 20px;
+        }
+
+        .categories-grid {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .category-item {
+            flex-shrink: 0;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            overflow: hidden;
+            border: 3px solid #e2e8f0;
+            transition: transform 0.3s ease;
+        }
+
+        .category-icon:hover {
+            transform: scale(1.05);
+        }
+
+        .category-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .category-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Magazines Section */
+        .magazines-container {
+            padding: 0 20px 20px;
+        }
+
+        .magazines-grid {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .magazine-card {
+            flex-shrink: 0;
+            width: 140px;
+            cursor: pointer;
+        }
+
+        .magazine-cover {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .magazine-cover:hover {
+            transform: translateY(-4px);
+        }
+
+        .magazine-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .magazine-info {
+            padding: 0 4px;
+        }
+
+        .magazine-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .magazine-author {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+
+        .magazine-genre {
+            font-size: 0.8rem;
+            color: #4299e1;
+            margin-bottom: 8px;
+        }
+
+        .magazine-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+        }
+
+        .stars {
+            color: #fbbf24;
+        }
+
+        /* Refer & Earn Section */
+        .refer-section {
+            padding: 0 20px 20px;
+        }
+
+        .refer-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .refer-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .refer-subtitle {
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .refer-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            padding: 0 20px 20px;
+        }
+
+        .activity-list {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #edf2f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #e53e3e;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* Slider */
+        .slider-container {
+            padding: 0 20px 20px;
+        }
+
+        .slider {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .slide-item {
+            flex-shrink: 0;
+            width: 280px;
+            height: 160px;
+            border-radius: 12px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .slide-item:hover {
+            transform: scale(1.02);
+        }
+
+        /* Scrollbar Styling */
+        .categories-grid::-webkit-scrollbar,
+        .magazines-grid::-webkit-scrollbar,
+        .slider::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .categories-grid::-webkit-scrollbar-track,
+        .magazines-grid::-webkit-scrollbar-track,
+        .slider::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .categories-grid::-webkit-scrollbar-thumb,
+        .magazines-grid::-webkit-scrollbar-thumb,
+        .slider::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="time">
+            <span>8:40</span>
+            <span>☁️</span>
+            <span>•••</span>
+        </div>
+        <div class="status-icons">
+            <span>2.24 KB/s</span>
+            <span>5G</span>
+            <span>📶</span>
+            <span>🔋 90%</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="greeting">
+            <span>Good Morning</span>
+            <span>☀️</span>
+        </div>
+        <div class="header-actions">
+            <button class="notification-btn">🔔</button>
+            <button class="brightness-btn">💡</button>
+            <div class="user-avatar">G</div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-bar">
+            <span>🔍</span>
+            <input type="text" class="search-input" placeholder="Search for books">
+        </div>
+    </div>
+
+    <!-- Banner/Ad Section -->
+    <div class="banner-section">
+        <div class="banner">
+            <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200'><defs><linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%238b7355'/><stop offset='100%' stop-color='%236b5b47'/></linearGradient></defs><rect width='400' height='200' fill='url(%23bg)'/><text x='200' y='100' text-anchor='middle' dominant-baseline='middle' fill='white' font-size='24' font-weight='bold'>FEMINA</text></svg>" alt="Featured Banner">
+            <div class="banner-overlay">
+                <div class="banner-text">Featured Content</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Track Performance -->
+    <div class="performance-section">
+        <div class="performance-card">
+            <div class="performance-header">
+                <div class="performance-title">Track Your Performance</div>
+                <span class="show-all">View Details →</span>
+            </div>
+            <div class="performance-stats">
+                <div class="stat-item">
+                    <div class="stat-number">24</div>
+                    <div class="stat-label">Books Read</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">156</div>
+                    <div class="stat-label">Hours Read</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">89%</div>
+                    <div class="stat-label">Goals Met</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="section-header">
+        <div class="section-title">Category</div>
+        <div class="show-all">Show All →</div>
+    </div>
+    <div class="categories-container">
+        <div class="categories-grid">
+            <div class="category-item">
+                <div class="category-icon">
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%234299e1'/><path d='M30 40h40v4H30zm0 8h40v4H30zm0 8h30v4H30z' fill='white'/></svg>" alt="Fantasy">
+                </div>
+                <div class="category-name">Fantasy</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon">
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2348bb78'/><circle cx='50' cy='35' r='15' fill='white'/><path d='M20 65c0-16.5 13.5-30 30-30s30 13.5 30 30' fill='white'/></svg>" alt="Science Fiction">
+                </div>
+                <div class="category-name">Science Fiction</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon">
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ed8936'/><path d='M50 20l10 20h20l-16 12 6 20-20-14-20 14 6-20-16-12h20z' fill='white'/></svg>" alt="Mystery">
+                </div>
+                <div class="category-name">Mystery</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon">
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23e53e3e'/><path d='M50 25c-13.8 0-25 11.2-25 25s25 40 25 40 25-26.2 25-40-11.2-25-25-25z' fill='white'/></svg>" alt="Romance">
+                </div>
+                <div class="category-name">Romance</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Magazines -->
+    <div class="section-header">
+        <div class="section-title">Top Magazines</div>
+        <div class="show-all">Show All →</div>
+    </div>
+    <div class="magazines-container">
+        <div class="magazines-grid">
+            <div class="magazine-card">
+                <div class="magazine-cover">
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 200'><rect width='140' height='200' fill='%23dc2626'/><text x='70' y='60' text-anchor='middle' fill='white' font-size='24' font-weight='bold'>FEMINA</text></svg>" alt="Femina">
+                </div>
+                <div class="magazine-info">
+                    <div class="magazine-title">Femina</div>
+                    <div class="magazine-author">By Rasipuram Krish...</div>
+                    <div class="magazine-genre">Romance</div>
+                    <div class="magazine-rating">
+                        <span>0</span>
+                        <span class="stars">☆☆☆☆☆</span>
+                        <span>(0)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="magazine-card">
+                <div class="magazine-cover">
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 200'><rect width='140' height='200' fill='%232563eb'/><text x='70' y='60' text-anchor='middle' fill='white' font-size='20' font-weight='bold'>VOGUE</text></svg>" alt="Vogue">
+                </div>
+                <div class="magazine-info">
+                    <div class="magazine-title">Vogue</div>
+                    <div class="magazine-author">By Salman Rushdie</div>
+                    <div class="magazine-genre">Fiction</div>
+                    <div class="magazine-rating">
+                        <span>0</span>
+                        <span class="stars">☆☆☆☆☆</span>
+                        <span>(0)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="magazine-card">
+                <div class="magazine-cover">
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 200'><rect width='140' height='200' fill='%2316a34a'/><text x='70' y='60' text-anchor='middle' fill='white' font-size='18' font-weight='bold'>Champak</text></svg>" alt="Champak">
+                </div>
+                <div class="magazine-info">
+                    <div class="magazine-title">Champak</div>
+                    <div class="magazine-author">By Jhumpa Lahiri</div>
+                    <div class="magazine-genre">Drama</div>
+                    <div class="magazine-rating">
+                        <span>0</span>
+                        <span class="stars">☆☆☆☆☆</span>
+                        <span>(0)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refer & Earn -->
+    <div class="refer-section">
+        <div class="refer-card">
+            <div class="refer-title">Refer & Earn</div>
+            <div class="refer-subtitle">Share with friends and earn rewards!</div>
+            <button class="refer-btn">Invite Now</button>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="section-header">
+        <div class="section-title">Recent Activity</div>
+        <div class="show-all">View All →</div>
+    </div>
+    <div class="recent-activity">
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-icon">📖</div>
+                <div class="activity-content">
+                    <div class="activity-title">Finished reading "The Great Gatsby"</div>
+                    <div class="activity-time">2 hours ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">⭐</div>
+                <div class="activity-content">
+                    <div class="activity-title">Rated "1984" - 5 stars</div>
+                    <div class="activity-time">1 day ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">🎯</div>
+                <div class="activity-content">
+                    <div class="activity-title">Achieved reading goal</div>
+                    <div class="activity-time">3 days ago</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slider Section -->
+    <div class="section-header">
+        <div class="section-title">Featured Promotions</div>
+    </div>
+    <div class="slider-container">
+        <div class="slider">
+            <div class="slide-item">🎉 Summer Reading Sale</div>
+            <div class="slide-item">📚 New Arrivals</div>
+            <div class="slide-item">💎 Premium Membership</div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📂</div>
+            <div class="nav-label">Categories</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📰</div>
+            <div class="nav-label">Magazines</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">🎧</div>
+            <div class="nav-label">AudioBook</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📚</div>
+            <div class="nav-label">Library</div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Search functionality
+            const searchInput = document.querySelector('.search-input');
+            searchInput.addEventListener('focus', function() {
+                this.parentElement.style.background = '#4a5568';
+            });
+            searchInput.addEventListener('blur', function() {
+                this.parentElement.style.background = '#2d3748';
+            });
+
+            // Notification click
+            document.querySelector('.notification-btn').addEventListener('click', function() {
+                alert('You have 3 new notifications!');
+            });
+
+            // Refer button
+            document.querySelector('.refer-btn').addEventListener('click', function() {
+                alert('Share your referral code: READER2024');
+            });
+
+            // Category clicks
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const categoryName = this.querySelector('.category-name').textContent;
+                    alert(`Opening ${categoryName} category`);
+                });
+            });
+
+            // Magazine clicks
+            document.querySelectorAll('.magazine-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const title = this.querySelector('.magazine-title').textContent;
+                    alert(`Opening ${title} magazine`);
+                });
+            });
+
+            // Slider auto-scroll
+            const slider = document.querySelector('.slider');
+            let scrollPosition = 0;
+            const scrollSpeed = 1;
+            
+            setInterval(() => {
+                scrollPosition += scrollSpeed;
+                if (scrollPosition >= slider.scrollWidth - slider.clientWidth) {
+                    scrollPosition = 0;
+                }
+                slider.scrollTo(scrollPosition, 0);
+            }, 50);
+        });
+    </script>
+</body>
+</html>

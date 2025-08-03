@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Result - AI Feedback</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #2d5016;
+        }
+
+        .feedback-container {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .answer-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 16px;
+            border: 2px solid #dee2e6;
+        }
+
+        .answer-letter {
+            width: 60px;
+            height: 60px;
+            background: #6c757d;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 24px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .answer-text {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 500;
+            color: #2d5016;
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        .result-section {
+            margin-bottom: 32px;
+        }
+
+        .result-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .result-icon {
+            width: 32px;
+            height: 32px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .result-text {
+            font-size: 24px;
+            font-weight: 600;
+            color: #dc3545;
+        }
+
+        .ai-button {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(34, 197, 94, 0.4);
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        }
+
+        .ai-button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+        }
+
+        .ai-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .ai-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .ai-button-text {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .ai-icon {
+            font-size: 20px;
+            animation: spin 3s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-state {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e5e7eb;
+            border-top: 3px solid #22c55e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .navigation-hint {
+            margin-top: 24px;
+            padding: 16px;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            border-radius: 12px;
+            border: 1px solid #4a7c59;
+        }
+
+        .hint-text {
+            color: #4a7c59;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .feedback-container {
+                padding: 24px;
+                margin: 16px;
+            }
+            
+            .answer-display {
+                padding: 16px;
+                gap: 12px;
+            }
+            
+            .answer-letter {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .answer-text {
+                font-size: 16px;
+            }
+            
+            .result-text {
+                font-size: 20px;
+            }
+            
+            .ai-button {
+                font-size: 16px;
+                padding: 14px 28px;
+            }
+        }
+
+        /* Success state variant */
+        .feedback-container.correct .result-icon {
+            background: #22c55e;
+        }
+        
+        .feedback-container.correct .result-text {
+            color: #22c55e;
+        }
+        
+        .feedback-container.correct .answer-letter {
+            background: #22c55e;
+        }
+    </style>
+</head>
+<body>
+    <div class="feedback-container" id="feedbackContainer">
+        <div class="answer-display">
+            <div class="answer-letter">D</div>
+            <div class="answer-text">Dipylidium caninum</div>
+        </div>
+
+        <div class="result-section">
+            <div class="result-indicator">
+                <div class="result-icon">!</div>
+                <div class="result-text">Wrong Answer</div>
+            </div>
+        </div>
+
+        <button class="ai-button" onclick="checkWithAI()" id="aiButton">
+            <div class="ai-button-text">
+                <span class="ai-icon">🤖</span>
+                <span>Check With AI</span>
+            </div>
+        </button>
+
+        <div class="loading-state" id="loadingState">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">AI is analyzing your answer...</div>
+        </div>
+
+        <div class="navigation-hint">
+            <div class="hint-text">
+                💡 Get detailed explanation and learn from AI feedback
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkWithAI() {
+            const button = document.getElementById('aiButton');
+            const loadingState = document.getElementById('loadingState');
+            
+            // Show loading state
+            button.style.display = 'none';
+            loadingState.style.display = 'flex';
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                // Hide loading
+                loadingState.style.display = 'none';
+                
+                // Show AI response (you can expand this to show actual AI feedback)
+                showAIResponse();
+            }, 2000);
+        }
+
+        function showAIResponse() {
+            const container = document.getElementById('feedbackContainer');
+            
+            // Create AI response section
+            const aiResponse = document.createElement('div');
+            aiResponse.innerHTML = `
+                <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%); border-radius: 16px; border: 2px solid #6366f1; animation: slideUp 0.5s ease-out;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span style="font-size: 20px;">🤖</span>
+                        <span style="font-weight: 600; color: #4338ca;">AI Explanation</span>
+                    </div>
+                    <div style="color: #4338ca; line-height: 1.6; font-size: 14px;">
+                        The correct answer is <strong>A - Dravya, Guna, Karma, Sāmānya, Vishesha, Samavāya</strong>. 
+                        According to Charaka Samhita, this is the traditional sequence of the six categories (shat padartha) 
+                        in Ayurvedic philosophy. Your selected answer represents a different philosophical arrangement.
+                    </div>
+                    <button style="margin-top: 16px; background: #4338ca; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 500;" onclick="continueToNext()">
+                        Continue to Next Question →
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(aiResponse);
+        }
+
+        function continueToNext() {
+            alert('Moving to next question...');
+            // Here you would typically navigate to the next question
+        }
+
+        // Example function to toggle between correct/wrong states
+        function toggleResult() {
+            const container = document.getElementById('feedbackContainer');
+            container.classList.toggle('correct');
+            
+            const resultText = container.querySelector('.result-text');
+            const resultIcon = container.querySelector('.result-icon');
+            
+            if (container.classList.contains('correct')) {
+                resultText.textContent = 'Correct Answer';
+                resultIcon.textContent = '✓';
+            } else {
+                resultText.textContent = 'Wrong Answer';
+                resultIcon.textContent = '!';
+            }
+        }
+
+        // Add some interactive feedback
+        document.querySelector('.ai-button').addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+
+        document.querySelector('.ai-button').addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    </script>
+</body>
+</html>

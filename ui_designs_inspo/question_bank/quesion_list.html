@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sutra Sthana - Questions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            min-height: 100vh;
+            color: #2d5016;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            background: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .time {
+            color: #2d5016;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #4a7c59;
+            font-size: 12px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .back-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #4a7c59;
+            border-radius: 16px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #4a7c59;
+            color: white;
+        }
+
+        .back-btn::before {
+            content: '←';
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a7c59;
+        }
+
+        .back-btn:hover::before {
+            color: white;
+        }
+
+        .title {
+            flex: 1;
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d5016;
+            text-align: center;
+        }
+
+        .translate-btn {
+            width: 50px;
+            height: 50px;
+            background: #4a7c59;
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .translate-btn:hover {
+            background: #3d6b4a;
+            transform: scale(1.05);
+        }
+
+        .breadcrumb {
+            padding: 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .breadcrumb-text {
+            color: #2d5016;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .search-section {
+            padding: 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 45px;
+            border: 2px solid #e0f2e0;
+            border-radius: 12px;
+            font-size: 16px;
+            background: #f8fef8;
+            color: #2d5016;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #4a7c59;
+            background: white;
+        }
+
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 18px;
+        }
+
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .filter-checkboxes {
+            display: flex;
+            gap: 20px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #4a7c59;
+            border-radius: 4px;
+            background: transparent;
+        }
+
+        .checkbox.checked {
+            background: #4a7c59;
+            position: relative;
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: -2px;
+            left: 2px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .checkbox-label {
+            color: #2d5016;
+            font-weight: 500;
+        }
+
+        .filter-btn {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: #7c3aed;
+            transform: scale(1.05);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-count {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d5016;
+        }
+
+        .guess-score {
+            background: #f3f4f6;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: #8b5cf6;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 20px 16px;
+            padding-bottom: 100px;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fef8 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e0f2e0;
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(74, 124, 89, 0.12);
+            border-color: #4a7c59;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .question-number {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            color: #2d5016;
+            font-size: 16px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.solved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .time-ago {
+            color: #6b7280;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .bookmark-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bookmark-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .question-text {
+            color: #2d5016;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .question-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e0f2e0;
+            padding-top: 12px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: #6b7280;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            color: #4a7c59;
+            transform: scale(1.05);
+        }
+
+        .action-btn.like {
+            color: #3b82f6;
+        }
+
+        .action-btn.view {
+            color: #10b981;
+        }
+
+        .action-btn.report {
+            color: #f59e0b;
+        }
+
+        .action-btn.notes {
+            color: #8b5cf6;
+        }
+
+        .info-icon {
+            background: #3b82f6;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            border-top: 1px solid #e0f2e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            background: #f0f9f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 24px;
+        }
+
+        .nav-item:hover {
+            background: #4a7c59;
+            transform: scale(1.1);
+        }
+
+        .nav-item.home {
+            background: #4a7c59;
+        }
+
+        @media (max-width: 480px) {
+            .filter-checkboxes {
+                gap: 12px;
+            }
+            
+            .checkbox-label {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <div class="time">9:52</div>
+        <div class="status-icons">
+            <span>799 KB/s</span>
+            <span>5G+</span>
+            <span>📶</span>
+            <span>28%</span>
+        </div>
+    </div>
+
+    <div class="header">
+        <button class="back-btn" onclick="goBack()"></button>
+        <div class="title">Sutra Sthana</div>
+        <button class="translate-btn">TE</button>
+    </div>
+
+    <div class="breadcrumb">
+        <div class="breadcrumb-text">Himachal Pradesh / Question Bank / Charaka Samhita - Purvardha</div>
+    </div>
+
+    <div class="search-section">
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search" />
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-checkboxes">
+                <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                    <div class="checkbox"></div>
+                    <span class="checkbox-label">Bookmarked</span>
+                </div>
+                <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                    <div class="checkbox"></div>
+                    <span class="checkbox-label">Reported</span>
+                </div>
+            </div>
+            <button class="filter-btn">🔽</button>
+        </div>
+
+        <div class="results-header">
+            <div class="results-count">4267 Result Found</div>
+            <div class="guess-score">Guess Score: 0%</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="question-card" onclick="openQuestion(1)">
+            <div class="question-header">
+                <div class="question-number">
+                    Q.01
+                    <span class="time-ago">📊 View 1 week ago</span>
+                </div>
+                <button class="bookmark-btn">⭐</button>
+            </div>
+            <div class="question-text">
+                "पंचकर्म" शब्द का सर्वप्रथम उल्लेख किया गया था -
+            </div>
+            <div class="question-actions">
+                <button class="action-btn like">👍 Like 0</button>
+                <button class="action-btn view">👁️ View 6</button>
+                <button class="action-btn report">📋 Report 0</button>
+                <button class="action-btn notes">📝 Notes 0</button>
+            </div>
+        </div>
+
+        <div class="question-card" onclick="openQuestion(2)">
+            <div class="question-header">
+                <div class="question-number">
+                    Q.02
+                    <span class="status-badge solved">✅ Solved</span>
+                    <span class="time-ago">42 minutes ago</span>
+                </div>
+                <button class="bookmark-btn">⭐</button>
+            </div>
+            <div class="question-text">
+                According to acharya charaka, the sequence of shat padartha is -
+            </div>
+            <div class="question-actions">
+                <button class="action-btn like">👍 Like 0</button>
+                <button class="action-btn view">👁️ View 9</button>
+                <button class="action-btn report">📋 Report 0</button>
+                <button class="action-btn notes">📝 Notes 0</button>
+            </div>
+        </div>
+
+        <div class="question-card" onclick="openQuestion(3)">
+            <div class="question-header">
+                <div class="question-number">Q.03</div>
+                <button class="bookmark-btn">⭐</button>
+            </div>
+            <div class="question-text">
+                What is tridanda ?
+            </div>
+            <div class="question-actions">
+                <button class="action-btn like">👍 Like 0</button>
+                <button class="action-btn view">👁️ View 2</button>
+                <button class="action-btn report">📋 Report 0</button>
+                <button class="action-btn notes">📝 Notes 0</button>
+            </div>
+        </div>
+
+        <div class="question-card" onclick="openQuestion(4)">
+            <div class="question-header">
+                <div class="question-number">
+                    Q.04
+                    <span class="info-icon">i</span>
+                </div>
+                <button class="bookmark-btn">⭐</button>
+            </div>
+            <div class="question-text">
+                Given below are two statements, Select the correct answer from the options below.
+            </div>
+            <div class="question-actions">
+                <button class="action-btn like">👍 Like 0</button>
+                <button class="action-btn view">👁️ View 0</button>
+                <button class="action-btn report">📋 Report 0</button>
+                <button class="action-btn notes">📝 Notes 0</button>
+            </div>
+        </div>
+
+        <div class="question-card" onclick="openQuestion(5)">
+            <div class="question-header">
+                <div class="question-number">
+                    Q.05
+                    <span class="info-icon">i</span>
+                </div>
+                <button class="bookmark-btn">⭐</button>
+            </div>
+            <div class="question-text">
+                Given below are two statements, Statement 1
+            </div>
+            <div class="question-actions">
+                <button class="action-btn like">👍 Like 0</button>
+                <button class="action-btn view">👁️ View 0</button>
+                <button class="action-btn report">📋 Report 0</button>
+                <button class="action-btn notes">📝 Notes 0</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item">⏹️</div>
+        <div class="nav-item home">🏠</div>
+        <div class="nav-item">◀️</div>
+    </div>
+
+    <script>
+        function goBack() {
+            document.querySelector('.back-btn').style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                document.querySelector('.back-btn').style.transform = '';
+                alert('Going back to subtopics');
+            }, 150);
+        }
+
+        function toggleCheckbox(item) {
+            const checkbox = item.querySelector('.checkbox');
+            checkbox.classList.toggle('checked');
+        }
+
+        function openQuestion(questionNumber) {
+            event.currentTarget.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                event.currentTarget.style.transform = '';
+            }, 150);
+            
+            alert(`Opening Question ${questionNumber}`);
+        }
+
+        // Search functionality
+        document.querySelector('.search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const questionCards = document.querySelectorAll('.question-card');
+            
+            questionCards.forEach(card => {
+                const questionText = card.querySelector('.question-text').textContent.toLowerCase();
+                if (questionText.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Touch feedback for mobile
+        document.querySelectorAll('.question-card').forEach(card => {
+            card.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            card.addEventListener('touchend', function() {
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

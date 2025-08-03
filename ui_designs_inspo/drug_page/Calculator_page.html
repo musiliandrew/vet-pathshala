@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Dose Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            min-height: 100vh;
+            color: #065f46;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 32px 24px;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            backdrop-filter: blur(10px);
+        }
+
+        .user-greeting {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .welcome-text {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-left: 76px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: -20px auto 0;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            min-height: calc(100vh - 140px);
+            box-shadow: 0 -8px 32px rgba(16, 185, 129, 0.2);
+            padding: 32px 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .dropdown-container {
+            position: relative;
+        }
+
+        .dropdown-button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #10b981;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            color: #065f46;
+        }
+
+        .dropdown-button:hover {
+            border-color: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .dropdown-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropdown-icon {
+            width: 32px;
+            height: 32px;
+            background: #10b981;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+
+        .dropdown-text {
+            font-weight: 600;
+        }
+
+        .dropdown-arrow {
+            color: #10b981;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #10b981;
+            border-radius: 16px;
+            margin-top: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.2);
+            display: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-bottom: 1px solid #d1fae5;
+            font-size: 16px;
+            outline: none;
+            background: #f0fdf4;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f0fdf4;
+        }
+
+        .dropdown-item:hover {
+            background: #f0fdf4;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid #d1fae5;
+            border-radius: 16px;
+            font-size: 16px;
+            background: #f0fdf4;
+            color: #065f46;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+
+        .input-label {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            color: #6b7280;
+            font-size: 16px;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus + .input-label,
+        .input-field:not(:placeholder-shown) + .input-label {
+            top: -8px;
+            left: 16px;
+            font-size: 12px;
+            background: white;
+            padding: 0 8px;
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .concentration-group {
+            position: relative;
+        }
+
+        .error-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .error-icon:hover {
+            background: #dc2626;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .dose-display {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #10b981;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .dose-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 8px;
+        }
+
+        .dose-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.4);
+        }
+
+        .calculate-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #065f46;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .modal-image {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            display: none;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .result-value {
+            font-weight: 700;
+            color: #3b82f6;
+            font-size: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: -10px auto 0;
+                padding: 24px 16px;
+                border-radius: 16px 16px 0 0;
+            }
+            
+            .header {
+                padding: 24px 16px;
+            }
+            
+            .user-greeting {
+                font-size: 24px;
+            }
+            
+            .welcome-text {
+                margin-left: 60px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="user-info">
+            <div class="user-avatar">👤</div>
+            <div class="user-greeting">Hello, Mr. NK</div>
+        </div>
+        <div class="welcome-text">Welcome to Drug Dose Calculator</div>
+    </div>
+
+    <div class="container">
+        <div class="form-group">
+            <div class="dropdown-container">
+                <div class="dropdown-button" onclick="toggleDropdown('medicine')">
+                    <div class="dropdown-content">
+                        <div class="dropdown-icon">🧪</div>
+                        <span class="dropdown-text" id="selectedMedicine">Select Medicine</span>
+                    </div>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="dropdown-menu" id="medicineDropdown">
+                    <input type="text" class="search-input" placeholder="Search medicines..." onkeyup="searchMedicines(this.value)">
+                    <div class="dropdown-item" onclick="selectMedicine('Amoxicillin', '🧪')">
+                        <div class="dropdown-icon">🧪</div>
+                        <span>Amoxicillin</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectMedicine('Penicillin', '💊')">
+                        <div class="dropdown-icon">💊</div>
+                        <span>Penicillin</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectMedicine('Oxytetracycline', '💉')">
+                        <div class="dropdown-icon">💉</div>
+                        <span>Oxytetracycline</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectMedicine('Ivermectin', '🧪')">
+                        <div class="dropdown-icon">🧪</div>
+                        <span>Ivermectin</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectMedicine('Dexamethasone', '💊')">
+                        <div class="dropdown-icon">💊</div>
+                        <span>Dexamethasone</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectMedicine('Vitamin B Complex', '💉')">
+                        <div class="dropdown-icon">💉</div>
+                        <span>Vitamin B Complex</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="dropdown-container">
+                <div class="dropdown-button" onclick="toggleDropdown('animal')">
+                    <div class="dropdown-content">
+                        <div class="dropdown-icon">🐄</div>
+                        <span class="dropdown-text" id="selectedAnimal">Cow</span>
+                    </div>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="dropdown-menu" id="animalDropdown">
+                    <div class="dropdown-item" onclick="selectAnimal('Cow', '🐄')">
+                        <div class="dropdown-icon">🐄</div>
+                        <span>Cow</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectAnimal('Buffalo', '🐃')">
+                        <div class="dropdown-icon">🐃</div>
+                        <span>Buffalo</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectAnimal('Goat', '🐐')">
+                        <div class="dropdown-icon">🐐</div>
+                        <span>Goat</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectAnimal('Sheep', '🐑')">
+                        <div class="dropdown-icon">🐑</div>
+                        <span>Sheep</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectAnimal('Dog', '🐕')">
+                        <div class="dropdown-icon">🐕</div>
+                        <span>Dog</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectAnimal('Cat', '🐱')">
+                        <div class="dropdown-icon">🐱</div>
+                        <span>Cat</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="dropdown-container">
+                <div class="dropdown-button" onclick="toggleDropdown('form')">
+                    <div class="dropdown-content">
+                        <div class="dropdown-icon">💊</div>
+                        <span class="dropdown-text" id="selectedForm">Bolus / Tablet</span>
+                    </div>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="dropdown-menu" id="formDropdown">
+                    <div class="dropdown-item" onclick="selectForm('Liquid Injection', '💉')">
+                        <div class="dropdown-icon">💉</div>
+                        <span>Liquid Injection</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectForm('Powder', '🧂')">
+                        <div class="dropdown-icon">🧂</div>
+                        <span>Powder</span>
+                    </div>
+                    <div class="dropdown-item" onclick="selectForm('Tablet / Bolus', '💊')">
+                        <div class="dropdown-icon">💊</div>
+                        <span>Tablet / Bolus</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group">
+                <input type="number" class="input-field" placeholder=" " id="weightInput" onchange="updateCalculation()">
+                <label class="input-label">Enter weight in kg</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="concentration-group">
+                <div class="input-group">
+                    <input type="text" class="input-field" placeholder=" " id="concentrationInput" onchange="updateCalculation()">
+                    <label class="input-label">e.g. 100 mg/ml</label>
+                    <div class="error-icon" onclick="showConcentrationHelp()">i</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-text">
+            As per standard reference, dosage in mg/kg body weight.
+        </div>
+
+        <div class="dose-display">
+            <div class="dose-label">Standard Dose</div>
+            <div class="dose-value" id="standardDose">10.0-0.0 mg/kg</div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculateDosage()">
+            Calculate Dosage
+        </button>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-title">Dosage Calculation Results</div>
+            <div class="result-item">
+                <span class="result-label">Animal Weight:</span>
+                <span class="result-value" id="resultWeight">-- kg</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Standard Dose:</span>
+                <span class="result-value" id="resultStandardDose">-- mg/kg</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Dose Required:</span>
+                <span class="result-value" id="resultTotalDose">-- mg</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Medicine Concentration:</span>
+                <span class="result-value" id="resultConcentration">-- mg/ml</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Volume to Administer:</span>
+                <span class="result-value" id="resultVolume">-- ml</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Concentration Help Modal -->
+    <div class="modal-overlay" id="concentrationModal" style="display: none;" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">How to Find Medicine Concentration</div>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'><rect width='400' height='300' fill='%23f0fdf4'/><rect x='50' y='50' width='300' height='200' fill='white' stroke='%2310b981' stroke-width='2' rx='10'/><text x='200' y='80' text-anchor='middle' font-family='Arial' font-size='16' font-weight='bold' fill='%23065f46'>Medicine Bottle Label</text><text x='70' y='110' font-family='Arial' font-size='14' fill='%23374151'>Drug Name: Amoxicillin</text><text x='70' y='130' font-family='Arial' font-size='14' fill='%23374151'>Concentration: 150mg/ml</text><text x='70' y='150' font-family='Arial' font-size='14' fill='%23374151'>Volume: 100ml</text><rect x='250' y='120' width='80' height='30' fill='%23fef3c7' stroke='%23f59e0b' stroke-width='2' rx='5'/><text x='290' y='138' text-anchor='middle' font-family='Arial' font-size='12' font-weight='bold' fill='%23d97706'>150mg/ml</text><text x='200' y='190' text-anchor='middle' font-family='Arial' font-size='12' fill='%236b7280'>Look for concentration on the label</text><text x='200' y='210' text-anchor='middle' font-family='Arial' font-size='12' fill='%236b7280'>Usually shown as mg/ml or %25</text></svg>" alt="Medicine Concentration Guide" class="modal-image">
+            <p style="margin-top: 16px; color: #6b7280; text-align: center;">
+                Look for the concentration value on your medicine bottle or vial label. 
+                It's usually written as "mg/ml", "mg/g", or as a percentage.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let selectedMedicineData = {
+            name: '',
+            standardDose: '10.0-20.0'
+        };
+
+        const medicineDatabase = {
+            'Amoxicillin': '15.0-20.0',
+            'Penicillin': '10.0-15.0',
+            'Oxytetracycline': '5.0-10.0',
+            'Ivermectin': '0.2-0.4',
+            'Dexamethasone': '0.1-0.5',
+            'Vitamin B Complex': '1.0-2.0'
+        };
+
+        function toggleDropdown(type) {
+            const dropdown = document.getElementById(type + 'Dropdown');
+            const arrow = event.currentTarget.querySelector('.dropdown-arrow');
+            
+            // Close other dropdowns
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.id !== type + 'Dropdown') {
+                    menu.style.display = 'none';
+                    const otherArrow = menu.parentElement.querySelector('.dropdown-arrow');
+                    otherArrow.style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                dropdown.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function selectMedicine(name, icon) {
+            selectedMedicineData.name = name;
+            selectedMedicineData.standardDose = medicineDatabase[name] || '10.0-20.0';
+            
+            document.getElementById('selectedMedicine').textContent = name;
+            document.querySelector('#medicineDropdown').previousElementSibling.querySelector('.dropdown-icon').textContent = icon;
+            document.getElementById('standardDose').textContent = selectedMedicineData.standardDose + ' mg/kg';
+            
+            toggleDropdown('medicine');
+            updateCalculation();
+        }
+
+        function selectAnimal(name, icon) {
+            document.getElementById('selectedAnimal').textContent = name;
+            document.querySelector('#animalDropdown').previousElementSibling.querySelector('.dropdown-icon').textContent = icon;
+            toggleDropdown('animal');
+        }
+
+        function selectForm(name, icon) {
+            document.getElementById('selectedForm').textContent = name;
+            document.querySelector('#formDropdown').previousElementSibling.querySelector('.dropdown-icon').textContent = icon;
+            toggleDropdown('form');
+        }
+
+        function searchMedicines(query) {
+            const items = document.querySelectorAll('#medicineDropdown .dropdown-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query.toLowerCase())) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function showConcentrationHelp() {
+            document.getElementById('concentrationModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('concentrationModal').style.display = 'none';
+        }
+
+        function updateCalculation() {
+            const weight = parseFloat(document.getElementById('weightInput').value);
+            const concentration = document.getElementById('concentrationInput').value;
+            
+            if (weight && concentration && selectedMedicineData.name) {
+                document.querySelector('.calculate-btn').disabled = false;
+            } else {
+                document.querySelector('.calculate-btn').disabled = true;
+            }
+        }
+
+        function calculateDosage() {
+            const weight = parseFloat(document.getElementById('weightInput').value);
+            const concentrationText = document.getElementById('concentrationInput').value;
+            const animal = document.getElementById('selectedAnimal').textContent;
+            const form = document.getElementById('selectedForm').textContent;
+            
+            if (!weight || !concentrationText || !selectedMedicineData.name) {
+                showNotification('Please fill in all required fields', '#ef4444');
+                return;
+            }
+
+            // Parse concentration (assuming mg/ml format)
+            const concentrationMatch = concentrationText.match(/(\d+(?:\.\d+)?)/);
+            if (!concentrationMatch) {
+                showNotification('Please enter concentration in correct format (e.g., 100 mg/ml)', '#ef4444');
+                return;
+            }
+            
+            const concentration = parseFloat(concentrationMatch[1]);
+            const doseParts = selectedMedicineData.standardDose.split('-');
+            const minDose = parseFloat(doseParts[0]);
+            const maxDose = parseFloat(doseParts[1]);
+            const avgDose = (minDose + maxDose) / 2;
+            
+            const totalDose = weight * avgDose; // mg
+            const volume = totalDose / concentration; // ml
+            
+            // Show results
+            document.getElementById('resultWeight').textContent = weight + ' kg';
+            document.getElementById('resultStandardDose').textContent = selectedMedicineData.standardDose + ' mg/kg';
+            document.getElementById('resultTotalDose').textContent = totalDose.toFixed(2) + ' mg';
+            document.getElementById('resultConcentration').textContent = concentration + ' mg/ml';
+            document.getElementById('resultVolume').textContent = volume.toFixed(2) + ' ml';
+            
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+            
+            showNotification('Dosage calculated successfully!', '#10b981');
+        }
+
+        function showNotification(message, color) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${color};
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideDown 0.3s ease-out;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                max-width: 90%;
+                text-align: center;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.dropdown-container')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                    const arrow = menu.parentElement.querySelector('.dropdown-arrow');
+                    arrow.style.transform = 'rotate(0deg)';
+                });
+            }
+        });
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { 
+                    opacity: 0; 
+                    transform: translateX(-50%) translateY(-20px); 
+                }
+                to { 
+                    opacity: 1; 
+                    transform: translateX(-50%) translateY(0); 
+                }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize
+        updateCalculation();
+    </script>
+</body>
+</html>

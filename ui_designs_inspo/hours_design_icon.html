@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pure HTML Clock Hour Counter</title>
+  <style>
+    body {
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .clock-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      border: 8px solid #0c7a09; /* Clock border color */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0c7a09;
+      font-family: monospace;
+      font-size: 2rem;
+    }
+
+    .clock-center-dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #0c7a09;
+      border-radius: 50%;
+      z-index: 2;
+    }
+
+    .clock-hour-hand {
+      position: absolute;
+      width: 4px;
+      height: 50px;
+      background: #0c7a09;
+      top: 25px;
+      left: 73px;
+      transform-origin: bottom center;
+      z-index: 1;
+      animation: rotateHourHand 12s linear infinite;
+    }
+
+    /* Optional: smooth hand rotation (1s = 1 hour in this demo) */
+    @keyframes rotateHourHand {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="clock-container">
+    <div class="clock-center-dot"></div>
+    <div class="clock-hour-hand"></div>
+    <div id="hour-count">0</div>
+  </div>
+
+  <script>
+    let hours = 0;
+    const maxHours = 56; // Change this to your target max
+    const hourCountElem = document.getElementById("hour-count");
+
+    setInterval(() => {
+      if (hours < maxHours) {
+        hours++;
+        hourCountElem.textContent = hours;
+      }
+    }, 1000); // 1 second per hour for demonstration
+  </script>
+
+</body>
+</html>

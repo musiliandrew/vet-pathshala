@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Affairs 25 - Lecture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            min-height: 100vh;
+            color: #2d5016;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .back-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #4a7c59;
+            border-radius: 16px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #4a7c59;
+            color: white;
+        }
+
+        .back-btn::before {
+            content: '←';
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a7c59;
+        }
+
+        .back-btn:hover::before {
+            color: white;
+        }
+
+        .title {
+            flex: 1;
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d5016;
+            text-align: center;
+        }
+
+        .translate-btn {
+            width: 50px;
+            height: 50px;
+            background: #4a7c59;
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .translate-btn:hover {
+            background: #3d6b4a;
+            transform: scale(1.05);
+        }
+
+        .breadcrumb-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .breadcrumb {
+            color: #2d5016;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b9270;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .timer::before {
+            content: '🕐';
+            font-size: 18px;
+        }
+
+        .content {
+            padding: 20px;
+            max-width: 100%;
+        }
+
+        .lecture-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .lecture-counter {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d5016;
+        }
+
+        .completion-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .completion-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #4a7c59;
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .completion-checkbox.checked {
+            background: #4a7c59;
+            position: relative;
+        }
+
+        .completion-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: -1px;
+            left: 3px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .completion-text {
+            color: #2d5016;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .action-icons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 18px;
+        }
+
+        .bookmark-icon {
+            background: #4a7c59;
+            color: white;
+        }
+
+        .warning-icon {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .action-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .lecture-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #6b46c1;
+            margin-bottom: 20px;
+        }
+
+        .video-container {
+            background: #000000;
+            border-radius: 16px;
+            aspect-ratio: 16/9;
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-placeholder {
+            color: white;
+            font-size: 48px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .play-btn {
+            background: #4a7c59;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4a7c59;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .time-display {
+            font-size: 12px;
+            color: white;
+        }
+
+        .topic-section {
+            margin-bottom: 20px;
+        }
+
+        .topic-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d5016;
+            margin-bottom: 8px;
+        }
+
+        .topic-value {
+            font-size: 16px;
+            color: #6b9270;
+        }
+
+        .description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #2d5016;
+            text-align: justify;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e0f2e0;
+            box-shadow: 0 2px 8px rgba(74, 124, 89, 0.08);
+        }
+
+        .navigation-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn.previous {
+            background: #9ca3af;
+            color: white;
+        }
+
+        .nav-btn.previous:hover {
+            background: #6b7280;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.next {
+            background: #2d5016;
+            color: white;
+        }
+
+        .nav-btn.next:hover {
+            background: #4a7c59;
+            transform: translateY(-2px);
+        }
+
+        .menu-btn {
+            width: 60px;
+            height: 60px;
+            background: #8b5cf6;
+            border: none;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .menu-btn:hover {
+            background: #7c3aed;
+            transform: scale(1.1);
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid #e0f2e0;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: #6b7280;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .action-btn:hover {
+            color: #4a7c59;
+            background: #f0f9f0;
+            transform: scale(1.05);
+        }
+
+        .action-btn.like { color: #3b82f6; }
+        .action-btn.view { color: #10b981; }
+        .action-btn.report { color: #f59e0b; }
+        .action-btn.notes { color: #8b5cf6; }
+
+        @media (max-width: 768px) {
+            .navigation-section {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .nav-btn {
+                width: 100%;
+                max-width: 200px;
+                justify-content: center;
+            }
+            
+            .content {
+                padding: 16px;
+            }
+            
+            .video-container {
+                margin-bottom: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 20px;
+            }
+            
+            .action-bar {
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+            }
+            
+            .action-btn {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+            
+            .description {
+                font-size: 14px;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="goBack()"></button>
+        <div class="title">Current Affairs 25</div>
+        <button class="translate-btn">TE</button>
+    </div>
+
+    <div class="breadcrumb-section">
+        <div class="breadcrumb">Himachal Pradesh / Lectures</div>
+        <div class="timer" id="timer">00:00:00</div>
+    </div>
+
+    <div class="content">
+        <div class="lecture-header">
+            <div class="lecture-counter">1 of 13</div>
+            <div class="completion-section">
+                <div class="completion-checkbox" onclick="toggleCompletion(this)"></div>
+                <span class="completion-text">Mark as Complete</span>
+            </div>
+            <div class="action-icons">
+                <div class="action-icon bookmark-icon" onclick="toggleBookmark()">⭐</div>
+                <div class="action-icon warning-icon" onclick="reportLecture()">⚠️</div>
+            </div>
+        </div>
+
+        <div class="lecture-title">अर्थव्यवस्था समसामयिक विषय</div>
+
+        <div class="video-container" onclick="toggleVideo()">
+            <div class="video-placeholder">⟲</div>
+            <div class="video-controls">
+                <button class="play-btn" onclick="playPause(event)">▶</button>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="time-display">0:00 / 15:30</div>
+            </div>
+        </div>
+
+        <div class="topic-section">
+            <div class="topic-label">Topic Covered: <span class="topic-value">Economy</span></div>
+        </div>
+
+        <div class="description">
+            एक समसामयिक विषयों पर अर्थव्यवस्था पर व्याख्यान हाल की वैश्विक और राष्ट्रीय आर्थिक प्रवृत्तियों, प्रमुख सरकारी नीतियों और वित्तीय विकास पर केंद्रित होता है। इसमें जीडीपी वृद्धि, मुद्रास्फीति, राजकोषीय नीतियों, आरबीआई की मौद्रिक नीति और व्यापार गतिविधियों पर चर्चा की जाती है। सत्र में पीएम सूधार, "आत्मनिर्भर भारत" और डिजिटल अर्थव्यवस्था जैसे सरकारी पहलुओं पर प्रकाश डाला जाता है। इसके अलावा, कृषि, विनिर्माण और प्रौद्योगिकी जैसे क्षेत्रों का विश्लेषण किया जाता है, जिसमें बेरोजगारी और वैश्विक बाजार में बदलाव जैसी चुनौतियों पर भी चर्चा की जाती है।
+        </div>
+
+        <div class="navigation-section">
+            <button class="nav-btn previous" onclick="previousLecture()">
+                ← Previous
+            </button>
+            <button class="menu-btn" onclick="openMenu()">☰</button>
+            <button class="nav-btn next" onclick="nextLecture()">
+                Next →
+            </button>
+        </div>
+
+        <div class="action-bar">
+            <button class="action-btn like">👍 Like 3</button>
+            <button class="action-btn view">👁️ View 3</button>
+            <button class="action-btn report">📋 Report 0/0</button>
+            <button class="action-btn notes">📝 Notes 0</button>
+        </div>
+    </div>
+
+    <script>
+        let isPlaying = false;
+        let currentTime = 0;
+        let duration = 930; // 15:30 in seconds
+        let timerInterval;
+
+        function goBack() {
+            document.querySelector('.back-btn').style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                document.querySelector('.back-btn').style.transform = '';
+                alert('Going back to lectures list');
+            }, 150);
+        }
+
+        function toggleCompletion(checkbox) {
+            checkbox.classList.toggle('checked');
+            const isChecked = checkbox.classList.contains('checked');
+            showFeedback(isChecked ? 'Marked as complete!' : 'Unmarked as complete');
+        }
+
+        function toggleBookmark() {
+            const bookmark = document.querySelector('.bookmark-icon');
+            bookmark.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                bookmark.style.transform = '';
+            }, 200);
+            showFeedback('Lecture bookmarked!');
+        }
+
+        function reportLecture() {
+            const warning = document.querySelector('.warning-icon');
+            warning.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                warning.style.transform = '';
+            }, 200);
+            showFeedback('Lecture reported!');
+        }
+
+        function toggleVideo() {
+            const placeholder = document.querySelector('.video-placeholder');
+            placeholder.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                placeholder.style.transform = '';
+            }, 200);
+        }
+
+        function playPause(event) {
+            event.stopPropagation();
+            const playBtn = document.querySelector('.play-btn');
+            
+            if (isPlaying) {
+                playBtn.textContent = '▶';
+                clearInterval(timerInterval);
+                isPlaying = false;
+                showFeedback('Video paused');
+            } else {
+                playBtn.textContent = '⏸';
+                startTimer();
+                isPlaying = true;
+                showFeedback('Video playing');
+            }
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                currentTime++;
+                updateProgress();
+                updateTimer();
+                
+                if (currentTime >= duration) {
+                    clearInterval(timerInterval);
+                    isPlaying = false;
+                    document.querySelector('.play-btn').textContent = '▶';
+                    showFeedback('Video completed!');
+                }
+            }, 1000);
+        }
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const percentage = (currentTime / duration) * 100;
+            progressFill.style.width = `${percentage}%`;
+            
+            const currentMin = Math.floor(currentTime / 60);
+            const currentSec = currentTime % 60;
+            const totalMin = Math.floor(duration / 60);
+            const totalSec = duration % 60;
+            
+            document.querySelector('.time-display').textContent = 
+                `${currentMin}:${currentSec.toString().padStart(2, '0')} / ${totalMin}:${totalSec.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimer() {
+            const timer = document.getElementById('timer');
+            const hours = Math.floor(currentTime / 3600);
+            const minutes = Math.floor((currentTime % 3600) / 60);
+            const seconds = currentTime % 60;
+            
+            timer.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function previousLecture() {
+            const btn = document.querySelector('.nav-btn.previous');
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+                showFeedback('Going to previous lecture');
+            }, 150);
+        }
+
+        function nextLecture() {
+            const btn = document.querySelector('.nav-btn.next');
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+                showFeedback('Going to next lecture');
+            }, 150);
+        }
+
+        function openMenu() {
+            const btn = document.querySelector('.menu-btn');
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                btn.style.transform = '';
+                showFeedback('Opening lecture menu');
+            }, 150);
+        }
+
+        function showFeedback(message) {
+            const feedback = document.createElement('div');
+            feedback.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #22c55e;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideDown 0.3s ease-out;
+                box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            `;
+            feedback.textContent = message;
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    feedback.remove();
+                }, 300);
+            }, 2000);
+        }
+
+        // Add action bar interactions
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+                
+                const action = this.textContent.split(' ')[1];
+                showFeedback(`${action} action performed!`);
+            });
+        });
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

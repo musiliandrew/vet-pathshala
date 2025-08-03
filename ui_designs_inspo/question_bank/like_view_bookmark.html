@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Discussion - Comments</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            min-height: 100vh;
+            color: #2d5016;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            background: #8b5cf6;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .time {
+            color: white;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid white;
+            border-radius: 12px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .back-btn::before {
+            content: '←';
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .timer::before {
+            content: '🕐';
+            font-size: 18px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .translate-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+        }
+
+        .translate-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-content {
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            min-height: calc(100vh - 120px);
+            border-radius: 20px 20px 0 0;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .question-section {
+            padding: 20px;
+            background: white;
+            border-bottom: 2px solid #e0f2e0;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .question-number {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d5016;
+        }
+
+        .action-icons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .bookmark-icon {
+            background: #4a7c59;
+            color: white;
+        }
+
+        .warning-icon {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .action-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .question-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2d5016;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .question-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b9270;
+            font-size: 14px;
+        }
+
+        .author-avatar {
+            width: 24px;
+            height: 24px;
+            background: #4a7c59;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .stats-section {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .stat-item:hover {
+            background: #f0f9f0;
+            transform: scale(1.05);
+        }
+
+        .stat-icon {
+            font-size: 18px;
+            color: #4a7c59;
+        }
+
+        .stat-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d5016;
+        }
+
+        .comments-section {
+            padding: 20px;
+        }
+
+        .comments-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .comments-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d5016;
+        }
+
+        .comments-count {
+            background: #4a7c59;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .comment-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e0f2e0;
+            transition: all 0.2s ease;
+        }
+
+        .comment-item:hover {
+            border-color: #4a7c59;
+            box-shadow: 0 2px 8px rgba(74, 124, 89, 0.1);
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .avatar-vet {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+
+        .avatar-kapil {
+            background: linear-gradient(135df, #f59e0b 0%, #d97706 100%);
+        }
+
+        .avatar-kd {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d5016;
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: #6b9270;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            color: #4a7c59;
+            line-height: 1.4;
+        }
+
+        .load-more {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .load-more-btn {
+            background: #4a7c59;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .load-more-btn:hover {
+            background: #3d6b4a;
+            transform: translateY(-2px);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            border-top: 1px solid #e0f2e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            background: #f0f9f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 24px;
+            color: #4a7c59;
+        }
+
+        .nav-item:hover {
+            background: #4a7c59;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .nav-item.home {
+            background: #4a7c59;
+            color: white;
+        }
+
+        @media (max-width: 480px) {
+            .question-section {
+                padding: 16px;
+            }
+            
+            .comments-section {
+                padding: 16px;
+                padding-bottom: 100px;
+            }
+            
+            .stats-section {
+                padding: 12px;
+            }
+            
+            .stat-item {
+                padding: 6px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <div class="time">9:11</div>
+        <div class="status-icons">
+            <span>262 KB/s</span>
+            <span>5G+</span>
+            <span>📶</span>
+            <span>37%</span>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="goBack()"></button>
+            <div class="timer">00:01:30</div>
+        </div>
+        <div class="header-right">
+            <button class="translate-btn">TE</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="question-section">
+            <div class="question-header">
+                <div class="question-number">1 of 4267</div>
+                <div class="action-icons">
+                    <div class="action-icon bookmark-icon" onclick="toggleBookmark()">⭐</div>
+                    <div class="action-icon warning-icon" onclick="reportQuestion()">⚠️</div>
+                </div>
+            </div>
+            
+            <div class="question-text">
+                "पंचकर्म" शब्द का सर्वप्रथम उल्लेख किया गया था -
+            </div>
+            
+            <div class="question-author">
+                <div class="author-avatar">U</div>
+                <span>पाठ्य पुस्त</span>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-item" onclick="showAllStats()">
+                <div class="stat-icon">👍</div>
+                <div class="stat-number">All 19</div>
+            </div>
+            <div class="stat-item" onclick="showLikes()">
+                <div class="stat-icon">❤️</div>
+                <div class="stat-number">0</div>
+            </div>
+            <div class="stat-item" onclick="showComments()">
+                <div class="stat-icon">💬</div>
+                <div class="stat-number">7</div>
+            </div>
+            <div class="stat-item" onclick="shareQuestion()">
+                <div class="stat-icon">📤</div>
+                <div class="stat-number">1</div>
+            </div>
+            <div class="stat-item" onclick="showViews()">
+                <div class="stat-icon">👁️</div>
+                <div class="stat-number">2</div>
+            </div>
+        </div>
+
+        <div class="comments-section">
+            <div class="comments-header">
+                <div class="comments-title">Discussion</div>
+                <div class="comments-count">7</div>
+            </div>
+
+            <div class="comment-item">
+                <div class="comment-avatar avatar-vet">V</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <div class="comment-author">Vet study with NK</div>
+                        <div class="comment-time">10s</div>
+                    </div>
+                    <div class="comment-text">Great explanation! This really helps understand the concept.</div>
+                </div>
+            </div>
+
+            <div class="comment-item">
+                <div class="comment-avatar avatar-vet">V</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <div class="comment-author">Vet study with NK</div>
+                        <div class="comment-time">44s</div>
+                    </div>
+                    <div class="comment-text">Can someone explain this in more detail?</div>
+                </div>
+            </div>
+
+            <div class="comment-item">
+                <div class="comment-avatar avatar-vet">V</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <div class="comment-author">Vet study with NK</div>
+                        <div class="comment-time">1m</div>
+                    </div>
+                    <div class="comment-text">Thanks for sharing this question!</div>
+                </div>
+            </div>
+
+            <div class="comment-item">
+                <div class="comment-avatar avatar-kapil">K</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <div class="comment-author">Kapil Dev</div>
+                        <div class="comment-time">2m</div>
+                    </div>
+                    <div class="comment-text">Very informative discussion here.</div>
+                </div>
+            </div>
+
+            <div class="comment-item">
+                <div class="comment-avatar avatar-kapil">K</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <div class="comment-author">Kapil Dev</div>
+                        <div class="comment-time">3m</div>
+                    </div>
+                    <div class="comment-text">I have a different perspective on this.</div>
+                </div>
+            </div>
+
+            <div class="comment-item">
+                <div class="comment-avatar avatar-kd">K</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <div class="comment-author">KD Thakur</div>
+                        <div class="comment-time">5m</div>
+                    </div>
+                    <div class="comment-text">Excellent question for practice!</div>
+                </div>
+            </div>
+
+            <div class="load-more">
+                <button class="load-more-btn" onclick="loadMoreComments()">Load More Comments</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item">⏹️</div>
+        <div class="nav-item home">🏠</div>
+        <div class="nav-item">◀️</div>
+    </div>
+
+    <script>
+        function goBack() {
+            document.querySelector('.back-btn').style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                document.querySelector('.back-btn').style.transform = '';
+                alert('Going back to question');
+            }, 150);
+        }
+
+        function toggleBookmark() {
+            const bookmark = document.querySelector('.bookmark-icon');
+            bookmark.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                bookmark.style.transform = '';
+            }, 200);
+            showFeedback('Question bookmarked!');
+        }
+
+        function reportQuestion() {
+            const warning = document.querySelector('.warning-icon');
+            warning.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                warning.style.transform = '';
+            }, 200);
+            showFeedback('Question reported!');
+        }
+
+        function showAllStats() {
+            showFeedback('Showing all interactions');
+        }
+
+        function showLikes() {
+            showFeedback('0 likes on this question');
+        }
+
+        function showComments() {
+            showFeedback('7 comments in discussion');
+        }
+
+        function shareQuestion() {
+            showFeedback('Question shared!');
+        }
+
+        function showViews() {
+            showFeedback('2 people viewed this question');
+        }
+
+        function loadMoreComments() {
+            const btn = document.querySelector('.load-more-btn');
+            btn.style.transform = 'scale(0.95)';
+            btn.textContent = 'Loading...';
+            
+            setTimeout(() => {
+                btn.style.transform = '';
+                btn.textContent = 'Load More Comments';
+                showFeedback('No more comments to load');
+            }, 1000);
+        }
+
+        function showFeedback(message) {
+            const feedback = document.createElement('div');
+            feedback.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #22c55e;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideDown 0.3s ease-out;
+                box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            `;
+            feedback.textContent = message;
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    feedback.remove();
+                }, 300);
+            }, 2000);
+        }
+
+        // Auto-update timer
+        let seconds = 90;
+        function updateTimer() {
+            seconds++;
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            const timeString = `00:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            document.querySelector('.timer').textContent = timeString;
+        }
+
+        setInterval(updateTimer, 1000);
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

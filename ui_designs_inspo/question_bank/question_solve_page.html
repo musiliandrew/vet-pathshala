@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question 2 - Sutra Sthana</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            min-height: 100vh;
+            color: #2d5016;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            background: #8b5cf6;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .time {
+            color: white;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .back-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid white;
+            border-radius: 16px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .back-btn::before {
+            content: '←';
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .timer::before {
+            content: '🕐';
+            font-size: 24px;
+        }
+
+        .translate-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 16px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .translate-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .question-container {
+            background: white;
+            margin: 16px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
+            overflow: hidden;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #e0f2e0;
+        }
+
+        .question-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d5016;
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 20px;
+        }
+
+        .bookmark-icon {
+            background: #2d5016;
+            color: white;
+        }
+
+        .bookmark-icon:hover {
+            background: #4a7c59;
+            transform: scale(1.1);
+        }
+
+        .warning-icon {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .warning-icon:hover {
+            background: #d97706;
+            transform: scale(1.1);
+        }
+
+        .question-content {
+            padding: 24px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d5016;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            border: 2px solid #e0f2e0;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fef8 100%);
+        }
+
+        .option-item:hover {
+            border-color: #4a7c59;
+            background: linear-gradient(135deg, #f8fef8 0%, #f0f9f0 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.1);
+        }
+
+        .option-item.selected {
+            border-color: #4a7c59;
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.2);
+        }
+
+        .option-letter {
+            width: 40px;
+            height: 40px;
+            background: #9ca3af;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .option-item.selected .option-letter {
+            background: #4a7c59;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #2d5016;
+        }
+
+        .guess-section {
+            margin-top: 24px;
+            padding: 16px;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 16px;
+            border: 1px solid #d1d5db;
+        }
+
+        .guess-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #8b5cf6;
+            border-radius: 6px;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox.checked {
+            background: #8b5cf6;
+            position: relative;
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: -1px;
+            left: 4px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .guess-label {
+            color: #2d5016;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .info-icon {
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .navigation-section {
+            padding: 20px 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn.previous {
+            background: #2d5016;
+            color: white;
+        }
+
+        .nav-btn.previous:hover {
+            background: #4a7c59;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+        }
+
+        .nav-btn.next {
+            background: #2d5016;
+            color: white;
+        }
+
+        .nav-btn.next:hover {
+            background: #4a7c59;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+        }
+
+        .menu-btn {
+            width: 60px;
+            height: 60px;
+            background: #8b5cf6;
+            border: none;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .menu-btn:hover {
+            background: #7c3aed;
+            transform: scale(1.1);
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: white;
+            border-top: 1px solid #e0f2e0;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: #6b7280;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .action-btn:hover {
+            color: #4a7c59;
+            background: #f0f9f0;
+            transform: scale(1.05);
+        }
+
+        .action-btn.like { color: #3b82f6; }
+        .action-btn.view { color: #10b981; }
+        .action-btn.report { color: #f59e0b; }
+        .action-btn.notes { color: #8b5cf6; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            border-top: 1px solid #e0f2e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            background: #f0f9f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 24px;
+        }
+
+        .nav-item:hover {
+            background: #4a7c59;
+            transform: scale(1.1);
+        }
+
+        .nav-item.home {
+            background: #4a7c59;
+        }
+
+        @media (max-width: 480px) {
+            .nav-btn {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+            
+            .question-container {
+                margin: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <div class="time">9:10</div>
+        <div class="status-icons">
+            <span>262 KB/s</span>
+            <span>5G+</span>
+            <span>📶</span>
+            <span>37%</span>
+        </div>
+    </div>
+
+    <div class="header">
+        <button class="back-btn" onclick="goBack()"></button>
+        <div class="timer">00:00:04</div>
+        <button class="translate-btn">TE</button>
+    </div>
+
+    <div class="question-container">
+        <div class="question-header">
+            <div class="question-number">2 of 4267</div>
+            <div class="question-actions">
+                <div class="action-icon bookmark-icon" onclick="toggleBookmark()">⭐</div>
+                <div class="action-icon warning-icon" onclick="reportQuestion()">⚠️</div>
+            </div>
+        </div>
+
+        <div class="question-content">
+            <div class="question-text">
+                According to ācharya charaka, the sequence of shat padartha is -
+            </div>
+
+            <div class="options-list">
+                <div class="option-item" onclick="selectOption(this, 'A')">
+                    <div class="option-letter">A</div>
+                    <div class="option-text">Dravya,Guna,Karma, Sāmānya, Vishesha, Samavāya</div>
+                </div>
+
+                <div class="option-item" onclick="selectOption(this, 'B')">
+                    <div class="option-letter">B</div>
+                    <div class="option-text">Sāmānya, Vishesha, Guna, Dravya, Karma, Samavāya</div>
+                </div>
+
+                <div class="option-item" onclick="selectOption(this, 'C')">
+                    <div class="option-letter">C</div>
+                    <div class="option-text">Sāmānya, Vishesha, Samavāya, Dravya, Guna, Karma</div>
+                </div>
+
+                <div class="option-item" onclick="selectOption(this, 'D')">
+                    <div class="option-letter">D</div>
+                    <div class="option-text">Dravya, Guna, Karma, Samavāya, Sāmānya, Vishesha</div>
+                </div>
+            </div>
+
+            <div class="guess-section">
+                <div class="guess-checkbox" onclick="toggleGuess()">
+                    <div class="checkbox"></div>
+                    <span class="guess-label">Guess Answer <span class="info-icon">i</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="action-btn like">👍 Like 0</button>
+            <button class="action-btn view">👁️ View 8</button>
+            <button class="action-btn report">📋 Report 0</button>
+            <button class="action-btn notes">📝 Notes 0</button>
+        </div>
+    </div>
+
+    <div class="navigation-section">
+        <button class="nav-btn previous" onclick="previousQuestion()">
+            ← Previous
+        </button>
+        <button class="menu-btn" onclick="openMenu()">☰</button>
+        <button class="nav-btn next" onclick="nextQuestion()">
+            Next →
+        </button>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item">⏹️</div>
+        <div class="nav-item home">🏠</div>
+        <div class="nav-item">◀️</div>
+    </div>
+
+    <script>
+        let selectedOption = null;
+        let isGuessing = false;
+        let timeElapsed = 4;
+
+        function goBack() {
+            document.querySelector('.back-btn').style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                document.querySelector('.back-btn').style.transform = '';
+                alert('Going back to question list');
+            }, 150);
+        }
+
+        function selectOption(element, option) {
+            // Remove previous selection
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Select current option
+            element.classList.add('selected');
+            selectedOption = option;
+            
+            // Add animation
+            element.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                element.style.transform = '';
+            }, 150);
+        }
+
+        function toggleBookmark() {
+            const bookmark = document.querySelector('.bookmark-icon');
+            bookmark.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                bookmark.style.transform = '';
+            }, 200);
+            alert('Question bookmarked!');
+        }
+
+        function reportQuestion() {
+            const warning = document.querySelector('.warning-icon');
+            warning.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                warning.style.transform = '';
+            }, 200);
+            alert('Question reported!');
+        }
+
+        function toggleGuess() {
+            const checkbox = document.querySelector('.checkbox');
+            checkbox.classList.toggle('checked');
+            isGuessing = !isGuessing;
+        }
+
+        function previousQuestion() {
+            const btn = document.querySelector('.nav-btn.previous');
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+                alert('Going to previous question');
+            }, 150);
+        }
+
+        function nextQuestion() {
+            if (!selectedOption) {
+                alert('Please select an answer first!');
+                return;
+            }
+            
+            const btn = document.querySelector('.nav-btn.next');
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+                alert(`Answer ${selectedOption} submitted! Moving to next question.`);
+            }, 150);
+        }
+
+        function openMenu() {
+            const btn = document.querySelector('.menu-btn');
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                btn.style.transform = '';
+                alert('Opening question menu');
+            }, 150);
+        }
+
+        // Timer functionality
+        function updateTimer() {
+            timeElapsed++;
+            const hours = Math.floor(timeElapsed / 3600);
+            const minutes = Math.floor((timeElapsed % 3600) / 60);
+            const seconds = timeElapsed % 60;
+            
+            const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.querySelector('.timer').textContent = timeString;
+        }
+
+        // Start timer
+        setInterval(updateTimer, 1000);
+
+        // Touch feedback for mobile
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            item.addEventListener('touchend', function() {
+                setTimeout(() => {
+                    if (!this.classList.contains('selected')) {
+                        this.style.transform = '';
+                    }
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

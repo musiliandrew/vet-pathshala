@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Bank Analytics - Vet-Pathshala</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const QuestionBankAnalytics = () => {
+            const [selectedTimeframe, setSelectedTimeframe] = React.useState('week');
+            const [selectedSubject, setSelectedSubject] = React.useState('all');
+
+            const analyticsData = {
+                overall: {
+                    accuracy: 78,
+                    questionsAttempted: 245,
+                    averageSpeed: 45, // seconds per question
+                    streak: 7,
+                    rank: 142
+                },
+                subjects: [
+                    { name: 'Veterinary Pathology', accuracy: 85, attempted: 89, weak: false },
+                    { name: 'Animal Physiology', accuracy: 72, attempted: 65, weak: true },
+                    { name: 'Pharmacology', accuracy: 80, attempted: 45, weak: false },
+                    { name: 'Surgery', accuracy: 69, attempted: 46, weak: true },
+                ],
+                weakTopics: [
+                    { topic: 'Cardiovascular Diseases', accuracy: 45, questions: 23 },
+                    { topic: 'Respiratory System', accuracy: 52, questions: 18 },
+                    { topic: 'Drug Interactions', accuracy: 58, questions: 15 },
+                ],
+                recentActivity: [
+                    { date: '2025-01-26', questions: 15, accuracy: 80 },
+                    { date: '2025-01-25', questions: 12, accuracy: 75 },
+                    { date: '2025-01-24', questions: 18, accuracy: 83 },
+                    { date: '2025-01-23', questions: 8, accuracy: 72 },
+                    { date: '2025-01-22', questions: 20, accuracy: 85 },
+                ]
+            };
+
+            const timeframes = ['week', 'month', '3months'];
+
+            React.useEffect(() => {
+                // Initialize chart when component mounts
+                const ctx = document.getElementById('progressChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: analyticsData.recentActivity.map(item => {
+                                const date = new Date(item.date);
+                                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            }),
+                            datasets: [{
+                                label: 'Accuracy %',
+                                data: analyticsData.recentActivity.map(item => item.accuracy),
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    grid: { color: '#f3f4f6' }
+                                },
+                                x: {
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+                }
+            }, []);
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Header */}
+                    <div className="bg-white shadow-sm border-b">
+                        <div className="px-4 py-3">
+                            <div className="flex items-center justify-between">
+                                <button className="text-gray-600">
+                                    <i className="fas fa-arrow-left text-xl"></i>
+                                </button>
+                                <h1 className="text-lg font-semibold text-gray-800">Performance Analytics</h1>
+                                <button className="text-gray-600">
+                                    <i className="fas fa-download text-xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Overall Stats Cards */}
+                    <div className="px-4 py-4">
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-green-100 text-sm">Overall Accuracy</p>
+                                        <p className="text-2xl font-bold">{analyticsData.overall.accuracy}%</p>
+                                    </div>
+                                    <div className="bg-white bg-opacity-20 rounded-full p-3">
+                                        <i className="fas fa-bullseye text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-blue-100 text-sm">Questions Done</p>
+                                        <p className="text-2xl font-bold">{analyticsData.overall.questionsAttempted}</p>
+                                    </div>
+                                    <div className="bg-white bg-opacity-20 rounded-full p-3">
+                                        <i className="fas fa-question-circle text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-purple-100 text-sm">Avg Speed</p>
+                                        <p className="text-2xl font-bold">{analyticsData.overall.averageSpeed}s</p>
+                                    </div>
+                                    <div className="bg-white bg-opacity-20 rounded-full p-3">
+                                        <i className="fas fa-stopwatch text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-4 text-white">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-orange-100 text-sm">Current Rank</p>
+                                        <p className="text-2xl font-bold">#{analyticsData.overall.rank}</p>
+                                    </div>
+                                    <div className="bg-white bg-opacity-20 rounded-full p-3">
+                                        <i className="fas fa-trophy text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Streak Card */}
+                        <div className="bg-white rounded-xl p-4 shadow-sm border mb-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <div className="bg-yellow-100 rounded-full p-3">
+                                        <i className="fas fa-fire text-yellow-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-gray-800">Study Streak</p>
+                                        <p className="text-gray-600 text-sm">Keep it up!</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-2xl font-bold text-yellow-600">{analyticsData.overall.streak}</p>
+                                    <p className="text-gray-500 text-sm">days</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Time Filter */}
+                    <div className="px-4 mb-4">
+                        <div className="flex space-x-2">
+                            {timeframes.map(timeframe => (
+                                <button
+                                    key={timeframe}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                        selectedTimeframe === timeframe
+                                            ? 'bg-green-600 text-white'
+                                            : 'bg-white text-gray-600 border'
+                                    }`}
+                                    onClick={() => setSelectedTimeframe(timeframe)}
+                                >
+                                    {timeframe === 'week' ? 'This Week' : 
+                                     timeframe === 'month' ? 'This Month' : 'Last 3 Months'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Progress Chart */}
+                    <div className="px-4 mb-4">
+                        <div className="bg-white rounded-xl p-4 shadow-sm border">
+                            <h3 className="font-semibold text-gray-800 mb-4">Accuracy Trend</h3>
+                            <div className="h-48">
+                                <canvas id="progressChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Subject Performance */}
+                    <div className="px-4 mb-4">
+                        <div className="bg-white rounded-xl p-4 shadow-sm border">
+                            <h3 className="font-semibold text-gray-800 mb-4">Subject Performance</h3>
+                            <div className="space-y-3">
+                                {analyticsData.subjects.map((subject, index) => (
+                                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div className="flex-1">
+                                            <div className="flex items-center space-x-2">
+                                                <p className="font-medium text-gray-800 text-sm">{subject.name}</p>
+                                                {subject.weak && (
+                                                    <span className="bg-red-100 text-red-600 px-2 py-1 rounded text-xs">
+                                                        Needs Focus
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center space-x-4 mt-2">
+                                                <div className="flex-1">
+                                                    <div className="flex justify-between text-xs text-gray-600 mb-1">
+                                                        <span>Accuracy</span>
+                                                        <span>{subject.accuracy}%</span>
+                                                    </div>
+                                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                                        <div
+                                                            className={`h-2 rounded-full ${
+                                                                subject.accuracy >= 75 ? 'bg-green-500' :
+                                                                subject.accuracy >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                                                            }`}
+                                                            style={{width: `${subject.accuracy}%`}}
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-xs text-gray-600">Questions</p>
+                                                    <p className="font-medium text-gray-800">{subject.attempted}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Weak Topics */}
+                    <div className="px-4 mb-4">
+                        <div className="bg-white rounded-xl p-4 shadow-sm border">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-semibold text-gray-800">Weak Topics</h3>
+                                <button className="text-green-600 text-sm font-medium">Practice Now</button>
+                            </div>
+                            <div className="space-y-3">
+                                {analyticsData.weakTopics.map((topic, index) => (
+                                    <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-100">
+                                        <div className="flex-1">
+                                            <p className="font-medium text-gray-800 text-sm">{topic.topic}</p>
+                                            <div className="flex items-center space-x-2 mt-2">
+                                                <div className="w-24 bg-red-200 rounded-full h-2">
+                                                    <div
+                                                        className="h-2 bg-red-500 rounded-full"
+                                                        style={{width: `${topic.accuracy}%`}}
+                                                    ></div>
+                                                </div>
+                                                <span className="text-xs text-gray-600">{topic.accuracy}% ({topic.questions} Qs)</span>
+                                            </div>
+                                        </div>
+                                        <button className="bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-medium">
+                                            Practice
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* AI Insights */}
+                    <div className="px-4 mb-20">
+                        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white">
+                            <div className="flex items-start space-x-3">
+                                <div className="bg-white bg-opacity-20 rounded-full p-2 mt-1">
+                                    <i className="fas fa-robot text-sm"></i>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="font-semibold mb-2">🤖 AI Insights</h3>
+                                    <p className="text-sm opacity-90 leading-5">
+                                        Your performance in Cardiovascular Diseases has improved by 15% this week! 
+                                        Consider focusing 20 minutes daily on Respiratory System topics to boost overall accuracy.
+                                    </p>
+                                    <button className="bg-white text-indigo-600 px-4 py-2 rounded-lg text-sm font-medium mt-3">
+                                        Get Study Plan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Bottom Navigation */}
+                    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+                        <div className="flex justify-around py-2">
+                            <button className="flex flex-col items-center py-2 text-gray-400">
+                                <i className="fas fa-home text-lg"></i>
+                                <span className="text-xs mt-1">Home</span>
+                            </button>
+                            <button className="flex flex-col items-center py-2 text-green-600">
+                                <i className="fas fa-chart-bar text-lg"></i>
+                                <span className="text-xs mt-1">Analytics</span>
+                            </button>
+                            <button className="flex flex-col items-center py-2 text-gray-400">
+                                <i className="fas fa-gamepad text-lg"></i>
+                                <span className="text-xs mt-1">Battle</span>
+                            </button>
+                            <button className="flex flex-col items-center py-2 text-gray-400">
+                                <i className="fas fa-user text-lg"></i>
+                                <span className="text-xs mt-1">Profile</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<QuestionBankAnalytics />, document.getElementById('root'));
+    </script>
+</body>
+</html>

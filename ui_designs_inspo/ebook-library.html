@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Read A Book</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .show-all {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .show-all:hover {
+            color: #374151;
+        }
+
+        .arrow {
+            background-color: #6b7280;
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: background-color 0.2s;
+        }
+
+        .show-all:hover .arrow {
+            background-color: #374151;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .book-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .book-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 240px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cover-the-home {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .cover-the-home h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .author-image {
+            width: 80px;
+            height: 100px;
+            border-radius: 8px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            object-fit: cover;
+        }
+
+        .cover-bachelor {
+            background: linear-gradient(135deg, #ea580c, #dc2626);
+            color: #2d3748;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .cover-bachelor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="8" fill="%23ffffff" opacity="0.1"/><circle cx="80" cy="30" r="6" fill="%23ffffff" opacity="0.1"/></svg>');
+        }
+
+        .bachelor-illustration {
+            width: 120px;
+            height: 120px;
+            background: #8b4513;
+            border-radius: 50%;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bachelor-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .cover-thriller {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .thriller-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .thriller-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            text-align: center;
+            max-width: 200px;
+        }
+
+        .book-info {
+            padding: 20px;
+        }
+
+        .book-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .book-author {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .book-genre {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .rating-number {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #fbbf24;
+            font-size: 1rem;
+        }
+
+        .star.empty {
+            color: #d1d5db;
+        }
+
+        .rating-count {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #059669;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .books-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Read A Book</h1>
+            <div class="show-all">
+                Show All
+                <div class="arrow">›</div>
+            </div>
+        </div>
+
+        <div class="books-grid">
+            <div class="book-card">
+                <div class="book-cover cover-the-home">
+                    <h2>THE HOME<br>AND<br>THE WORLD</h2>
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 100'><rect width='80' height='100' fill='%234a5568'/><circle cx='40' cy='30' r='15' fill='%23e2e8f0'/><rect x='30' y='45' width='20' height='25' rx='10' fill='%23e2e8f0'/><rect x='25' y='70' width='30' height='20' rx='5' fill='%23e2e8f0'/></svg>" alt="Author" class="author-image">
+                </div>
+                <div class="book-info">
+                    <div class="book-title">The Home and the World</div>
+                    <div class="book-author">By Rabindranath Tagore</div>
+                    <div class="book-genre">Non Fiction</div>
+                    <div class="rating">
+                        <span class="rating-number">5</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <span class="rating-count">(1)</span>
+                    </div>
+                    <div class="price">Free</div>
+                </div>
+            </div>
+
+            <div class="book-card">
+                <div class="book-cover cover-bachelor">
+                    <div class="bachelor-illustration"></div>
+                    <div class="bachelor-title">THE</div>
+                </div>
+                <div class="book-info">
+                    <div class="book-title">The Bachelor of Arts</div>
+                    <div class="book-author">By Rasipuram Krishnaswa...</div>
+                    <div class="book-genre">Fiction</div>
+                    <div class="rating">
+                        <span class="rating-number">4</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                        <span class="rating-count">(1)</span>
+                    </div>
+                    <div class="price">Free</div>
+                </div>
+            </div>
+
+            <div class="book-card">
+                <div class="book-cover cover-thriller">
+                    <div class="thriller-title">H</div>
+                    <div class="thriller-subtitle">'A no...</div>
+                </div>
+                <div class="book-info">
+                    <div class="book-title">The H...</div>
+                    <div class="book-author">By Aru...</div>
+                    <div class="book-genre">Thriller</div>
+                    <div class="rating">
+                        <span class="rating-number">5</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <span class="rating-count">(1)</span>
+                    </div>
+                    <div class="price">Free</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add click handlers for interactivity
+        document.querySelectorAll('.book-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const title = card.querySelector('.book-title').textContent;
+                alert(`Opening "${title}"`);
+            });
+        });
+
+        document.querySelector('.show-all').addEventListener('click', () => {
+            alert('Show All Books clicked!');
+        });
+    </script>
+</body>
+</html>

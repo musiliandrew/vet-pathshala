@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "116294954906",
+    "project_id": "vet-pathshala",
+    "storage_bucket": "vet-pathshala.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:116294954906:android:128826c99672d1d6f5d423",
+        "android_client_info": {
+          "package_name": "in.vetpathshalabooks.vetapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlJlzuELWLJ2N7fL0OlBsjfk-KR_MmvkM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

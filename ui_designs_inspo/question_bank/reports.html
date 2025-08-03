@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Question - Modal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4a7c59 0%, #2d5016 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #2d5016;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fef8 100%);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(74, 124, 89, 0.3);
+            animation: slideUp 0.4s ease-out;
+            overflow: hidden;
+            border: 2px solid #e0f2e0;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 2px solid #e0f2e0;
+            background: linear-gradient(135deg, #4a7c59 0%, #3d6b4a 100%);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .modal-content {
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .empty-state {
+            margin-bottom: 32px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 36px;
+            color: #dc2626;
+            border: 3px solid #dc2626;
+        }
+
+        .empty-message {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d5016;
+            margin-bottom: 8px;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            color: #6b9270;
+            line-height: 1.5;
+        }
+
+        .report-section {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 2px dashed #dc2626;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .report-section:hover {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+        }
+
+        .report-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: #dc2626;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            padding: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .report-btn:hover {
+            color: #b91c1c;
+            transform: scale(1.02);
+        }
+
+        .report-icon {
+            width: 24px;
+            height: 24px;
+            background: #dc2626;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .report-input-section {
+            display: none;
+            margin-bottom: 24px;
+        }
+
+        .report-input-section.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+
+        .report-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 16px;
+            border: 2px solid #e0f2e0;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #2d5016;
+            background: #ffffff;
+            resize: vertical;
+            transition: all 0.2s ease;
+        }
+
+        .report-textarea:focus {
+            outline: none;
+            border-color: #4a7c59;
+            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+        }
+
+        .report-textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn {
+            background: #4a7c59;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background: #3d6b4a;
+            transform: translateY(-1px);
+        }
+
+        .cancel-btn {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+        }
+
+        .cancel-btn:hover {
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+
+        .done-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .done-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+        }
+
+        .submitted-report {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border: 1px solid #22c55e;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: left;
+            display: none;
+        }
+
+        .report-content {
+            font-size: 14px;
+            color: #15803d;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .report-meta {
+            font-size: 12px;
+            color: #16a34a;
+            opacity: 0.8;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #22c55e;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            color: #15803d;
+            font-weight: 600;
+            display: none;
+        }
+
+        .success-icon {
+            color: #22c55e;
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .modal-container {
+                width: 95%;
+                margin: 10px;
+            }
+            
+            .modal-content {
+                padding: 24px 20px;
+            }
+        }
+
+        /* Fade out animation */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">Your Report(s)</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            
+            <div class="modal-content">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">⚠️</div>
+                    <div class="empty-message">No Reports Added!</div>
+                    <div class="empty-description">Report inappropriate or incorrect questions</div>
+                </div>
+                
+                <div class="success-message" id="successMessage">
+                    <span class="success-icon">✅</span>
+                    Thank you! Your report has been submitted successfully.
+                </div>
+                
+                <div class="report-section" onclick="showReportInput()" id="reportSection">
+                    <button class="report-btn">
+                        <div class="report-icon">⚠</div>
+                        Report This Question
+                    </button>
+                </div>
+                
+                <div class="report-input-section" id="reportInput">
+                    <textarea 
+                        class="report-textarea" 
+                        placeholder="Report This Question
+                        
+Please describe the issue with this question (e.g., incorrect answer, unclear wording, inappropriate content, etc.)"
+                        id="reportText"
+                    ></textarea>
+                    <div class="input-actions">
+                        <button class="action-btn submit-btn" onclick="submitReport()">Submit Report</button>
+                        <button class="action-btn cancel-btn" onclick="hideReportInput()">Cancel</button>
+                    </div>
+                </div>
+                
+                <div class="submitted-report" id="submittedReport">
+                    <div class="report-content">Question reported for: Incorrect answer provided</div>
+                    <div class="report-meta">Submitted just now • Under review</div>
+                </div>
+                
+                <button class="done-btn" onclick="closeModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function closeModal() {
+            const modal = document.querySelector('.modal-overlay');
+            modal.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function showReportInput() {
+            const inputSection = document.getElementById('reportInput');
+            const reportSection = document.getElementById('reportSection');
+            
+            inputSection.classList.add('active');
+            reportSection.style.display = 'none';
+            
+            // Focus on textarea
+            setTimeout(() => {
+                document.getElementById('reportText').focus();
+            }, 100);
+        }
+
+        function hideReportInput() {
+            const inputSection = document.getElementById('reportInput');
+            const reportSection = document.getElementById('reportSection');
+            
+            inputSection.classList.remove('active');
+            reportSection.style.display = 'block';
+            
+            // Clear textarea
+            document.getElementById('reportText').value = '';
+        }
+
+        function submitReport() {
+            const reportText = document.getElementById('reportText').value.trim();
+            
+            if (reportText) {
+                // Hide empty state
+                document.getElementById('emptyState').style.display = 'none';
+                
+                // Show success message
+                const successMessage = document.getElementById('successMessage');
+                successMessage.style.display = 'block';
+                
+                // Show submitted report
+                const submittedReport = document.getElementById('submittedReport');
+                submittedReport.style.display = 'block';
+                submittedReport.querySelector('.report-content').textContent = `Question reported for: ${reportText}`;
+                
+                // Hide input and show report section
+                hideReportInput();
+                
+                // Success feedback
+                showSuccessToast('Report submitted successfully!');
+                
+                // Auto-hide success message after 3 seconds
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 3000);
+                
+            } else {
+                alert('Please describe the issue before submitting.');
+            }
+        }
+
+        function showSuccessToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #22c55e;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideDown 0.3s ease-out;
+                box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Close modal on outside click
+        document.querySelector('.modal-overlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Add some interactive feedback
+        document.querySelector('.report-section').addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+
+        document.querySelector('.report-section').addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    </script>
+</body>
+</html>

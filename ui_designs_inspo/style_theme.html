@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduFlow - Advanced Learning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00c851 0%, #007e33 100%);
+            padding: 60px 24px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .greeting {
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .greeting h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .greeting p {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .search-container {
+            position: relative;
+            margin-top: 24px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border: none;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            font-size: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .content {
+            padding: 32px 24px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #00c851, #007e33);
+            border-radius: 2px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 20px;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .category-card:hover::before {
+            left: 100%;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: #00c851;
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00c851, #007e33);
+            border-radius: 16px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover .category-icon {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .category-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            line-height: 1.3;
+        }
+
+        .veterinary-card {
+            grid-column: 1 / -1;
+        }
+
+        .exam-section {
+            position: relative;
+        }
+
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .show-all {
+            color: #00c851;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .show-all:hover {
+            transform: translateX(4px);
+            color: #007e33;
+        }
+
+        .exam-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .exam-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .exam-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+            border-color: #00c851;
+        }
+
+        .exam-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            border-radius: 12px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .exam-card:nth-child(2) .exam-icon {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+        }
+
+        .exam-card:nth-child(3) .exam-icon {
+            background: linear-gradient(135deg, #38b2ac, #319795);
+        }
+
+        .exam-card:nth-child(4) .exam-icon {
+            background: linear-gradient(135deg, #9f7aea, #805ad5);
+        }
+
+        .exam-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+            line-height: 1.3;
+        }
+
+        .bottom-nav {
+            background: white;
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .nav-item:hover {
+            background: #f7fafc;
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active {
+            color: #00c851;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: #e53e3e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="status-bar">
+                <div class="status-left">
+                    <span>8:58</span>
+                    <span>📶</span>
+                </div>
+                <div class="status-right">
+                    <span>5G</span>
+                    <span>📶</span>
+                    <span>🔋 83%</span>
+                </div>
+            </div>
+            
+            <div class="greeting">
+                <h1>Hello, mr nk</h1>
+                <p>Let's Start Learning</p>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="Search courses, exams, topics...">
+                <div class="search-icon">🔍</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">Choose Category</h2>
+                <div class="category-grid">
+                    <div class="category-card">
+                        <div class="category-icon">🎓</div>
+                        <div class="category-title">B.V.SC. & A.H</div>
+                    </div>
+                    
+                    <div class="category-card">
+                        <div class="category-icon">🌾</div>
+                        <div class="category-title">Farmers</div>
+                    </div>
+                    
+                    <div class="category-card veterinary-card">
+                        <div class="category-icon">🏥</div>
+                        <div class="category-title">Veterinary Diploma</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section exam-section">
+                <div class="exam-header">
+                    <h2 class="section-title">Choose Exam</h2>
+                    <a href="#" class="show-all">Show All Exams →</a>
+                </div>
+                
+                <div class="exam-grid">
+                    <div class="exam-card">
+                        <div class="exam-icon">👨‍⚕️</div>
+                        <div class="exam-title">State Veterinary Officer</div>
+                    </div>
+                    
+                    <div class="exam-card">
+                        <div class="exam-icon">📚</div>
+                        <div class="exam-title">Diploma Year Wise Prep.</div>
+                    </div>
+                    
+                    <div class="exam-card">
+                        <div class="exam-icon">🎯</div>
+                        <div class="exam-title">B.V.Sc Year-Wise Prep.</div>
+                    </div>
+                    
+                    <div class="exam-card">
+                        <div class="exam-icon">🐄</div>
+                        <div class="exam-title">Livestock Assistant (LSA) / Paravet Exams</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">📖</div>
+                <div class="nav-label">Ebook</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">📝</div>
+                <div class="nav-label">Exams</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">💊</div>
+                <div class="nav-label">Drug Index</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">⚙️</div>
+                <div class="nav-label">Settings</div>
+            </div>
+            
+            <div class="nav-item">
+                <div class="nav-icon">👑</div>
+                <div class="nav-label">Store</div>
+                <div class="notification-badge"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search box focus animation
+            const searchBox = document.querySelector('.search-box');
+            searchBox.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            searchBox.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+
+            // Category card click animations
+            const categoryCards = document.querySelectorAll('.category-card');
+            categoryCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // Exam card click animations
+            const examCards = document.querySelectorAll('.exam-card');
+            examCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95) translateY(-4px)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // Navigation item interactions
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Add subtle parallax effect on scroll
+            window.addEventListener('scroll', function() {
+                const header = document.querySelector('.header');
+                const scrolled = window.pageYOffset;
+                header.style.transform = `translateY(${scrolled * 0.2}px)`;
+            });
+        });
+    </script>
+</body>
+</html>

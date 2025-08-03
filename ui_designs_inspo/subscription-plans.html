@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Plans - Vet-Pathshala</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const SubscriptionPlans = () => {
+            const [selectedPlan, setSelectedPlan] = React.useState('premium');
+            const [selectedDuration, setSelectedDuration] = React.useState('6M');
+            const [promoCode, setPromoCode] = React.useState('');
+            const [appliedPromo, setAppliedPromo] = React.useState(null);
+
+            const features = [
+                { name: 'Question Bank', icon: '❓', basic: true, premium: true, pro: true },
+                { name: 'Short Notes', icon: '📝', basic: false, premium: true, pro: true },
+                { name: 'Quiz Section', icon: '🧠', basic: false, premium: true, pro: true },
+                { name: 'E-books', icon: '📚', basic: false, premium: false, pro: true },
+                { name: 'Battle Mode', icon: '⚔️', basic: false, premium: true, pro: true },
+                { name: 'AI Explanations', icon: '🤖', basic: false, premium: false, pro: true },
+                { name: 'Analytics Dashboard', icon: '📊', basic: false, premium: true, pro: true },
+                { name: 'Offline Access', icon: '📱', basic: false, premium: false, pro: true },
+                { name: 'Priority Support', icon: '🎧', basic: false, premium: false, pro: true },
+            ];
+
+            const plans = {
+                basic: {
+                    name: 'Basic',
+                    color: 'gray',
+                    gradient: 'from-gray-400 to-gray-500',
+                    popular: false,
+                    pricing: {
+                        '3M': { price: 299, original: 399 },
+                        '6M': { price: 499, original: 699 },
+                        '1Y': { price: 899, original: 1299 },
+                    }
+                },
+                premium: {
+                    name: 'Premium',
+                    color: 'green',
+                    gradient: 'from-green-500 to-green-600',
+                    popular: true,
+                    pricing: {
+                        '3M': { price: 599, original: 799 },
+                        '6M': { price: 999, original: 1399 },
+                        '1Y': { price: 1699, original: 2499 },
+                    }
+                },
+                pro: {
+                    name: 'Pro',
+                    color: 'purple',
+                    gradient: 'from-purple-500 to-purple-600',
+                    popular: false,
+                    pricing: {
+                        '3M': { price: 899, original: 1199 },
+                        '6M': { price: 1499, original: 2099 },
+                        '1Y': { price: 2499, original: 3699 },
+                        'Lifetime': { price: 4999, original: 7999 }
+                    }
+                }
+            };
+
+            const durations = ['3M', '6M', '1Y', 'Lifetime'];
+
+            const applyPromoCode = () => {
+                if (promoCode === 'NEWBIE20') {
+                    setAppliedPromo({ code: 'NEWBIE20', discount: 20 });
+                } else if (promoCode === 'STUDENT15') {
+                    setAppliedPromo({ code: 'STUDENT15', discount: 15 });
+                } else {
+                    alert('Invalid promo code');
+                }
+            };
+
+            const removePromo = () => {
+                setAppliedPromo(null);
+                setPromoCode('');
+            };
+
+            const getCurrentPrice = () => {
+                const plan = plans[selectedPlan];
+                const pricing = plan.pricing[selectedDuration];
+                if (!pricing) return { price: 0, original: 0 };
+                
+                let finalPrice = pricing.price;
+                if (appliedPromo) {
+                    finalPrice = Math.round(pricing.price * (1 - appliedPromo.discount / 100));
+                }
+                
+                return { ...pricing, finalPrice };
+            };
+
+            const currentPrice = getCurrentPrice();
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Header */}
+                    <div className="bg-white shadow-sm border-b">
+                        <div className="px-4 py-3">
+                            <div className="flex items-center justify-between">
+                                <button className="text-gray-600">
+                                    <i className="fas fa-arrow-left text-xl"></i>
+                                </button>
+                                <h1 className="text-lg font-semibold text-gray-800">Choose Your Plan</h1>
+                                <button className="text-gray-600">
+                                    <i className="fas fa-question-circle text-xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Hero Section */}
+                    <div className="px-4 py-6 bg-gradient-to-r from-green-500 to-blue-600 text-white">
+                        <div className="text-center">
+                            <h2 className="text-2xl font-bold mb-2">Unlock Your Full Potential</h2>
+                            <p className="text-green-100">Join thousands of veterinary professionals advancing their careers</p>
+                            <div className="flex items-center justify-center space-x-6 mt-4">
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold">50K+</div>
+                                    <div className="text-xs text-green-100">Students</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold">95%</div>
+                                    <div className="text-xs text-green-100">Success Rate</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold">24/7</div>
+                                    <div className="text-xs text-green-100">Support</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Duration Selector */}
+                    <div className="px-4 py-4 bg-white border-b">
+                        <p className="text-gray-700 font-medium mb-3">Select Duration:</p>
+                        <div className="grid grid-cols-4 gap-2">
+                            {durations.map(duration => (
+                                <button
+                                    key={duration}
+                                    className={`p-3 rounded-lg text-sm font-medium transition-colors ${
+                                        selectedDuration === duration
+                                            ? 'bg-green-600 text-white'
+                                            : 'bg-gray-100 text-gray-600'
+                                    }`}
+                                    onClick={() => setSelectedDuration(duration)}
+                                >
+                                    {duration === 'Lifetime' ? 'Life' : duration}
+                                    {duration === '1Y' && (
+                                        <div className="text-xs text-green-200 mt-1">Most Popular</div>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Plans */}
+                    <div className="px-4 py-4">
+                        <div className="space-y-4">
+                            {Object.entries(plans).map(([planKey, plan]) => {
+                                const pricing = plan.pricing[selectedDuration];
+                                if (!pricing) return null;
+
+                                return (
+                                    <div
+                                        key={planKey}
+                                        className={`relative bg-white rounded-xl border-2 transition-all ${
+                                            selectedPlan === planKey
+                                                ? `border-${plan.color}-500 shadow-lg`
+                                                : 'border-gray-200'
+                                        }`}
+                                        onClick={() => setSelectedPlan(planKey)}
+                                    >
+                                        {plan.popular && (
+                                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                                                <span className="bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                                                    Most Popular
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <div className="p-4">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className={`w-12 h-12 bg-gradient-to-r ${plan.gradient} rounded-xl flex items-center justify-center text-white text-xl font-bold`}>
+                                                        {plan.name[0]}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-lg font-semibold text-gray-800">{plan.name}</h3>
+                                                        <p className="text-gray-600 text-sm">Perfect for {planKey === 'basic' ? 'beginners' : planKey === 'premium' ? 'serious learners' : 'professionals'}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-2xl font-bold text-gray-800">₹{pricing.price}</div>
+                                                    <div className="text-gray-400 text-sm line-through">₹{pricing.original}</div>
+                                                    <div className="text-green-600 text-xs font-medium">
+                                                        Save {Math.round((pricing.original - pricing.price) / pricing.original * 100)}%
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Features */}
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {features.map((feature, index) => {
+                                                    const hasFeature = feature[planKey];
+                                                    return (
+                                                        <div key={index} className="flex items-center space-x-3">
+                                                            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                                                                hasFeature ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+                                                            }`}>
+                                                                <i className={`fas ${hasFeature ? 'fa-check' : 'fa-times'} text-xs`}></i>
+                                                            </div>
+                                                            <span className={`text-sm ${hasFeature ? 'text-gray-800' : 'text-gray-400'}`}>
+                                                                {feature.icon} {feature.name}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Promo Code */}
+                    <div className="px-4 py-4">
+                        <div className="bg-white rounded-xl p-4 border">
+                            <h3 className="font-semibold text-gray-800 mb-3">🎁 Have a Promo Code?</h3>
+                            {!appliedPromo ? (
+                                <div className="flex space-x-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Enter promo code"
+                                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        value={promoCode}
+                                        onChange={(e) => setPromoCode(e.target.value)}
+                                    />
+                                    <button
+                                        className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium"
+                                        onClick={applyPromoCode}
+                                    >
+                                        Apply
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-between bg-green-50 p-3 rounded-lg">
+                                    <div>
+                                        <p className="text-green-700 font-medium">{appliedPromo.code} Applied!</p>
+                                        <p className="text-green-600 text-sm">You saved {appliedPromo.discount}%</p>
+                                    </div>
+                                    <button
+                                        className="text-red-500 font-medium text-sm"
+                                        onClick={removePromo}
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            )}
+                            <div className="mt-3 flex flex-wrap gap-2">
+                                <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs">NEWBIE20</span>
+                                <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs">STUDENT15</span>
+                                <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs">FESTIVAL25</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Price Summary */}
+                    <div className="px-4 py-4">
+                        <div className="bg-white rounded-xl p-4 border">
+                            <h3 className="font-semibold text-gray-800 mb-3">Price Summary</h3>
+                            <div className="space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">{plans[selectedPlan].name} Plan ({selectedDuration})</span>
+                                    <span className="text-gray-800">₹{currentPrice.price}</span>
+                                </div>
+                                {appliedPromo && (
+                                    <div className="flex justify-between text-green-600">
+                                        <span>Discount ({appliedPromo.discount}%)</span>
+                                        <span>-₹{currentPrice.price - currentPrice.finalPrice}</span>
+                                    </div>
+                                )}
+                                <div className="border-t pt-2 flex justify-between font-semibold text-lg">
+                                    <span>Total</span>
+                                    <span className="text-green-600">₹{appliedPromo ? currentPrice.finalPrice : currentPrice.price}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Continue Button */}
+                    <div className="px-4 py-4 pb-20">
+                        <button className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg">
+                            Continue to Payment
+                        </button>
+                        <p className="text-center text-gray-500 text-sm mt-3">
+                            🔒 Secure payment • Cancel anytime • 7-day money back guarantee
+                        </p>
+                    </div>
+
+                    {/* Bottom Navigation */}
+                    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+                        <div className="flex justify-around py-2">
+                            <button className="flex flex-col items-center py-2 text-gray-400">
+                                <i className="fas fa-home text-lg"></i>
+                                <span className="text-xs mt-1">Home</span>
+                            </button>
+                            <button className="flex flex-col items-center py-2 text-gray-400">
+                                <i className="fas fa-book text-lg"></i>
+                                <span className="text-xs mt-1">Library</span>
+                            </button>
+                            <button className="flex flex-col items-center py-2 text-green-600">
+                                <i className="fas fa-crown text-lg"></i>
+                                <span className="text-xs mt-1">Premium</span>
+                            </button>
+                            <button className="flex flex-col items-center py-2 text-gray-400">
+                                <i className="fas fa-user text-lg"></i>
+                                <span className="text-xs mt-1">Profile</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<SubscriptionPlans />, document.getElementById('root'));
+    </script>
+</body>
+</html>
