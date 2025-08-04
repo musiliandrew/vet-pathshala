@@ -1,33 +1,41 @@
 import 'package:flutter/material.dart';
 
 class UnifiedTheme {
-  // Consistent Color Palette (Quiet Green Theme)
-  static const Color primaryGreen = Color(0xFF4B5E4A);
-  static const Color lightGreen = Color(0xFF6B7A69);
-  static const Color darkGreen = Color(0xFF4B5E4A);
-  static const Color greenAccent = Color(0xFF4B5E4A);
+  // Modern Bright Color Palette (VetPathshala Pro Theme)
+  static const Color primary = Color(0xFF00C897);
+  static const Color secondary = Color(0xFF3D84FF);
+  static const Color accent = Color(0xFFFF9F29);
+  static const Color dark = Color(0xFF2D4059);
+  static const Color light = Color(0xFFF6F6F6);
+  static const Color white = Color(0xFFFFFFFF);
   
-  // Background Colors
-  static const Color backgroundColor = Color(0xFF1C2526);
-  static const Color lightBackground = Color(0xFF1C2526);
-  static const Color cardBackground = Color(0xFF1C2526);
-  static const Color surfaceColor = Color(0xFF1C2526);
+  // Legacy names for backward compatibility
+  static const Color primaryGreen = primary;
+  static const Color lightGreen = Color(0xFF00A278);
+  static const Color darkGreen = Color(0xFF00A278);
+  static const Color greenAccent = primary;
   
-  // Text Colors
-  static const Color primaryText = Color(0xFFD4D4D4);
-  static const Color secondaryText = Color(0x99D4D4D4);
-  static const Color tertiaryText = Color(0x66D4D4D4);
+  // Background Colors (Light Theme)
+  static const Color backgroundColor = light;
+  static const Color lightBackground = Color(0xFFF9F9F9);
+  static const Color cardBackground = white;
+  static const Color surfaceColor = white;
+  
+  // Text Colors (Dark on Light)
+  static const Color primaryText = dark;
+  static const Color secondaryText = Color(0xFF7A7A7A);
+  static const Color tertiaryText = Color(0xFFBDBDBD);
   
   // Accent Colors
-  static const Color goldAccent = Color(0xFFFBBF24);
+  static const Color goldAccent = accent;
   static const Color redAccent = Color(0xFFEF4444);
-  static const Color blueAccent = Color(0xFF3B82F6);
+  static const Color blueAccent = secondary;
   
-  // Border Colors
-  static const Color borderColor = Color(0xFF4B5E4A);
-  static const Color lightBorder = Color(0xFF6B7A69);
+  // Border Colors (Light Theme)
+  static const Color borderColor = Color(0xFFE0E0E0);
+  static const Color lightBorder = Color(0xFFF0F0F0);
   
-  // Gradients
+  // Gradients (Modern Bright)
   static const LinearGradient backgroundGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -35,11 +43,36 @@ class UnifiedTheme {
   );
   
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [primaryGreen, lightGreen],
+    colors: [primary, lightGreen],
   );
   
   static const LinearGradient goldGradient = LinearGradient(
-    colors: [Color(0xFFFFD700), Color(0xFFFFB300)],
+    colors: [accent, Color(0xFFFF7B00)],
+  );
+  
+  // Ebook Gradients (from HTML design)
+  static const LinearGradient ebook1Gradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF6C63FF), secondary],
+  );
+  
+  static const LinearGradient ebook2Gradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [primary, lightGreen],
+  );
+  
+  static const LinearGradient ebook3Gradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [accent, Color(0xFFFF7B00)],
+  );
+  
+  static const LinearGradient ebook4Gradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFF6B6B), Color(0xFFFF3D3D)],
   );
   
   // Typography
@@ -101,20 +134,36 @@ class UnifiedTheme {
   static const double radiusXL = 20.0;
   static const double radiusRound = 25.0;
   
-  // Shadows
+  // Shadows (Enhanced for modern look)
   static List<BoxShadow> cardShadow = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.05),
-      blurRadius: 10,
-      offset: const Offset(0, 2),
+      color: Colors.black.withOpacity(0.1),
+      blurRadius: 30,
+      offset: const Offset(0, 10),
     ),
   ];
   
   static List<BoxShadow> elevatedShadow = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.1),
+      color: Colors.black.withOpacity(0.15),
+      blurRadius: 30,
+      offset: const Offset(0, 15),
+    ),
+  ];
+  
+  static List<BoxShadow> primaryShadow = [
+    BoxShadow(
+      color: primary.withOpacity(0.3),
       blurRadius: 20,
-      offset: const Offset(0, 4),
+      offset: const Offset(0, 8),
+    ),
+  ];
+  
+  static List<BoxShadow> accentShadow = [
+    BoxShadow(
+      color: accent.withOpacity(0.3),
+      blurRadius: 20,
+      offset: const Offset(0, 8),
     ),
   ];
   

@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetPathshala Pro - Veterinary Learning App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00C897;
+            --secondary: #3D84FF;
+            --accent: #FF9F29;
+            --dark: #2D4059;
+            --light: #F6F6F6;
+            --white: #FFFFFF;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --ebook-1: linear-gradient(135deg, #6C63FF, #3D84FF);
+            --ebook-2: linear-gradient(135deg, #00C897, #00A278);
+            --ebook-3: linear-gradient(135deg, #FF9F29, #FF7B00);
+            --ebook-4: linear-gradient(135deg, #FF6B6B, #FF3D3D);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 100px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Animated Background */
+        .bg-particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(0, 200, 151, 0.1);
+            border-radius: 50%;
+            animation: float-particle 15s infinite linear;
+        }
+        
+        @keyframes float-particle {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        /* Enhanced Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .greeting {
+            position: relative;
+        }
+        
+        .greeting h1 {
+            color: var(--dark);
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .greeting h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+            animation: underlineGrow 0.5s ease-out;
+        }
+        
+        @keyframes underlineGrow {
+            0% { width: 0; }
+            100% { width: 50px; }
+        }
+        
+        .greeting p {
+            color: #7A7A7A;
+            font-size: 14px;
+            font-weight: 400;
+            animation: fadeIn 1s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(5px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-icon span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: var(--dark);
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+        }
+        
+        .menu-icon:hover span {
+            background: var(--primary);
+        }
+        
+        .menu-icon:hover span:nth-child(1) {
+            transform: translateY(2px);
+        }
+        
+        .menu-icon:hover span:nth-child(3) {
+            transform: translateY(-2px);
+        }
+        
+        .notification {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            background: var(--white);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .notification:hover {
+            transform: translateY(-3px) rotate(10deg);
+            background: var(--primary);
+        }
+        
+        .notification:hover i {
+            color: white;
+        }
+        
+        .notification i {
+            color: var(--dark);
+            transition: all 0.3s ease;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
+            border-radius: 50%;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--light);
+            animation: pulse 2s infinite, shake 0.5s ease-in-out 3;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+        
+        /* Enhanced Search Bar */
+        .search-bar-container {
+            position: relative;
+            margin: 25px 0;
+            z-index: 2;
+        }
+        
+        .search-bar {
+            display: flex;
+            background: var(--white);
+            border-radius: 15px;
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            align-items: center;
+            border: 2px solid transparent;
+        }
+        
+        .search-bar:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .search-bar i {
+            color: #7A7A7A;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus-within i {
+            color: var(--primary);
+        }
+        
+        .search-bar input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 14px;
+            background: transparent;
+            margin-left: 10px;
+            padding: 5px 0;
+        }
+        
+        .search-bar input::placeholder {
+            color: #BDBDBD;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus-within input::placeholder {
+            color: var(--primary);
+            opacity: 0.5;
+        }
+        
+        /* Promotional Banner Slider */
+        .banner-slider {
+            position: relative;
+            margin-bottom: 25px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            height: 150px;
+        }
+        
+        .banner-track {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        
+        .banner {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .banner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+        
+        .banner-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+        }
+        
+        .banner h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .banner p {
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .banner-btn {
+            display: inline-block;
+            background: var(--white);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .banner-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .banner-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 3;
+        }
+        
+        .banner-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .banner-dot.active {
+            background: var(--white);
+            transform: scale(1.2);
+        }
+        
+        /* Hero Card */
+        .hero-card {
+            background: linear-gradient(135deg, var(--primary), #00A278);
+            color: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+        
+        .hero-card:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(0, 200, 151, 0.3);
+        }
+        
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .hero-card h2 {
+            margin: 0 0 10px;
+            font-size: 22px;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-card p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-icon {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            font-size: 60px;
+            opacity: 0.2;
+            z-index: 1;
+            transform: rotate(-15deg);
+            animation: float-icon 6s ease-in-out infinite;
+        }
+        
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0) rotate(-15deg); }
+            50% { transform: translateY(-10px) rotate(-20deg); }
+        }
+        
+        /* Enhanced Performance Tracking Card */
+        .performance-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+        
+        .performance-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .performance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .performance-header h3 {
+            margin: 0;
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .performance-tabs {
+            display: flex;
+            background: rgba(0, 200, 151, 0.1);
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .performance-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .performance-tab {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        
+        .performance-tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 200, 151, 0.2);
+        }
+        
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .performance-stat {
+            padding: 15px 10px;
+            background: rgba(0, 200, 151, 0.05);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .performance-stat:hover {
+            background: rgba(0, 200, 151, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .stat-value.small {
+            font-size: 20px;
+        }
+        
+        .stat-value::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #7A7A7A;
+            font-weight: 500;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #E0E0E0;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            width: 95%;
+            position: relative;
+            animation: progressAnimation 2s ease-in-out;
+        }
+        
+        @keyframes progressAnimation {
+            0% { width: 0; }
+            100% { width: 95%; }
+        }
+        
+        .progress-text {
+            font-size: 10px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .view-details {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .view-details:hover {
+            letter-spacing: 0.5px;
+        }
+        
+        .view-details i {
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .view-details:hover i {
+            transform: translateX(3px);
+        }
+        
+        /* Section Title */
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 20px;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .see-all {
+            color: var(--secondary);
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .see-all:hover {
+            color: var(--primary);
+        }
+        
+        .see-all i {
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .see-all:hover i {
+            transform: translateX(3px);
+        }
+        
+        /* Enhanced Category Section */
+        .category-section {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .category-item {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .category-item:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .category-item:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .category-item.selected {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 10px 20px rgba(0, 200, 151, 0.3);
+        }
+        
+        .category-item.selected .category-icon {
+            color: var(--white);
+        }
+        
+        .category-icon {
+            font-size: 30px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            color: var(--primary);
+        }
+        
+        .category-item:hover .category-icon {
+            transform: scale(1.2);
+        }
+        
+        .category-label {
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .category-item:hover .category-label {
+            transform: translateY(3px);
+        }
+        
+        /* Ebooks Section */
+        .ebooks-section {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .ebooks-scroll {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 20px 10px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+        
+        .ebooks-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .ebook-card {
+            min-width: 200px;
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            scroll-snap-align: start;
+            flex-shrink: 0;
+        }
+        
+        .ebook-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .ebook-cover {
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 18px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ebook-cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(255, 255, 255, 0) 60%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        .ebook-1 { background: var(--ebook-1); }
+        .ebook-2 { background: var(--ebook-2); }
+        .ebook-3 { background: var(--ebook-3); }
+        .ebook-4 { background: var(--ebook-4); }
+        
+        .ebook-cover i {
+            position: absolute;
+            font-size: 60px;
+            opacity: 0.2;
+            right: 10px;
+            bottom: 10px;
+        }
+        
+        .ebook-content {
+            padding: 15px;
+        }
+        
+        .ebook-title {
+            font-weight: 600;
+            margin: 0 0 5px;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .ebook-author {
+            color: #7A7A7A;
+            font-size: 13px;
+            margin: 0 0 10px;
+        }
+        
+        .ebook-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #7A7A7A;
+            align-items: center;
+        }
+        
+        .ebook-price {
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .rating {
+            color: var(--accent);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .rating i {
+            margin-right: 3px;
+            font-size: 14px;
+        }
+        
+        .ebook-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--accent);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        /* Referral Card */
+        .referral-card {
+            background: linear-gradient(135deg, var(--accent), #FF7B00);
+            color: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(255, 159, 41, 0.3);
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+        
+        .referral-card:hover {
+            transform: translateY(-5px) rotateY(5deg);
+            box-shadow: 0 20px 40px rgba(255, 159, 41, 0.4);
+        }
+        
+        .referral-card h3 {
+            margin: 0 0 15px;
+            font-size: 20px;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .referral-card p {
+            margin: 0 0 15px;
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .referral-icon {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 80px;
+            opacity: 0.1;
+            z-index: 1;
+            animation: bounce 3s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--white);
+            color: var(--accent);
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        /* Activity Feed */
+        .activity-item {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .activity-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .activity-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+        
+        .activity-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover .activity-icon {
+            transform: rotate(15deg) scale(1.1);
+            border-radius: 50%;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-content div:first-child {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: #7A7A7A;
+            display: flex;
+            align-items: center;
+        }
+        
+        .activity-time i {
+            margin-right: 5px;
+            font-size: 10px;
+        }
+        
+        /* Testimonials Section */
+        .testimonials-section {
+            margin: 30px 0;
+        }
+        
+        .testimonial-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 60px;
+            color: rgba(0, 200, 151, 0.1);
+            font-family: serif;
+            line-height: 1;
+        }
+        
+        .testimonial-content {
+            font-size: 14px;
+            color: var(--dark);
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+        
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+        
+        .author-info h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .author-info p {
+            margin: 0;
+            font-size: 12px;
+            color: #7A7A7A;
+        }
+        
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .achievement-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .achievement-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 200, 151, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: var(--primary);
+            font-size: 20px;
+        }
+        
+        .achievement-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .achievement-label {
+            font-size: 12px;
+            color: #7A7A7A;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #7A7A7A;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            transform: translateY(-5px);
+        }
+        
+        .nav-item.active i {
+            transform: scale(1.2);
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active::after {
+            opacity: 1;
+            bottom: -5px;
+        }
+        
+        /* Animations */
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        @keyframes rotateBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        @keyframes progressAnimation {
+            0% { width: 0; }
+            100% { width: 95%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-particles" id="particles"></div>
+    
+    <div class="container">
+        <!-- Enhanced Header -->
+        <div class="header">
+            <div class="greeting">
+                <h1>Good Morning</h1>
+                <p>Welcome back to VetPathshala</p>
+            </div>
+            <div class="header-icons">
+                <div class="menu-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <div class="notification-badge">3</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Search Bar -->
+        <div class="search-bar-container">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search veterinary resources...">
+            </div>
+        </div>
+        
+        <!-- Promotional Banner Slider -->
+        <div class="banner-slider">
+            <div class="banner-track">
+                <div class="banner" style="background-image: url('https://via.placeholder.com/600x400/00C897/FFFFFF?text=Summer+Sale+50%25+Off')">
+                    <div class="banner-content">
+                        <h3>Summer Sale</h3>
+                        <p>Get 50% off on all ebooks this week</p>
+                        <a href="#" class="banner-btn">Shop Now</a>
+                    </div>
+                </div>
+                <div class="banner" style="background-image: url('https://via.placeholder.com/600x400/3D84FF/FFFFFF?text=New+Courses+Added')">
+                    <div class="banner-content">
+                        <h3>New Courses</h3>
+                        <p>Explore our latest veterinary courses</p>
+                        <a href="#" class="banner-btn">Explore</a>
+                    </div>
+                </div>
+                <div class="banner" style="background-image: url('https://via.placeholder.com/600x400/FF9F29/FFFFFF?text=Refer+and+Earn')">
+                    <div class="banner-content">
+                        <h3>Refer & Earn</h3>
+                        <p>Get ₹50 for every successful referral</p>
+                        <a href="#" class="banner-btn">Invite Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="banner-dots">
+                <div class="banner-dot active"></div>
+                <div class="banner-dot"></div>
+                <div class="banner-dot"></div>
+            </div>
+        </div>
+        
+        <!-- Explore Categories Section -->
+        <div class="section-title">
+            <h2>Explore Categories</h2>
+            <a href="#" class="see-all">See All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        
+        <div class="category-section">
+            <div class="category-grid">
+                <button class="category-item selected">
+                    <i class="fas fa-question-circle category-icon"></i>
+                    <span class="category-label">Q Bank</span>
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-file-alt category-icon"></i>
+                    <span class="category-label">Short Notes</span>
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-video category-icon"></i>
+                    <span class="category-label">Lectures</span>
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-gamepad category-icon"></i>
+                    <span class="category-label">Gamification</span>
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-pills category-icon"></i>
+                    <span class="category-label">Drug Centre</span>
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-question category-icon"></i>
+                    <span class="category-label">Quiz & PYP</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Popular Ebooks Section -->
+        <div class="section-title">
+            <h2>Popular Ebooks</h2>
+            <a href="#" class="see-all">Browse All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        
+        <div class="ebooks-section">
+            <div class="ebooks-scroll">
+                <div class="ebook-card">
+                    <div class="ebook-cover ebook-1">
+                        <span>Veterinary Anatomy</span>
+                        <i class="fas fa-book-open"></i>
+                        <span class="ebook-badge">Bestseller</span>
+                    </div>
+                    <div class="ebook-content">
+                        <h3 class="ebook-title">Veterinary Anatomy</h3>
+                        <p class="ebook-author">Nikhil Kumar</p>
+                        <div class="ebook-meta">
+                            <span class="ebook-price">₹499</span>
+                            <span class="rating"><i class="fas fa-star"></i> 4.8</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ebook-card">
+                    <div class="ebook-cover ebook-2">
+                        <span>Small Animal Surgery</span>
+                        <i class="fas fa-bone"></i>
+                        <span class="ebook-badge">New</span>
+                    </div>
+                    <div class="ebook-content">
+                        <h3 class="ebook-title">Small Animal Surgery</h3>
+                        <p class="ebook-author">Johnson</p>
+                        <div class="ebook-meta">
+                            <span class="ebook-price">₹599</span>
+                            <span class="rating"><i class="fas fa-star"></i> 4.9</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ebook-card">
+                    <div class="ebook-cover ebook-3">
+                        <span>Vet Pharmacology</span>
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                    </div>
+                    <div class="ebook-content">
+                        <h3 class="ebook-title">Vet Pharmacology</h3>
+                        <p class="ebook-author">Dr. Williams</p>
+                        <div class="ebook-meta">
+                            <span class="ebook-price">₹449</span>
+                            <span class="rating"><i class="fas fa-star"></i> 4.7</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Performance Tracking Section -->
+        <div class="performance-card">
+            <div class="performance-header">
+                <h3>Track Your Performance</h3>
+                <i class="fas fa-chart-line" style="color: var(--primary); font-size: 20px;"></i>
+            </div>
+            
+            <div class="performance-tabs">
+                <div class="performance-tab active">Overall</div>
+                <div class="performance-tab">Q Bank</div>
+                <div class="performance-tab">Lectures</div>
+                <div class="performance-tab">Notes</div>
+                <div class="performance-tab">Quiz & PYP</div>
+            </div>
+            
+            <div class="performance-stats">
+                <div class="performance-stat">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">Courses</div>
+                </div>
+                <div class="performance-stat">
+                    <div class="stat-value">92</div>
+                    <div class="stat-label">Hours</div>
+                </div>
+                <div class="performance-stat">
+                    <div class="stat-value small">95%</div>
+                    <div class="stat-label">Score</div>
+                    <div class="progress-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <div class="progress-text">95% Complete</div>
+                </div>
+            </div>
+            
+            <a href="#" class="view-details">View Detailed Analytics <i class="fas fa-arrow-right"></i></a>
+        </div>
+        
+        <!-- Referral Card -->
+        <div class="referral-card">
+            <div class="referral-icon">
+                <i class="fas fa-gift"></i>
+            </div>
+            <h3>Refer & Earn</h3>
+            <p>Earn ₹50 per referral!</p>
+            <p>Share with fellow veterinarians and build your earning network!</p>
+            <button class="btn">Invite Friends Now</button>
+        </div>
+        
+        <!-- Recent Activity Section -->
+        <div class="section-title">
+            <h2>Recent Activity</h2>
+            <a href="#" class="see-all">View All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        
+        <div class="activity-item">
+            <div class="activity-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="activity-content">
+                <div>Completed "Canine Anatomy" quiz</div>
+                <div class="activity-time">
+                    <i class="far fa-clock"></i> 2 hours ago
+                </div>
+            </div>
+        </div>
+        
+        <div class="activity-item">
+            <div class="activity-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div class="activity-content">
+                <div>Achieved 95% in Surgery module</div>
+                <div class="activity-time">
+                    <i class="far fa-clock"></i> 1 day ago
+                </div>
+            </div>
+        </div>
+        
+        <!-- Testimonials & Achievements Section -->
+        <div class="testimonials-section">
+            <div class="section-title">
+                <h2>Success Stories</h2>
+                <a href="#" class="see-all">See All <i class="fas fa-chevron-right"></i></a>
+            </div>
+            
+            <div class="testimonial-card">
+                <p class="testimonial-content">VetPathshala helped me pass my exams with flying colors. The Q Bank and lectures were incredibly helpful for my preparation.</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">DR</div>
+                    <div class="author-info">
+                        <h4>Dr. Rajesh Kumar</h4>
+                        <p>BVSc, MVSc</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievements-grid">
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="achievement-value">5,247+</div>
+                    <div class="achievement-label">Veterinarians</div>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="achievement-value">120+</div>
+                    <div class="achievement-label">Courses</div>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="achievement-value">4.9/5</div>
+                    <div class="achievement-label">Rating</div>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="achievement-value">92%</div>
+                    <div class="achievement-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <i class="fas fa-home"></i>
+            Home
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-book"></i>
+            Ebooks
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-pills"></i>
+            Drugs
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-trophy"></i>
+            Battle
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            Profile
+        </a>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 15;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 50px and 150px
+                const size = Math.random() * 100 + 50;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.bottom = `-${size}px`;
+                
+                // Random animation duration between 10s and 20s
+                const duration = Math.random() * 10 + 10;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // Random delay
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Banner Slider
+        let currentBanner = 0;
+        const banners = document.querySelectorAll('.banner');
+        const dots = document.querySelectorAll('.banner-dot');
+        const bannerTrack = document.querySelector('.banner-track');
+        
+        function showBanner(index) {
+            bannerTrack.style.transform = `translateX(-${index * 100}%)`;
+            dots.forEach(dot => dot.classList.remove('active'));
+            dots[index].classList.add('active');
+            currentBanner = index;
+        }
+        
+        function nextBanner() {
+            currentBanner = (currentBanner + 1) % banners.length;
+            showBanner(currentBanner);
+        }
+        
+        // Auto slide every 5 seconds
+        let slideInterval = setInterval(nextBanner, 5000);
+        
+        // Pause on hover
+        document.querySelector('.banner-slider').addEventListener('mouseenter', () => {
+            clearInterval(slideInterval);
+        });
+        
+        document.querySelector('.banner-slider').addEventListener('mouseleave', () => {
+            slideInterval = setInterval(nextBanner, 5000);
+        });
+        
+        // Dot navigation
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showBanner(index);
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextBanner, 5000);
+            });
+        });
+        
+        // Initialize particles and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            
+            // Category selection
+            const categoryItems = document.querySelectorAll('.category-item');
+            categoryItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    categoryItems.forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                });
+            });
+            
+            // Performance tab selection
+            const performanceTabs = document.querySelectorAll('.performance-tab');
+            performanceTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    performanceTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

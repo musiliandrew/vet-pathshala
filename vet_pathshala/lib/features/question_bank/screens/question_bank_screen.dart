@@ -19,7 +19,6 @@ class _QuestionBankScreenState extends State<QuestionBankScreen> with TickerProv
   late Animation<Offset> _slideAnimation;
 
   bool _topicsEnabled = true;
-  bool _subtopicsEnabled = false;
 
   // Sample subjects data - in real app this would come from Firebase
   final List<Map<String, dynamic>> subjects = [
@@ -197,14 +196,6 @@ class _QuestionBankScreenState extends State<QuestionBankScreen> with TickerProv
                           _buildToggleButton('Topics', _topicsEnabled, () {
                             setState(() {
                               _topicsEnabled = !_topicsEnabled;
-                              if (!_topicsEnabled) _subtopicsEnabled = false;
-                            });
-                          }),
-                          const SizedBox(width: 8),
-                          _buildToggleButton('Subtopics', _subtopicsEnabled, () {
-                            setState(() {
-                              _subtopicsEnabled = !_subtopicsEnabled;
-                              if (_subtopicsEnabled) _topicsEnabled = true;
                             });
                           }),
                         ],
@@ -284,7 +275,7 @@ class _QuestionBankScreenState extends State<QuestionBankScreen> with TickerProv
               border: Border.all(color: UnifiedTheme.primaryGreen.withOpacity(0.3)),
             ),
             child: Text(
-              'Popular Subjects',
+              'Subjects',
               style: UnifiedTheme.headerMedium.copyWith(
                 color: UnifiedTheme.primaryGreen,
                 fontWeight: FontWeight.w700,
@@ -474,15 +465,30 @@ class _QuestionBankScreenState extends State<QuestionBankScreen> with TickerProv
   }
 
   void _navigateToSubjectTopics(BuildContext context, Map<String, dynamic> subject, UserModel user) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => SubjectTopicsScreen(
-          subject: subject,
-          userRole: user.userRole,
-          showTopics: _topicsEnabled,
-          showSubtopics: _subtopicsEnabled,
+    if (_topicsEnabled) {
+      // Navigate to Topics page
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SubjectTopicsScreen(
+            subject: subject,
+            userRole: user.userRole,
+            showTopics: true,
+            showSubtopics: false,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      // Navigate directly to all questions for this subject
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SubjectTopicsScreen(
+            subject: subject,
+            userRole: user.userRole,
+            showTopics: false,
+            showSubtopics: false,
+          ),
+        ),
+      );
+    }
   }
 }

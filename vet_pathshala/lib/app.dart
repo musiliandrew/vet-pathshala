@@ -22,13 +22,26 @@ class AppWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
+        print('🟡 AppWrapper: Building with state: ${authProvider.state}');
+        print('🟡 AppWrapper: isAuthenticated: ${authProvider.isAuthenticated}');
+        print('🟡 AppWrapper: currentUser: ${authProvider.currentUser?.email}');
+        print('🟡 AppWrapper: profileComplete: ${authProvider.currentUser?.isProfileComplete}');
+        
         // Show loading screen while initializing
         if (authProvider.state == AuthState.initial) {
+          print('🟡 AppWrapper: Showing initial splash screen');
+          return const SplashScreen();
+        }
+
+        // Show loading screen while loading
+        if (authProvider.state == AuthState.loading) {
+          print('🟡 AppWrapper: Showing loading splash screen');
           return const SplashScreen();
         }
 
         // Show authentication screens if not authenticated
         if (authProvider.state == AuthState.unauthenticated) {
+          print('🟡 AppWrapper: Showing role selection screen');
           return const RoleSelectionScreen();
         }
 
@@ -36,11 +49,13 @@ class AppWrapper extends StatelessWidget {
         if (authProvider.isAuthenticated && 
             authProvider.currentUser != null && 
             !authProvider.currentUser!.isProfileComplete) {
+          print('🟡 AppWrapper: Showing profile setup screen');
           return ProfileSetupSkipScreen(authProvider: authProvider);
         }
 
         // Show main app if authenticated and profile is complete
         if (authProvider.isAuthenticated) {
+          print('✅ AppWrapper: Showing main app screen');
           // Initialize coin provider when user is authenticated
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.read<CoinProvider>().initialize(authProvider.currentUser!.id);
@@ -49,6 +64,7 @@ class AppWrapper extends StatelessWidget {
         }
 
         // Fallback to splash screen
+        print('🟡 AppWrapper: Fallback to splash screen');
         return const SplashScreen();
       },
     );

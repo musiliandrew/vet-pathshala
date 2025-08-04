@@ -25,6 +25,32 @@ service cloud.firestore {
                    get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userRole == 'admin';
     }
 
+    // Note categories, subjects, topics - allow read for authenticated users
+    match /noteCategories/{categoryId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+                   get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userRole == 'admin';
+    }
+
+    match /noteSubjects/{subjectId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+                   get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userRole == 'admin';
+    }
+
+    match /noteTopics/{topicId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+                   get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userRole == 'admin';
+    }
+
+    // User interactions with notes - users can read/write their own
+    match /userNoteInteractions/{interactionId} {
+      allow read, write: if request.auth != null &&
+                         resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+    }
+
     // Lectures - authenticated users can read, only admins can write
     match /lectures/{lectureId} {
       allow read: if request.auth != null;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
+import '../../../core/theme/unified_theme.dart';
 
 class InspiredBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -15,17 +15,17 @@ class InspiredBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1C2526),
+        color: UnifiedTheme.white,
         border: Border(
           top: BorderSide(
-            color: const Color(0xFF4B5E4A).withOpacity(0.3),
+            color: UnifiedTheme.primary.withOpacity(0.1),
             width: 2,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4B5E4A).withOpacity(0.2),
-            blurRadius: 32,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
             offset: const Offset(0, -8),
           ),
         ],
@@ -99,19 +99,19 @@ class InspiredBottomNav extends StatelessWidget {
             : Matrix4.identity(),
         decoration: BoxDecoration(
           color: isActive 
-              ? const Color(0xFF4B5E4A).withOpacity(0.1) 
+              ? UnifiedTheme.primary.withOpacity(0.1) 
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: isActive 
               ? Border.all(
-                  color: const Color(0xFF4B5E4A).withOpacity(0.3),
+                  color: UnifiedTheme.primary.withOpacity(0.3),
                   width: 1,
                 )
               : null,
           boxShadow: isActive
               ? [
                   BoxShadow(
-                    color: const Color(0xFF4B5E4A).withOpacity(0.2),
+                    color: UnifiedTheme.primary.withOpacity(0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -126,7 +126,7 @@ class InspiredBottomNav extends StatelessWidget {
               child: Icon(
                 isActive ? filledIcon : outlineIcon,
                 key: ValueKey(isActive),
-                color: isActive ? const Color(0xFF4B5E4A) : const Color(0x99D4D4D4),
+                color: isActive ? UnifiedTheme.primary : UnifiedTheme.secondaryText,
                 size: 24,
               ),
             ),
@@ -136,7 +136,7 @@ class InspiredBottomNav extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                color: isActive ? const Color(0xFF4B5E4A) : const Color(0x99D4D4D4),
+                color: isActive ? UnifiedTheme.primary : UnifiedTheme.secondaryText,
               ),
               child: Text(label),
             ),

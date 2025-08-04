@@ -31,6 +31,7 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
   bool _showAIResponse = false;
   int _timeElapsed = 0;
   bool _isBookmarked = false;
+  bool _timerStopped = false;
   
   // Sample question data with options
   final Map<String, dynamic> _questionData = {
@@ -80,12 +81,18 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
 
   void _startTimer() {
     Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
+      if (mounted && !_timerStopped) {
         setState(() {
           _timeElapsed++;
         });
         _startTimer();
       }
+    });
+  }
+
+  void _stopTimer() {
+    setState(() {
+      _timerStopped = true;
     });
   }
 
@@ -853,9 +860,30 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
   }
 
   void _selectOption(int index) {
+    if (_hasAnswered) return; // Prevent answering same question multiple times
+    
     setState(() {
       _selectedOption = index;
+      _hasAnswered = true; // Immediately submit answer
     });
+    
+    // Stop the timer immediately
+    _stopTimer();
+    
+    // Show feedback
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          _selectedOption == _questionData['correctAnswer'] 
+              ? 'Correct! Well done!' 
+              : 'Incorrect. The correct answer is ${String.fromCharCode(65 + (_questionData['correctAnswer'] as int))}',
+        ),
+        backgroundColor: _selectedOption == _questionData['correctAnswer'] 
+            ? UnifiedTheme.lightGreen 
+            : Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   void _toggleBookmark() {
@@ -967,17 +995,10 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
       return;
     }
     
-    if (!_hasAnswered) {
-      setState(() {
-        _hasAnswered = true;
-      });
-      return;
-    }
-    
     // Move to next question - in real app this would navigate to next question
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Answer ${String.fromCharCode(65 + _selectedOption)} submitted! Moving to next question.'),
+        content: Text('Moving to next question...'),
         backgroundColor: UnifiedTheme.primaryGreen,
         duration: const Duration(seconds: 2),
       ),
@@ -985,80 +1006,264 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
   }
 
   void _openQuestionMenu() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: 250,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: UnifiedTheme.borderColor)),
+      builder: (context) => Dialog(
+        alignment: Alignment.centerRight,
+        insetPadding: const EdgeInsets.only(left: 50),
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.4,
+          height: MediaQuery.of(context).size.height * 0.8,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(-5, 0),
               ),
-              child: Text(
-                'Question Menu',
-                style: UnifiedTheme.headerMedium.copyWith(
-                  color: UnifiedTheme.primaryText,
-                ),
-              ),
-            ),
-            Expanded(
-              child: GridView.builder(
+            ],
+          ),
+          child: Column(
+            children: [
+              // Header with Back button
+              Container(
                 padding: const EdgeInsets.all(16),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 5,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: UnifiedTheme.borderColor)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
-                itemCount: 25,
-                itemBuilder: (context, index) {
-                  final isCurrentQuestion = index == 1; // Assuming question 2 is current
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Navigating to question ${index + 1}'),
-                          backgroundColor: UnifiedTheme.primaryGreen,
+                child: Row(
+                  children: [
+                    // Back Button
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: UnifiedTheme.primaryGreen, width: 2),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isCurrentQuestion 
-                            ? UnifiedTheme.primaryGreen 
-                            : UnifiedTheme.lightBackground,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isCurrentQuestion 
-                              ? UnifiedTheme.primaryGreen 
-                              : UnifiedTheme.borderColor,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${index + 1}',
-                          style: TextStyle(
-                            color: isCurrentQuestion 
-                                ? Colors.white 
-                                : UnifiedTheme.primaryText,
-                            fontWeight: FontWeight.w600,
+                        child: const Center(
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: UnifiedTheme.primaryGreen,
+                            size: 18,
                           ),
                         ),
                       ),
                     ),
-                  );
-                },
+                    const SizedBox(width: 12),
+                    Text(
+                      'All Questions',
+                      style: UnifiedTheme.headerMedium.copyWith(
+                        color: UnifiedTheme.primaryText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Questions List
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: 50, // Sample 50 questions
+                  itemBuilder: (context, index) {
+                    final isCurrentQuestion = index == 1; // Assuming question 2 is current
+                    final isPaidContent = index > 25; // Questions after 25 are paid
+                    final isAnswered = index < 1; // Questions before current are answered
+                    
+                    return _buildQuestionListItem(
+                      context, 
+                      index, 
+                      isCurrentQuestion, 
+                      isPaidContent, 
+                      isAnswered
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuestionListItem(
+    BuildContext context, 
+    int index, 
+    bool isCurrentQuestion, 
+    bool isPaidContent, 
+    bool isAnswered
+  ) {
+    Color backgroundColor = Colors.white;
+    Color borderColor = UnifiedTheme.borderColor;
+    Color textColor = UnifiedTheme.primaryText;
+    
+    if (isCurrentQuestion) {
+      backgroundColor = UnifiedTheme.primaryGreen.withOpacity(0.1);
+      borderColor = UnifiedTheme.primaryGreen;
+      textColor = UnifiedTheme.primaryGreen;
+    } else if (isAnswered) {
+      backgroundColor = UnifiedTheme.lightGreen.withOpacity(0.1);
+      borderColor = UnifiedTheme.lightGreen;
+      textColor = UnifiedTheme.lightGreen;
+    } else if (isPaidContent) {
+      backgroundColor = UnifiedTheme.goldAccent.withOpacity(0.05);
+      borderColor = UnifiedTheme.goldAccent.withOpacity(0.3);
+      textColor = UnifiedTheme.goldAccent;
+    }
+    
+    return GestureDetector(
+      onTap: isPaidContent ? _showPremiumDialog : () {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Navigating to question ${index + 1}'),
+            backgroundColor: UnifiedTheme.primaryGreen,
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          border: Border.all(color: borderColor),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            // Question Number
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: isCurrentQuestion 
+                    ? UnifiedTheme.primaryGreen 
+                    : isAnswered 
+                        ? UnifiedTheme.lightGreen 
+                        : isPaidContent 
+                            ? UnifiedTheme.goldAccent 
+                            : UnifiedTheme.borderColor,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  '${index + 1}',
+                  style: TextStyle(
+                    color: (isCurrentQuestion || isAnswered || isPaidContent) 
+                        ? Colors.white 
+                        : UnifiedTheme.primaryText,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            
+            // Question Title
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Question ${index + 1}',
+                    style: UnifiedTheme.bodyLarge.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'According to ācharya charaka...',
+                    style: UnifiedTheme.bodySmall.copyWith(
+                      color: UnifiedTheme.secondaryText,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            
+            // Status Icons
+            if (isPaidContent)
+              const Icon(
+                Icons.lock,
+                color: UnifiedTheme.goldAccent,
+                size: 20,
+              )
+            else if (isAnswered)
+              const Icon(
+                Icons.check_circle,
+                color: UnifiedTheme.lightGreen,
+                size: 20,
+              )
+            else if (isCurrentQuestion)
+              const Icon(
+                Icons.play_circle_filled,
+                color: UnifiedTheme.primaryGreen,
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPremiumDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(
+              Icons.lock,
+              color: UnifiedTheme.goldAccent,
+              size: 24,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Premium Content',
+              style: UnifiedTheme.headerMedium.copyWith(
+                color: UnifiedTheme.goldAccent,
               ),
             ),
           ],
         ),
+        content: const Text(
+          'This question is part of our premium content. Upgrade to access all questions.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Upgrade feature coming soon!'),
+                  backgroundColor: UnifiedTheme.goldAccent,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: UnifiedTheme.goldAccent,
+            ),
+            child: const Text(
+              'Upgrade',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
   }

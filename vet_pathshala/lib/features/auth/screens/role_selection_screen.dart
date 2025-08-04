@@ -201,7 +201,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> with TickerPr
         return Transform.translate(
           offset: Offset(0, 50 * (1 - value)),
           child: Opacity(
-            opacity: value,
+            opacity: value.clamp(0.0, 1.0),
             child: GestureDetector(
               onTap: () => setState(() => selectedRole = role),
               child: AnimatedContainer(
@@ -232,30 +232,35 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> with TickerPr
                     // Image Container
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
-                      width: 70,
-                      height: 70,
+                      width: 80,
+                      height: 80,
                       decoration: BoxDecoration(
                         color: isSelected 
                             ? UnifiedTheme.primaryGreen.withOpacity(0.1)
-                            : UnifiedTheme.backgroundColor,
+                            : UnifiedTheme.cardBackground,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isSelected 
-                              ? UnifiedTheme.primaryGreen.withOpacity(0.3)
+                              ? UnifiedTheme.primaryGreen
                               : UnifiedTheme.borderColor,
+                          width: isSelected ? 2 : 1,
                         ),
+                        boxShadow: isSelected ? [
+                          BoxShadow(
+                            color: UnifiedTheme.primaryGreen.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ] : null,
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(14),
                         child: Padding(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(16),
                           child: Image.asset(
                             imagePath,
                             fit: BoxFit.contain,
-                            color: isSelected 
-                                ? UnifiedTheme.primaryGreen
-                                : UnifiedTheme.secondaryText,
-                            colorBlendMode: BlendMode.srcIn,
+                            // Remove color tinting to show original images
                           ),
                         ),
                       ),

@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetPathshala Pro - Advanced Veterinary Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00C897;
+            --secondary: #3D84FF;
+            --accent: #FF9F29;
+            --dark: #2D4059;
+            --light: #F6F6F6;
+            --white: #FFFFFF;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --ebook-1: linear-gradient(135deg, #6C63FF, #3D84FF);
+            --ebook-2: linear-gradient(135deg, #00C897, #00A278);
+            --ebook-3: linear-gradient(135deg, #FF9F29, #FF7B00);
+            --ebook-4: linear-gradient(135deg, #FF6B6B, #FF3D3D);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 100px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Animated Background */
+        .bg-particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(0, 200, 151, 0.1);
+            border-radius: 50%;
+            animation: float-particle 15s infinite linear;
+        }
+        
+        @keyframes float-particle {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .greeting h1 {
+            color: var(--dark);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .greeting p {
+            color: #7A7A7A;
+            font-size: 14px;
+            font-weight: 400;
+        }
+        
+        .notification {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            background: var(--white);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .notification:hover {
+            transform: translateY(-3px) rotate(10deg);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
+            border-radius: 50%;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--light);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            background: var(--white);
+            border-radius: 15px;
+            padding: 12px 20px;
+            box-shadow: var(--shadow);
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+            align-items: center;
+        }
+        
+        .search-bar:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-bar input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 14px;
+            background: transparent;
+            margin-left: 10px;
+        }
+        
+        /* Hero Card */
+        .hero-card {
+            background: linear-gradient(135deg, var(--primary), #00A278);
+            color: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+        
+        .hero-card:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(0, 200, 151, 0.3);
+        }
+        
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .hero-card h2 {
+            margin: 0 0 10px;
+            font-size: 22px;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-card p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-icon {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            font-size: 60px;
+            opacity: 0.2;
+            z-index: 1;
+            transform: rotate(-15deg);
+            animation: float-icon 6s ease-in-out infinite;
+        }
+        
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0) rotate(-15deg); }
+            50% { transform: translateY(-10px) rotate(-20deg); }
+        }
+        
+        /* Stats Card */
+        .stats-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stats-card h3 {
+            margin: 0 0 20px;
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            padding: 10px;
+            background: rgba(0, 200, 151, 0.05);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            background: rgba(0, 200, 151, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #7A7A7A;
+            font-weight: 500;
+        }
+        
+        .progress-circle {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 5px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 95%, #E0E0E0 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 18px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 200, 151, 0.2);
+            transition: all 0.5s ease;
+        }
+        
+        .progress-circle:hover {
+            transform: rotate(10deg) scale(1.1);
+        }
+        
+        .progress-circle::before {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--white);
+        }
+        
+        .progress-circle span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .view-details {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .view-details:hover {
+            letter-spacing: 0.5px;
+        }
+        
+        .view-details i {
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .view-details:hover i {
+            transform: translateX(3px);
+        }
+        
+        /* Section Title */
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 20px;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .see-all {
+            color: var(--secondary);
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .see-all:hover {
+            color: var(--primary);
+        }
+        
+        .see-all i {
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .see-all:hover i {
+            transform: translateX(3px);
+        }
+        
+        /* Category Section - Enhanced */
+        .category-section {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .category-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none; /* Firefox */
+        }
+        
+        .category-scroll::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+        
+        .category-item {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 18px 15px;
+            min-width: 110px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            scroll-snap-align: start;
+            flex-shrink: 0;
+        }
+        
+        .category-item:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .category-item:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .category-item.selected {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 10px 20px rgba(0, 200, 151, 0.3);
+        }
+        
+        .category-icon {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .category-item:hover .category-icon {
+            transform: scale(1.2);
+        }
+        
+        .category-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--white);
+        }
+        
+        /* Ebook Section - Completely Redesigned */
+        .ebooks-section {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .ebooks-scroll {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 20px 10px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+        
+        .ebooks-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .ebook-card {
+            min-width: 200px;
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            scroll-snap-align: start;
+            flex-shrink: 0;
+        }
+        
+        .ebook-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .ebook-cover {
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 18px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ebook-cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(255, 255, 255, 0) 60%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        .ebook-1 { background: var(--ebook-1); }
+        .ebook-2 { background: var(--ebook-2); }
+        .ebook-3 { background: var(--ebook-3); }
+        .ebook-4 { background: var(--ebook-4); }
+        
+        .ebook-cover i {
+            position: absolute;
+            font-size: 60px;
+            opacity: 0.2;
+            right: 10px;
+            bottom: 10px;
+        }
+        
+        .ebook-content {
+            padding: 15px;
+        }
+        
+        .ebook-title {
+            font-weight: 600;
+            margin: 0 0 5px;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .ebook-author {
+            color: #7A7A7A;
+            font-size: 13px;
+            margin: 0 0 10px;
+        }
+        
+        .ebook-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #7A7A7A;
+            align-items: center;
+        }
+        
+        .ebook-price {
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .rating {
+            color: var(--accent);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .rating i {
+            margin-right: 3px;
+            font-size: 14px;
+        }
+        
+        .ebook-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--accent);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        /* Referral Card */
+        .referral-card {
+            background: linear-gradient(135deg, var(--accent), #FF7B00);
+            color: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(255, 159, 41, 0.3);
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+        
+        .referral-card:hover {
+            transform: translateY(-5px) rotateY(5deg);
+            box-shadow: 0 20px 40px rgba(255, 159, 41, 0.4);
+        }
+        
+        .referral-card h3 {
+            margin: 0 0 15px;
+            font-size: 20px;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .referral-card p {
+            margin: 0 0 15px;
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .referral-icon {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 80px;
+            opacity: 0.1;
+            z-index: 1;
+            animation: bounce 3s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--white);
+            color: var(--accent);
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        /* Activity Feed */
+        .activity-item {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .activity-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .activity-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+        
+        .activity-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover .activity-icon {
+            transform: rotate(15deg) scale(1.1);
+            border-radius: 50%;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-content div:first-child {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: #7A7A7A;
+            display: flex;
+            align-items: center;
+        }
+        
+        .activity-time i {
+            margin-right: 5px;
+            font-size: 10px;
+        }
+        
+        /* Success Card */
+        .success-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: var(--shadow);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .success-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .success-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .success-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 15px 0;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .success-number::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+        
+        .success-text {
+            color: #7A7A7A;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .avatar-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--white);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .avatar:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .avatar::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            border: 2px dashed var(--primary);
+            animation: rotateBorder 10s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .avatar:hover::before {
+            opacity: 1;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #7A7A7A;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            transform: translateY(-5px);
+        }
+        
+        .nav-item.active i {
+            transform: scale(1.2);
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active::after {
+            opacity: 1;
+            bottom: -5px;
+        }
+        
+        /* 3D Effects */
+        .perspective-container {
+            perspective: 1000px;
+        }
+        
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+        
+        .card-3d:hover {
+            transform: rotateY(10deg) rotateX(5deg) translateY(-5px);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 400px) {
+            .container {
+                padding: 15px;
+                padding-bottom: 80px;
+            }
+            
+            .hero-card h2 {
+                font-size: 20px;
+            }
+            
+            .stats-grid {
+                gap: 10px;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
+            
+            .progress-circle {
+                width: 60px;
+                height: 60px;
+                font-size: 16px;
+            }
+            
+            .ebook-card {
+                min-width: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="greeting">
+                <h1>Good Morning</h1>
+                <p>Welcome back to VetPathshala</p>
+            </div>
+            <div class="notification">
+                <i class="fas fa-bell"></i>
+                <div class="notification-badge">3</div>
+            </div>
+        </div>
+        
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search veterinary resources...">
+        </div>
+        
+        <div class="hero-card card-3d">
+            <h2>Master Veterinary Medicine</h2>
+            <p>Join thousands of successful veterinarians</p>
+            <div class="hero-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+        </div>
+        
+        <div class="stats-card card-3d">
+            <h3>Track Your Performance</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">Courses</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">92</div>
+                    <div class="stat-label">Hours</div>
+                </div>
+                <div class="stat-item">
+                    <div class="progress-circle"><span>95%</span></div>
+                    <div class="stat-label">Score</div>
+                </div>
+            </div>
+            <a href="#" class="view-details">View Details <i class="fas fa-arrow-right"></i></a>
+        </div>
+        
+        <!-- Enhanced Category Section -->
+        <div class="section-title">
+            <h2>Explore Categories</h2>
+            <a href="#" class="see-all">See All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        
+        <div class="category-section">
+            <div class="category-scroll">
+                <button class="category-item selected">
+                    <i class="fas fa-question-circle category-icon"></i>
+                    Q Bank
+                    <span class="category-badge">New</span>
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-file-alt category-icon"></i>
+                    Short Notes
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-puzzle-piece category-icon"></i>
+                    Quiz & PYP
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-video category-icon"></i>
+                    Lectures
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-pills category-icon"></i>
+                    Drug Center
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-gamepad category-icon"></i>
+                    Gamification
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-flask category-icon"></i>
+                    Case Studies
+                </button>
+                <button class="category-item">
+                    <i class="fas fa-chart-line category-icon"></i>
+                    Analytics
+                </button>
+            </div>
+        </div>
+        
+        <!-- Completely Redesigned Ebooks Section -->
+        <div class="section-title">
+            <h2>Popular Ebooks</h2>
+            <a href="#" class="see-all">Browse All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        
+        <div class="ebooks-section">
+            <div class="ebooks-scroll">
+                <div class="ebook-card">
+                    <div class="ebook-cover ebook-1">
+                        <span>Veterinary Anatomy</span>
+                        <i class="fas fa-book-open"></i>
+                        <span class="ebook-badge">Bestseller</span>
+                    </div>
+                    <div class="ebook-content">
+                        <h3 class="ebook-title">Veterinary Anatomy</h3>
+                        <p class="ebook-author">Dr. Smith</p>
+                        <div class="ebook-meta">
+                            <span class="ebook-price">₹499</span>
+                            <span class="rating"><i class="fas fa-star"></i> 4.8</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ebook-card">
+                    <div class="ebook-cover ebook-2">
+                        <span>Small Animal Surgery</span>
+                        <i class="fas fa-bone"></i>
+                        <span class="ebook-badge">New</span>
+                    </div>
+                    <div class="ebook-content">
+                        <h3 class="ebook-title">Small Animal Surgery</h3>
+                        <p class="ebook-author">Dr. Johnson</p>
+                        <div class="ebook-meta">
+                            <span class="ebook-price">₹599</span>
+                            <span class="rating"><i class="fas fa-star"></i> 4.9</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ebook-card">
+                    <div class="ebook-cover ebook-3">
+                        <span>Vet Pharmacology</span>
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                    </div>
+                    <div class="ebook-content">
+                        <h3 class="ebook-title">Vet Pharmacology</h3>
+                        <p class="ebook-author">Dr. Williams</p>
+                        <div class="ebook-meta">
+                            <span class="ebook-price">₹449</span>
+                            <span class="rating"><i class="fas fa-star"></i> 4.7</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ebook-card">
+                    <div class="ebook-cover ebook-4">
+                        <span>Animal Nutrition</span>
+                        <i class="fas fa-apple-alt"></i>
+                    </div>
+                    <div class="ebook-content">
+                        <h3 class="ebook-title">Animal Nutrition</h3>
+                        <p class="ebook-author">Dr. Brown</p>
+                        <div class="ebook-meta">
+                            <span class="ebook-price">₹399</span>
+                            <span class="rating"><i class="fas fa-star"></i> 4.6</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="referral-card card-3d">
+            <div class="referral-icon">
+                <i class="fas fa-gift"></i>
+            </div>
+            <h3>Refer & Earn</h3>
+            <p>Earn ₹50 per referral!</p>
+            <p>Share with fellow veterinarians and build your earning network!</p>
+            <button class="btn">Invite Friends Now</button>
+        </div>
+        
+        <div class="section-title">
+            <h2>Recent Activity</h2>
+            <a href="#" class="see-all">View All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        
+        <div class="activity-item hover-grow">
+            <div class="activity-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="activity-content">
+                <div>Completed "Canine Anatomy" quiz</div>
+                <div class="activity-time">
+                    <i class="far fa-clock"></i> 2 hours ago
+                </div>
+            </div>
+        </div>
+        
+        <div class="activity-item hover-grow">
+            <div class="activity-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div class="activity-content">
+                <div>Achieved 95% in Surgery module</div>
+                <div class="activity-time">
+                    <i class="far fa-clock"></i> 1 day ago
+                </div>
+            </div>
+        </div>
+        
+        <div class="success-card card-3d">
+            <div class="success-number">5,247</div>
+            <div class="success-text">Successful Veterinarians</div>
+            <p>Veterinarians who advanced their careers through our platform</p>
+            <div class="avatar-grid">
+                <div class="avatar hover-grow">DR</div>
+                <div class="avatar hover-grow">VT</div>
+                <div class="avatar hover-grow">AS</div>
+                <div class="avatar hover-grow">MJ</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <i class="fas fa-home"></i>
+            Home
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-book"></i>
+            Ebooks
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-pills"></i>
+            Drugs
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-trophy"></i>
+            Battle
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            Profile
+        </a>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 15;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 50px and 150px
+                const size = Math.random() * 100 + 50;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.bottom = `-${size}px`;
+                
+                // Random animation duration between 10s and 20s
+                const duration = Math.random() * 10 + 10;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // Random delay
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Initialize particles and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            
+            // 3D card tilt effect
+            const cards = document.querySelectorAll('.card-3d');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                    const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                    card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                });
+                
+                card.addEventListener('mouseenter', () => {
+                    card.style.transition = 'none';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+                });
+            });
+            
+            // Click animations for buttons
+            const buttons = document.querySelectorAll('.btn, .category-item');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        button.style.transform = '';
+                    }, 200);
+                });
+            });
+            
+            // Auto-scroll categories after 3 seconds
+            setTimeout(() => {
+                const categoryScroll = document.querySelector('.category-scroll');
+                if (categoryScroll.scrollWidth > categoryScroll.clientWidth) {
+                    categoryScroll.scrollBy({
+                        left: 100,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

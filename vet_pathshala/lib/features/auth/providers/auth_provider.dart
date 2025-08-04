@@ -32,48 +32,54 @@ class AuthProvider extends ChangeNotifier {
   void _initializeAuth() {
     try {
       _authService.authStateChanges.listen((User? user) async {
-      if (user != null) {
-        try {
-          _currentUser = await _authService.getCurrentUserData();
-          if (_currentUser != null) {
-            _setState(AuthState.authenticated);
-          } else {
-            // User is authenticated with Firebase but has no Firestore document
-            // This can happen with Google/Phone sign-in or incomplete registration
-            print('User authenticated but no Firestore document found. Creating minimal user profile...');
-            await _createMinimalUserProfile(user);
+        print('🟡 AuthProvider: Auth state changed - User: ${user?.uid}');
+        
+        if (user != null) {
+          print('🟡 AuthProvider: User is signed in, loading user data...');
+          try {
             _currentUser = await _authService.getCurrentUserData();
-            _setState(AuthState.authenticated);
-          }
-        } catch (e) {
-          print('🔴 AuthProvider: Error loading user data: $e');
-          print('🔴 AuthProvider: User UID: ${user.uid}');
-          print('🔴 AuthProvider: User email: ${user.email}');
-          print('🔴 AuthProvider: User displayName: ${user.displayName}');
-          
-          // If we can't load user data but user is authenticated, create minimal profile
-          if (e.toString().contains('Failed to get user data')) {
-            print('🟡 AuthProvider: Attempting to create minimal user profile...');
-            try {
-              await _createMinimalUserProfile(user);
-              print('✅ AuthProvider: Minimal profile created successfully');
-              _currentUser = await _authService.getCurrentUserData();
-              print('✅ AuthProvider: User data loaded after profile creation');
+            if (_currentUser != null) {
+              print('✅ AuthProvider: User data loaded successfully, setting authenticated state');
               _setState(AuthState.authenticated);
-            } catch (createError) {
-              print('🔴 AuthProvider: Failed to create minimal profile: $createError');
-              _setError('Unable to set up your account. Please try signing in again.');
+            } else {
+              // User is authenticated with Firebase but has no Firestore document
+              // This can happen with Google/Phone sign-in or incomplete registration
+              print('🟡 AuthProvider: User authenticated but no Firestore document found. Creating minimal user profile...');
+              await _createMinimalUserProfile(user);
+              _currentUser = await _authService.getCurrentUserData();
+              print('✅ AuthProvider: Minimal profile created, setting authenticated state');
+              _setState(AuthState.authenticated);
             }
-          } else {
-            print('🔴 AuthProvider: Unexpected error type: $e');
-            _setError('Network error. Please check your connection and try again.');
+          } catch (e) {
+            print('🔴 AuthProvider: Error loading user data: $e');
+            print('🔴 AuthProvider: User UID: ${user.uid}');
+            print('🔴 AuthProvider: User email: ${user.email}');
+            print('🔴 AuthProvider: User displayName: ${user.displayName}');
+            
+            // If we can't load user data but user is authenticated, create minimal profile
+            if (e.toString().contains('Failed to get user data')) {
+              print('🟡 AuthProvider: Attempting to create minimal user profile...');
+              try {
+                await _createMinimalUserProfile(user);
+                print('✅ AuthProvider: Minimal profile created successfully');
+                _currentUser = await _authService.getCurrentUserData();
+                print('✅ AuthProvider: User data loaded after profile creation');
+                _setState(AuthState.authenticated);
+              } catch (createError) {
+                print('🔴 AuthProvider: Failed to create minimal profile: $createError');
+                _setError('Unable to set up your account. Please try signing in again.');
+              }
+            } else {
+              print('🔴 AuthProvider: Unexpected error type: $e');
+              _setError('Network error. Please check your connection and try again.');
+            }
           }
+        } else {
+          print('🟡 AuthProvider: User signed out, setting unauthenticated state');
+          _currentUser = null;
+          _setState(AuthState.unauthenticated);
         }
-      } else {
-        _currentUser = null;
-        _setState(AuthState.unauthenticated);
-      }
-    });
+      });
     } catch (e) {
       print('🔴 AuthProvider: Failed to initialize auth: $e');
       // Fallback to unauthenticated state if Firebase is not available
@@ -146,6 +152,11 @@ class AuthProvider extends ChangeNotifier {
     try {
       await _authService.signInWithGoogle(role: role);
       print('✅ AuthProvider: Google sign-in successful');
+      
+      // Don't manually set state here - let the auth state listener handle it
+      // The Firebase auth state will change and trigger the listener
+      print('🟡 AuthProvider: Waiting for auth state listener to handle authentication...');
+      
       return true;
     } catch (e) {
       print('🔴 AuthProvider: Google sign-in failed: $e');
@@ -381,11 +392,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void _setState(AuthState newState) {
+    print('🟡 AuthProvider: State changing from ${_state} to $newState');
     _state = newState;
     if (newState != AuthState.error) {
       _errorMessage = null;
     }
+    print('🟡 AuthProvider: Notifying listeners of state change');
     notifyListeners();
+    print('✅ AuthProvider: Listeners notified');
   }
 
   void _setError(String error) {

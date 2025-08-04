@@ -109,8 +109,8 @@ class _SubjectTopicsScreenState extends State<SubjectTopicsScreen>
                     // Header
                     _buildHeader(context),
                     
-                    // Breadcrumb
-                    _buildBreadcrumb(context),
+                    // Breadcrumb (only show if showing topics)
+                    if (widget.showTopics) _buildBreadcrumb(context),
                     
                     // Content based on toggle states
                     Expanded(
@@ -230,11 +230,11 @@ class _SubjectTopicsScreenState extends State<SubjectTopicsScreen>
   }
 
   Widget _buildContent(BuildContext context) {
-    if (!_topicsEnabled) {
-      // Show all questions directly
+    if (!widget.showTopics) {
+      // Show all questions directly for this subject
       return _buildAllQuestions(context);
     } else if (_subtopicsEnabled) {
-      // Show subtopics after selecting a topic
+      // Show subtopics for all topics (or selected topic)
       return _buildSubtopicsList(context);
     } else {
       // Show topics list
@@ -330,12 +330,18 @@ class _SubjectTopicsScreenState extends State<SubjectTopicsScreen>
   }
 
   Widget _buildSubtopicsList(BuildContext context) {
-    // Sample subtopics for demonstration
-    final subtopics = [
-      'Bone Structure',
-      'Muscle Types',
-      'Joint Mechanics',
-      'Skeletal Development',
+    // Sample subtopics from all topics (not just one)
+    final allSubtopics = [
+      {'title': 'Bone Structure', 'topic': 'Musculoskeletal System'},
+      {'title': 'Muscle Types', 'topic': 'Musculoskeletal System'},
+      {'title': 'Joint Mechanics', 'topic': 'Musculoskeletal System'},
+      {'title': 'Skeletal Development', 'topic': 'Musculoskeletal System'},
+      {'title': 'Heart Anatomy', 'topic': 'Cardiovascular System'},
+      {'title': 'Blood Circulation', 'topic': 'Cardiovascular System'},
+      {'title': 'Cardiac Cycle', 'topic': 'Cardiovascular System'},
+      {'title': 'Lung Structure', 'topic': 'Respiratory System'},
+      {'title': 'Gas Exchange', 'topic': 'Respiratory System'},
+      {'title': 'Breathing Mechanics', 'topic': 'Respiratory System'},
     ];
 
     return Container(
@@ -352,7 +358,7 @@ class _SubjectTopicsScreenState extends State<SubjectTopicsScreen>
               border: Border.all(color: UnifiedTheme.goldAccent.withOpacity(0.3)),
             ),
             child: Text(
-              'Subtopics - Musculoskeletal System',
+              'Subtopics - ${widget.subject['title']}',
               style: UnifiedTheme.headerSmall.copyWith(
                 color: UnifiedTheme.goldAccent,
                 fontWeight: FontWeight.w700,
@@ -361,66 +367,143 @@ class _SubjectTopicsScreenState extends State<SubjectTopicsScreen>
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: subtopics.length,
+              itemCount: allSubtopics.length,
               itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () => _navigateToQuestions(context, {'title': subtopics[index]}),
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: UnifiedTheme.spacingM),
-                    padding: const EdgeInsets.all(UnifiedTheme.spacingL),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.white, Colors.white.withOpacity(0.95)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(UnifiedTheme.radiusL),
-                      border: Border.all(color: UnifiedTheme.borderColor),
-                      boxShadow: UnifiedTheme.cardShadow,
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: UnifiedTheme.goldAccent,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${index + 1}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: UnifiedTheme.spacingM),
-                        Expanded(
-                          child: Text(
-                            subtopics[index],
-                            style: UnifiedTheme.bodyLarge.copyWith(
-                              color: UnifiedTheme.primaryText,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: 16,
-                          color: UnifiedTheme.tertiaryText,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
+                final subtopic = allSubtopics[index];
+                return _buildSubtopicCard(context, subtopic, index);
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSubtopicCard(BuildContext context, Map<String, String> subtopic, int index) {
+    return GestureDetector(
+      onTap: () => _navigateToQuestions(context, subtopic),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: UnifiedTheme.spacingM),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.white.withOpacity(0.95)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(UnifiedTheme.radiusXL),
+          border: Border.all(color: UnifiedTheme.borderColor),
+          boxShadow: UnifiedTheme.cardShadow,
+        ),
+        child: Column(
+          children: [
+            // Subtopic content
+            Padding(
+              padding: const EdgeInsets.all(UnifiedTheme.spacingL),
+              child: Row(
+                children: [
+                  // Number and content
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: UnifiedTheme.goldAccent,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${index + 1}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: UnifiedTheme.spacingM),
+                            Expanded(
+                              child: Text(
+                                subtopic['title']!,
+                                style: UnifiedTheme.headerSmall.copyWith(
+                                  color: UnifiedTheme.primaryText,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: UnifiedTheme.spacingS),
+                        Text(
+                          'From: ${subtopic['topic']}',
+                          style: UnifiedTheme.bodyMedium.copyWith(
+                            color: UnifiedTheme.secondaryText,
+                            height: 1.4,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Icon
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [UnifiedTheme.goldAccent, UnifiedTheme.goldAccent.withOpacity(0.8)],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.subdirectory_arrow_right,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Stats footer
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: UnifiedTheme.spacingL,
+                vertical: UnifiedTheme.spacingM,
+              ),
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: UnifiedTheme.borderColor)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Score: 0%',
+                    style: UnifiedTheme.bodySmall.copyWith(
+                      color: UnifiedTheme.goldAccent,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '${150 + (index * 20)} Questions',
+                    style: UnifiedTheme.bodySmall.copyWith(
+                      color: UnifiedTheme.goldAccent,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/unified_theme.dart';
 import '../providers/auth_provider.dart';
 import 'sign_up_screen.dart';
+import 'phone_auth_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   final String selectedRole;
@@ -25,6 +26,7 @@ class _SignInScreenState extends State<SignInScreen> with TickerProviderStateMix
   bool _isLoading = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  AuthProvider? _authProvider;
 
   @override
   void initState() {
@@ -44,7 +46,36 @@ class _SignInScreenState extends State<SignInScreen> with TickerProviderStateMix
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Store reference to AuthProvider safely
+    if (_authProvider == null) {
+      _authProvider = context.read<AuthProvider>();
+      _authProvider!.addListener(_onAuthStateChanged);
+    }
+  }
+
+  void _onAuthStateChanged() {
+    if (!mounted) return;
+    
+    final authProvider = _authProvider;
+    if (authProvider == null) return;
+    
+    print('🟡 SignInScreen: Auth state changed to ${authProvider.state}');
+    
+    if (authProvider.isAuthenticated && mounted) {
+      print('✅ SignInScreen: User authenticated, navigating to home');
+      // Pop all auth screens and let AppWrapper handle navigation
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
+  @override
   void dispose() {
+    // Remove authentication listener safely
+    _authProvider?.removeListener(_onAuthStateChanged);
+    _authProvider = null;
+    
     _emailController.dispose();
     _passwordController.dispose();
     _animationController.dispose();
@@ -294,21 +325,23 @@ class _SignInScreenState extends State<SignInScreen> with TickerProviderStateMix
                     const SizedBox(height: 30),
                     
                     // Social Login Buttons
-                    _buildSocialButton(
-                      onPressed: () {
-                        // TODO: Implement Google sign in
+                    Consumer<AuthProvider>(
+                      builder: (context, authProvider, child) {
+                        return _buildSocialButton(
+                          onPressed: (_isLoading || authProvider.state == AuthState.loading) 
+                              ? null 
+                              : _onGoogleSignInPressed,
+                          icon: Icons.g_mobiledata,
+                          label: 'Continue with Google',
+                          color: Colors.red,
+                        );
                       },
-                      icon: Icons.g_mobiledata,
-                      label: 'Continue with Google',
-                      color: Colors.red,
                     ),
                     
                     const SizedBox(height: 16),
                     
                     _buildSocialButton(
-                      onPressed: () {
-                        // TODO: Implement phone sign in
-                      },
+                      onPressed: _isLoading ? null : _onPhoneSignInPressed,
                       icon: Icons.phone_outlined,
                       label: 'Continue with Phone',
                       color: UnifiedTheme.primaryGreen,
@@ -447,7 +480,7 @@ class _SignInScreenState extends State<SignInScreen> with TickerProviderStateMix
   }
 
   Widget _buildSocialButton({
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
     required IconData icon,
     required String label,
     required Color color,
@@ -512,5 +545,43 @@ class _SignInScreenState extends State<SignInScreen> with TickerProviderStateMix
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _onGoogleSignInPressed() async {
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final success = await authProvider.signInWithGoogle(role: widget.selectedRole);
+      
+      if (!success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Google sign in failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      // Don't set _isLoading = false here, let AuthProvider handle the state
+      // The AppWrapper will navigate away automatically on successful auth
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Google sign in failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _onPhoneSignInPressed() {
+    // Navigate to phone auth screen for sign in
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PhoneAuthScreen(
+          selectedRole: widget.selectedRole,
+        ),
+      ),
+    );
   }
 }
