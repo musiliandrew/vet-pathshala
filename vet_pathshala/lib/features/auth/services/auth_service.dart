@@ -209,16 +209,27 @@ class AuthService {
             // Create user document if new user
             if (userCredential.additionalUserInfo?.isNewUser == true) {
               print('🟡 AuthService: Creating user document for new user...');
+              print('🚀 AuthService: Role parameter received = "$role"');
               final displayName = userCredential.user!.displayName ?? 
                                  googleUser.displayName ?? 
                                  googleUser.email?.split('@').first ?? 
                                  'User';
               
+              final finalRole = role ?? 'doctor';
+              print('🚀 AuthService: Final role being saved = "$finalRole"');
+              
               await _createUserDocument(
                 userCredential.user!,
                 name: displayName,
-                role: role ?? 'doctor',
+                role: finalRole,
               );
+            } else {
+              print('🟡 AuthService: Existing user detected (path 1)');
+              // For existing users, check if we need to update their role
+              if (role != null) {
+                print('🚀 AuthService: Updating existing user role to "$role" (path 1)');
+                await _updateUserRole(userCredential.user!.uid, role);
+              }
             }
             
             return userCredential;
@@ -247,6 +258,7 @@ class AuthService {
       // Check if this is a new user
       if (userCredential.additionalUserInfo?.isNewUser == true) {
         print('🟡 AuthService: New user detected, creating user document...');
+        print('🚀 AuthService: Role parameter received (path 2) = "$role"');
         // Create user document for new Google users
         // Use Firebase Auth data, fallback to GoogleSignIn data
         final displayName = userCredential.user!.displayName ?? 
@@ -254,13 +266,23 @@ class AuthService {
                            googleUser.email?.split('@').first ?? 
                            'User';
         
+        final finalRole = role ?? 'doctor';
+        print('🚀 AuthService: Final role being saved (path 2) = "$finalRole"');
+        
         await _createUserDocument(
           userCredential.user!,
           name: displayName,
-          role: role ?? 'doctor',
+          role: finalRole,
         );
         print('✅ AuthService: User document created for new user');
         print('✅ AuthService: User document created');
+      } else {
+        print('🟡 AuthService: Existing user detected');
+        // For existing users, check if we need to update their role
+        if (role != null) {
+          print('🚀 AuthService: Updating existing user role to "$role"');
+          await _updateUserRole(userCredential.user!.uid, role);
+        }
       }
 
       return userCredential;
@@ -385,6 +407,7 @@ class AuthService {
     required String name,
     required String role,
   }) async {
+    print('🚀 _createUserDocument: Creating user with role = "$role"');
     final userModel = UserModel(
       id: user.uid,
       email: user.email ?? '',
@@ -394,11 +417,45 @@ class AuthService {
       profileCompleted: true, // Mark as complete for Google Sign-In users
       createdTime: DateTime.now(),
     );
+    print('🚀 _createUserDocument: UserModel created with userRole = "${userModel.userRole}"');
 
     await _firestore
         .collection('users')
         .doc(user.uid)
         .set(userModel.toFirestore());
+    
+    print('✅ AuthService: User document created successfully');
+  }
+
+  // Update existing user's role
+  Future<void> _updateUserRole(String uid, String role) async {
+    try {
+      print('🚀 _updateUserRole: Updating user $uid to role "$role"');
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .update({'userRole': role});
+      print('✅ _updateUserRole: Role updated successfully in Firestore');
+      
+      // Trigger a refresh of the user data stream to pick up the new role
+      print('🔄 _updateUserRole: Triggering user data refresh...');
+      // Force a reload by getting fresh data
+      final userData = await getCurrentUserData();
+      print('✅ _updateUserRole: User data refreshed');
+      print('🚀 _updateUserRole: New role in refreshed data = "${userData?.userRole}"');
+      
+      // Force auth state change to trigger UI rebuild
+      print('🔄 _updateUserRole: Triggering auth state change...');
+      final currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        // This will trigger the auth state listener
+        await currentUser.reload();
+        print('✅ _updateUserRole: Auth state refreshed');
+      }
+    } catch (e) {
+      print('🔴 _updateUserRole: Failed to update role: $e');
+      // Don't throw error, just log it
+    }
   }
 
   // Mark existing user profile as complete

@@ -9,6 +9,7 @@ import '../../question_bank/screens/question_bank_screen.dart';
 import '../../drug_center/screens/drug_index_screen.dart';
 import '../../coins/screens/coin_store_screen.dart';
 import '../../ebooks/screens/ebooks_screen.dart';
+import 'farmer_home_screen.dart';
 
 class UnifiedHomeScreen extends StatefulWidget {
   const UnifiedHomeScreen({super.key});
@@ -43,6 +44,19 @@ class _UnifiedHomeScreenState extends State<UnifiedHomeScreen> {
       builder: (context, authProvider, homeProvider, coinProvider, child) {
         final user = authProvider.currentUser;
         if (user == null) return const SizedBox();
+
+        // Debug: Print user role
+        print('🚀 UnifiedHomeScreen: Current user role = "${user.userRole}"');
+        print('🚀 UnifiedHomeScreen: User name = "${user.name}"');
+        print('🚀 UnifiedHomeScreen: User email = "${user.email}"');
+
+        // Show farmer-specific home screen for farmer role
+        if (user.userRole == 'farmer') {
+          print('✅ UnifiedHomeScreen: Showing FarmerHomeScreen');
+          return const FarmerHomeScreen();
+        }
+
+        print('🟡 UnifiedHomeScreen: Showing standard home screen for role: ${user.userRole}');
 
         return Scaffold(
           backgroundColor: UnifiedTheme.backgroundColor,

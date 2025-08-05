@@ -266,7 +266,7 @@ class _SignInScreenState extends State<SignInScreen> with TickerProviderStateMix
                         style: ElevatedButton.styleFrom(
                           backgroundColor: UnifiedTheme.primaryGreen,
                           disabledBackgroundColor: UnifiedTheme.tertiaryText,
-                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -471,7 +471,7 @@ class _SignInScreenState extends State<SignInScreen> with TickerProviderStateMix
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
-              vertical: 16,
+              vertical: 12,
             ),
           ),
         ),
@@ -490,7 +490,7 @@ class _SignInScreenState extends State<SignInScreen> with TickerProviderStateMix
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

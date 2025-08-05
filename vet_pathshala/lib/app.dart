@@ -248,6 +248,18 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
     
+    // Debug: Print user info in MainApp
+    print('🔧 MainApp: Building with user role = "${user?.userRole}"');
+    print('🔧 MainApp: User name = "${user?.name}"');
+    
+    // Different navigation for farmers vs other roles
+    if (user?.userRole == 'farmer') {
+      print('✅ MainApp: Detected farmer role, building farmer navigation');
+      return _buildFarmerNavigation();
+    }
+    
+    print('🟡 MainApp: Building standard navigation for role: ${user?.userRole}');
+    
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -285,6 +297,73 @@ class _MainAppState extends State<MainApp> {
             label: 'Profile',
           ),
         ],
+      ),
+    );
+  }
+
+  // Farmer-specific navigation matching the design: 🔵🏠 📖 💊 📁 👤
+  Widget _buildFarmerNavigation() {
+    print('🚜 MainApp: Building farmer-specific navigation');
+    final farmerScreens = [
+      const UnifiedHomeScreen(),    // Home (shows FarmerHomeScreen)
+      const EbooksScreen(),         // E-books  
+      const DrugIndexScreen(),      // Drugs
+      const GamificationScreen(),   // Files/Gamification
+      const ProfileScreen(),        // Profile
+    ];
+
+    return Scaffold(
+      body: farmerScreens[_currentIndex],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: UnifiedTheme.cardBackground,
+          border: Border(
+            top: BorderSide(
+              color: const Color(0xFF2E7D32).withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.transparent,
+          selectedItemColor: const Color(0xFF2E7D32), // Farm green
+          unselectedItemColor: UnifiedTheme.tertiaryText,
+          elevation: 0,
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Text('🏠', style: TextStyle(fontSize: 20)),
+              activeIcon: Text('🏠', style: TextStyle(fontSize: 22)),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Text('📖', style: TextStyle(fontSize: 20)),
+              activeIcon: Text('📖', style: TextStyle(fontSize: 22)),
+              label: 'E-books',
+            ),
+            BottomNavigationBarItem(
+              icon: Text('💊', style: TextStyle(fontSize: 20)),
+              activeIcon: Text('💊', style: TextStyle(fontSize: 22)),
+              label: 'Drugs',
+            ),
+            BottomNavigationBarItem(
+              icon: Text('📁', style: TextStyle(fontSize: 20)),
+              activeIcon: Text('📁', style: TextStyle(fontSize: 22)),
+              label: 'Files',
+            ),
+            BottomNavigationBarItem(
+              icon: Text('👤', style: TextStyle(fontSize: 20)),
+              activeIcon: Text('👤', style: TextStyle(fontSize: 22)),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }

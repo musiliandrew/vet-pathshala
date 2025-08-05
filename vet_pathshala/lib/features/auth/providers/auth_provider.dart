@@ -40,6 +40,7 @@ class AuthProvider extends ChangeNotifier {
             _currentUser = await _authService.getCurrentUserData();
             if (_currentUser != null) {
               print('✅ AuthProvider: User data loaded successfully, setting authenticated state');
+              print('🚀 AuthProvider: User role from loaded data = "${_currentUser!.userRole}"');
               _setState(AuthState.authenticated);
             } else {
               // User is authenticated with Firebase but has no Firestore document
@@ -157,11 +158,36 @@ class AuthProvider extends ChangeNotifier {
       // The Firebase auth state will change and trigger the listener
       print('🟡 AuthProvider: Waiting for auth state listener to handle authentication...');
       
+      // If role was specified, refresh user data to get the updated role
+      if (role != null) {
+        print('🔄 AuthProvider: Refreshing user data after role update...');
+        await Future.delayed(Duration(milliseconds: 1000)); // Longer delay to ensure Firestore update
+        await refreshUserData();
+        // Force UI rebuild after role change
+        print('🔄 AuthProvider: Forcing UI rebuild after role change...');
+        notifyListeners();
+      }
+      
       return true;
     } catch (e) {
       print('🔴 AuthProvider: Google sign-in failed: $e');
       _setError(_parseAuthError(e.toString()));
       return false;
+    }
+  }
+
+  // Refresh current user data
+  Future<void> refreshUserData() async {
+    try {
+      print('🔄 AuthProvider: Refreshing user data...');
+      final userData = await _authService.getCurrentUserData();
+      if (userData != null) {
+        _currentUser = userData;
+        print('✅ AuthProvider: User data refreshed, new role = "${userData.userRole}"');
+        notifyListeners(); // Force UI rebuild
+      }
+    } catch (e) {
+      print('🔴 AuthProvider: Failed to refresh user data: $e');
     }
   }
 
