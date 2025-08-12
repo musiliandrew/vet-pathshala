@@ -54,17 +54,20 @@ class NotesTopicsScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          InkWell(
-            onTap: () => notesProvider.resetToCategories(),
-            borderRadius: BorderRadius.circular(8),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Text(
-                selectedCategory['title'] ?? 'Categories',
-                style: TextStyle(
-                  color: UnifiedTheme.primaryGreen,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
+          Flexible(
+            child: InkWell(
+              onTap: () => notesProvider.resetToCategories(),
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Text(
+                  selectedCategory['title'] ?? 'Categories',
+                  style: TextStyle(
+                    color: UnifiedTheme.primaryGreen,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
@@ -76,23 +79,26 @@ class NotesTopicsScreen extends StatelessWidget {
             color: UnifiedTheme.tertiaryText,
           ),
           const SizedBox(width: 4),
-          InkWell(
-            onTap: () {
-              // Go back to subjects
-              notesProvider.loadSubjects(
-                notesProvider.selectedCategoryId!,
-                context.read<AuthProvider>().currentUser!.userRole,
-              );
-            },
-            borderRadius: BorderRadius.circular(8),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Text(
-                selectedSubject['title'] ?? 'Subjects',
-                style: TextStyle(
-                  color: UnifiedTheme.primaryGreen,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
+          Flexible(
+            child: InkWell(
+              onTap: () {
+                // Go back to subjects
+                notesProvider.loadSubjects(
+                  notesProvider.selectedCategoryId!,
+                  context.read<AuthProvider>().currentUser!.userRole,
+                );
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Text(
+                  selectedSubject['title'] ?? 'Subjects',
+                  style: TextStyle(
+                    color: UnifiedTheme.primaryGreen,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),

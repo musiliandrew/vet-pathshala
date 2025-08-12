@@ -364,4 +364,50 @@ class CoinProvider with ChangeNotifier {
     _lastDailyBonusCheck = null;
     notifyListeners();
   }
+
+  // Simple method to add coins (for farmer module features)
+  void addCoins(int amount, String reason) {
+    _currentBalance += amount;
+    
+    // Create transaction record
+    final transaction = CoinTransaction(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      userId: 'current_user', // In real app, this would come from auth
+      type: CoinService.transactionTypeEarn,
+      amount: amount,
+      reason: reason,
+      description: reason,
+      balanceBefore: _currentBalance - amount,
+      balanceAfter: _currentBalance,
+      metadata: {},
+      createdAt: DateTime.now(),
+    );
+    
+    _transactions.insert(0, transaction);
+    notifyListeners();
+  }
+
+  // Simple method to deduct coins (for farmer module features)
+  void deductCoins(int amount, String reason) {
+    if (_currentBalance >= amount) {
+      _currentBalance -= amount;
+      
+      // Create transaction record
+      final transaction = CoinTransaction(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: 'current_user', // In real app, this would come from auth
+        type: CoinService.transactionTypeSpend,
+        amount: amount,
+        reason: reason,
+        description: reason,
+        balanceBefore: _currentBalance + amount,
+        balanceAfter: _currentBalance,
+        metadata: {},
+        createdAt: DateTime.now(),
+      );
+      
+      _transactions.insert(0, transaction);
+      notifyListeners();
+    }
+  }
 }

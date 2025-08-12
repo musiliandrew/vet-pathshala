@@ -10,6 +10,8 @@ import '../widgets/note_action_panel.dart';
 import '../widgets/sticky_note_widget.dart';
 import '../widgets/ai_summary_widget.dart';
 import '../widgets/text_selection_toolbar.dart';
+import '../widgets/tts_control_widget.dart';
+import '../widgets/flashcard_generator_widget.dart';
 
 class NoteReaderScreen extends StatefulWidget {
   final NoteModel note;
@@ -315,14 +317,36 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
             Consumer<NotesProvider>(
               builder: (context, notesProvider, child) {
                 if (notesProvider.aiSummary != null) {
-                  return AISummaryWidget(
-                    summary: notesProvider.aiSummary!,
-                    onDismiss: () => setState(() {}),
+                  return Column(
+                    children: [
+                      AISummaryWidget(
+                        summary: notesProvider.aiSummary!,
+                        onDismiss: () => setState(() {}),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                   );
                 }
                 return const SizedBox.shrink();
               },
             ),
+
+            // Text-to-Speech Controls
+            TtsControlWidget(
+              noteContent: widget.note.content,
+              selectedText: _selectedText,
+            ),
+            const SizedBox(height: 16),
+
+            // Auto-Flashcard Generator
+            FlashcardGeneratorWidget(
+              note: widget.note,
+              onFlashcardsGenerated: () {
+                // Optionally refresh something or show feedback
+                setState(() {});
+              },
+            ),
+            const SizedBox(height: 20),
 
             // Note Content with Selection Support
             SelectableText.rich(

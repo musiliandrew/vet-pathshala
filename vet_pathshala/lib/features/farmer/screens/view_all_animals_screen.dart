@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/unified_theme.dart';
+import '../services/qr_service.dart';
+import '../models/animal_model.dart';
+import '../../coins/providers/coin_provider.dart';
+import 'qr_scanner_screen.dart';
+import 'animal_profile_screen.dart';
+import 'add_animal_screen.dart';
 
 class ViewAllAnimalsScreen extends StatefulWidget {
   const ViewAllAnimalsScreen({super.key});
@@ -269,7 +277,12 @@ class _ViewAllAnimalsScreenState extends State<ViewAllAnimalsScreen> {
           Expanded(
             child: ElevatedButton.icon(
               onPressed: () {
-                // Handle QR scan
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const QRScannerScreen(),
+                  ),
+                );
               },
               icon: const Icon(Icons.qr_code_scanner, size: 16),
               label: const Text('QR Scan', style: TextStyle(fontSize: 12)),
@@ -457,7 +470,7 @@ class _ViewAllAnimalsScreenState extends State<ViewAllAnimalsScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const AddNewAnimalScreen(),
+              builder: (context) => const AddAnimalScreen(),
             ),
           );
         },
@@ -558,6 +571,7 @@ class _AddNewAnimalScreenState extends State<AddNewAnimalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('AddNewAnimalScreen build called'); // Debug
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
@@ -727,7 +741,7 @@ class _AddNewAnimalScreenState extends State<AddNewAnimalScreen> {
               const Text('🔲 QR Code: '),
               ElevatedButton(
                 onPressed: () {
-                  _showCoinRequiredDialog('Generate QR Code', 10);
+                  _showGenerateQRDialog();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.amber,
@@ -1321,6 +1335,238 @@ class _AddNewAnimalScreenState extends State<AddNewAnimalScreen> {
     );
   }
 
+  void _showGenerateQRDialog() async {
+    final coinProvider = context.read<CoinProvider>();
+    const requiredCoins = 10;
+
+    if (coinProvider.currentBalance < requiredCoins) {
+      _showCoinRequiredDialog('Generate QR Code', requiredCoins);
+      return;
+    }
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('🔲 Generate QR Code'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Generate a high-quality QR code for this animal profile?'),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.info, color: Colors.amber),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Cost: $requiredCoins coins',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              '• Google Lens compatible\n• High-quality scanning\n• Shareable format',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF4CAF50),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Generate'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      _generateQRCode();
+    }
+  }
+
+  void _generateQRCode() async {
+    // For demo, create a sample animal - in real app this would be current animal being added
+    final sampleAnimal = AnimalModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: _nameController.text.isNotEmpty ? _nameController.text : 'Sample Animal',
+      type: selectedAnimalType,
+      tagId: _tagIdController.text,
+      dateOfBirth: selectedBirthDate,
+      gender: selectedGender,
+      origin: selectedOrigin,
+      breed: selectedBreed,
+      customTags: customTags,
+      vaccinations: vaccinationHistory.map((v) => VaccinationRecord(
+        vaccineName: v['vaccine']!,
+        date: DateTime.now(), // In real app, parse date
+      )).toList(),
+      qrCode: '',
+      ownerId: 'current_user_id', // In real app, get from auth
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      status: AnimalStatus.healthy,
+    );
+
+    try {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Generating QR code...'),
+            ],
+          ),
+        ),
+      );
+
+      // Generate QR code data
+      final qrData = QRService.generateAnimalQRData(sampleAnimal);
+      
+      // Save QR code image
+      final imagePath = await QRService.saveQRCodeImage(qrData, sampleAnimal.name);
+      
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+      
+      if (imagePath != null) {
+        // Deduct coins and show success
+        context.read<CoinProvider>().deductCoins(10, 'QR Code Generation');
+        
+        // Show QR code dialog
+        _showQRCodePreview(qrData, sampleAnimal.name);
+      } else {
+        throw Exception('Failed to generate QR code image');
+      }
+      
+    } catch (e) {
+      // Close loading dialog if still open
+      if (mounted) Navigator.pop(context);
+      
+      // Show error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to generate QR code: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showQRCodePreview(String qrData, String animalName) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '✅ QR Code Generated!',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF4CAF50),
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // QR Code display
+              QRService.buildQRWidget(qrData, size: 200),
+              
+              const SizedBox(height: 20),
+              
+              Text(
+                'QR code for $animalName has been generated and saved to your device.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14),
+              ),
+              
+              const SizedBox(height: 20),
+              
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Close'),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      try {
+                        // For demo, create animal instance for sharing
+                        final animal = AnimalModel(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          name: animalName,
+                          type: 'cow',
+                          tagId: 'DEMO-001',
+                          dateOfBirth: DateTime.now().subtract(const Duration(days: 365)),
+                          gender: 'Female',
+                          origin: 'Home-born',
+                          breed: 'Holstein',
+                          customTags: [],
+                          vaccinations: [],
+                          qrCode: qrData,
+                          ownerId: 'demo',
+                          createdAt: DateTime.now(),
+                          updatedAt: DateTime.now(),
+                          status: AnimalStatus.healthy,
+                        );
+                        
+                        await QRService.shareAnimalQR(animal);
+                        if (mounted) Navigator.pop(context);
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Failed to share QR code'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    icon: const Icon(Icons.share),
+                    label: const Text('Share'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4CAF50),
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showCoinRequiredDialog(String feature, int coins) {
     showDialog(
       context: context,
@@ -1355,7 +1601,7 @@ class _AddNewAnimalScreenState extends State<AddNewAnimalScreen> {
     );
   }
 
-  void _saveAnimalProfile() {
+  void _saveAnimalProfile() async {
     // Validate required fields
     if (_nameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1364,34 +1610,139 @@ class _AddNewAnimalScreenState extends State<AddNewAnimalScreen> {
       return;
     }
 
-    // Show success dialog
+    if (_tagIdController.text.isEmpty || _tagIdController.text == 'RF-2024-') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please complete the tag ID')),
+      );
+      return;
+    }
+
+    // Show loading
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text('✅ Success!'),
-          content: Text(
-            'Animal profile for ${_nameController.text} has been saved successfully!',
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Return to previous screen
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4CAF50),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('OK'),
-            ),
+      barrierDismissible: false,
+      builder: (context) => const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Creating animal profile...'),
           ],
-        );
-      },
+        ),
+      ),
     );
+
+    try {
+      // Create AnimalModel
+      final animalId = DateTime.now().millisecondsSinceEpoch.toString();
+      final animal = AnimalModel(
+        id: animalId,
+        name: _nameController.text,
+        type: selectedAnimalType,
+        tagId: _tagIdController.text,
+        dateOfBirth: selectedBirthDate,
+        gender: selectedGender,
+        breed: selectedBreed,
+        ownerId: 'current_farmer', // In real app, get from auth
+        status: AnimalStatus.healthy,
+        dam: _damController.text.isNotEmpty ? _damController.text : null,
+        sire: _sireController.text.isNotEmpty ? _sireController.text : null,
+        origin: selectedOrigin,
+        purchaseDate: selectedOrigin == 'Purchased' ? selectedPurchaseDate : null,
+        purchasePrice: selectedOrigin == 'Purchased' && _purchasePriceController.text.isNotEmpty 
+            ? double.tryParse(_purchasePriceController.text) : null,
+        specialMarks: _specialMarksController.text.isNotEmpty ? _specialMarksController.text : null,
+        customTags: customTags,
+        vaccinations: vaccinationHistory.map((v) => VaccinationRecord(
+          vaccineName: v['vaccine']!,
+          date: DateFormat('dd MMM yyyy').parse(v['date']!),
+          veterinarian: null,
+          notes: null,
+        )).toList(),
+        notes: _notesController.text.isNotEmpty ? _notesController.text : null,
+        qrCode: 'https://vetpathshala.app/animal/$animalId',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      // Simulate saving to database
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Award coins for creating new animal profile
+      if (mounted) {
+        context.read<CoinProvider>().addCoins(10, 'New Animal Profile Created');
+      }
+
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        
+        // Show success dialog with QR code generation option
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Text('✅ Success!'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Animal profile for ${_nameController.text} has been saved successfully!',
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    '+10 coins earned! 🪙',
+                    style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Would you like to:'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog
+                    Navigator.of(context).pop(); // Return to animals list
+                  },
+                  child: const Text('Done'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => AnimalProfileScreen(animal: animal),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.visibility),
+                  label: const Text('View Profile'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4CAF50),
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }
+
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save animal profile: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override

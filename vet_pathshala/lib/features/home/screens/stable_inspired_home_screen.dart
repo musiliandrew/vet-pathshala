@@ -2098,7 +2098,7 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
   void _navigateToEbooks(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const EbooksScreen()),
+      MaterialPageRoute(builder: (context) => const EBooksScreen()),
     );
   }
 }

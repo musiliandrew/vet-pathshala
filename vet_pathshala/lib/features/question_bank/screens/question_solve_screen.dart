@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/unified_theme.dart';
+import '../../../core/services/user_interaction_service.dart';
+import '../../../shared/widgets/report_dialog.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../widgets/ai_explanation_widget.dart';
 
 class QuestionSolveScreen extends StatefulWidget {
   final Map<String, dynamic> question;
@@ -714,66 +719,22 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
       );
     }
     
-    // AI Response Display
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: UnifiedTheme.spacingM),
-      padding: const EdgeInsets.all(UnifiedTheme.spacingL),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [UnifiedTheme.blueAccent.withOpacity(0.1), UnifiedTheme.blueAccent.withOpacity(0.05)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: UnifiedTheme.blueAccent, width: 2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.smart_toy,
-                color: UnifiedTheme.blueAccent,
-                size: 18,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'AI Explanation',
-                style: UnifiedTheme.headerSmall.copyWith(
-                  color: UnifiedTheme.blueAccent,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: UnifiedTheme.spacingM),
-          Text(
-            'The correct answer is A - Dravya, Guna, Karma, Sāmānya, Vishesha, Samavāya. According to Charaka Samhita, this is the traditional sequence of the six categories (shat padartha) in Ayurvedic philosophy. Your selected answer represents a different philosophical arrangement.',
-            style: UnifiedTheme.bodyMedium.copyWith(
-              color: UnifiedTheme.blueAccent,
-              height: 1.6,
-            ),
-          ),
-          const SizedBox(height: UnifiedTheme.spacingM),
-          GestureDetector(
-            onTap: () => _continueToNext(),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: UnifiedTheme.blueAccent,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'Continue to Next Question →',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-        ],
+    // AI Explanation Widget
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: UnifiedTheme.spacingM),
+      child: AIExplanationWidget(
+        questionId: '${widget.question['id'] ?? 'demo_question'}',
+        questionText: _questionData['questionText'],
+        correctAnswer: _questionData['options'][_questionData['correctAnswer']],
+        allOptions: List<String>.from(_questionData['options']),
+        category: widget.subject['title'] ?? 'General',
+        difficulty: widget.question['difficulty'] ?? 'medium',
+        isExpanded: _showAIResponse,
+        onToggle: () {
+          setState(() {
+            _showAIResponse = !_showAIResponse;
+          });
+        },
       ),
     );
   }
@@ -910,14 +871,67 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
     );
   }
 
-  void _handleAction(String action) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${action.toUpperCase()} action performed!'),
-        backgroundColor: UnifiedTheme.primaryGreen,
-        duration: const Duration(seconds: 1),
-      ),
-    );
+  void _handleAction(String action) async {
+    final authProvider = context.read<AuthProvider>();
+    if (authProvider.currentUser == null) return;
+    
+    final interactionService = UserInteractionService();
+    final userId = authProvider.currentUser!.id;
+    final contentId = widget.question['id']?.toString() ?? 'demo_question';
+    
+    switch (action.toLowerCase()) {
+      case 'like':
+        final wasLiked = await interactionService.likeContent(
+          userId: userId,
+          contentId: contentId,
+          contentType: 'question',
+        );
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(wasLiked ? 'Question liked!' : 'Like removed'),
+              backgroundColor: UnifiedTheme.primaryGreen,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+        break;
+        
+      case 'report':
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => ReportDialog(
+              contentId: contentId,
+              contentType: 'question',
+              userId: userId,
+              contentTitle: _questionData['questionText'].toString().substring(0, 50) + '...',
+            ),
+          );
+        }
+        break;
+        
+      case 'view':
+        await interactionService.viewContent(
+          userId: userId,
+          contentId: contentId,
+          contentType: 'question',
+          duration: _timeElapsed,
+        );
+        break;
+        
+      default:
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${action.toUpperCase()} action performed!'),
+              backgroundColor: UnifiedTheme.primaryGreen,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+    }
   }
 
   void _showStickyNotes() {

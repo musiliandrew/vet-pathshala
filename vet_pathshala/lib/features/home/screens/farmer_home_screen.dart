@@ -7,6 +7,7 @@ import '../../coins/providers/coin_provider.dart';
 import '../providers/home_provider.dart';
 import '../../farmer/screens/view_all_animals_screen.dart';
 import '../../farmer/screens/daily_milk_log_screen.dart';
+import '../../farmer/screens/add_animal_screen.dart';
 
 class FarmerHomeScreen extends StatefulWidget {
   const FarmerHomeScreen({super.key});
@@ -341,7 +342,12 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> with TickerProvider
               Row(
                 children: [
                   _buildActionButton('➕ Add Animal', () {
-                    // Navigate to add animal screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddAnimalScreen(),
+                      ),
+                    );
                   }),
                   const SizedBox(width: 8),
                   _buildActionButton('📊 View All', () {

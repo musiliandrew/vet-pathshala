@@ -21,7 +21,7 @@ class _InspiredMainScreenState extends State<InspiredMainScreen> {
 
   final List<Widget> _screens = [
     const StableInspiredHomeScreen(),
-    const EbooksScreen(),
+    const EBooksScreen(),
     const DrugIndexScreen(),
     const GamificationScreen(),
     const ProfileScreen(),
@@ -41,7 +41,7 @@ class _InspiredMainScreenState extends State<InspiredMainScreen> {
       
       final farmerScreens = [
         const FarmerHomeScreen(),     // Farmer home instead of StableInspiredHomeScreen
-        const EbooksScreen(),
+        const EBooksScreen(),
         const DrugIndexScreen(),
         const GamificationScreen(),
         const ProfileScreen(),

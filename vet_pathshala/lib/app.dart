@@ -238,7 +238,7 @@ class _MainAppState extends State<MainApp> {
 
   final List<Widget> _screens = [
     const UnifiedHomeScreen(),    // Home
-    const EbooksScreen(),            // E-books
+    const EBooksScreen(),            // E-books
     const DrugIndexScreen(),         // Drugs
     const GamificationScreen(),      // Gamification
     const ProfileScreen(),           // Profile
@@ -306,7 +306,7 @@ class _MainAppState extends State<MainApp> {
     print('🚜 MainApp: Building farmer-specific navigation');
     final farmerScreens = [
       const UnifiedHomeScreen(),    // Home (shows FarmerHomeScreen)
-      const EbooksScreen(),         // E-books  
+      const EBooksScreen(),         // E-books  
       const DrugIndexScreen(),      // Drugs
       const GamificationScreen(),   // Files/Gamification
       const ProfileScreen(),        // Profile

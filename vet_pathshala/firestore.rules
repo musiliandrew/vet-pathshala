@@ -80,5 +80,90 @@ service cloud.firestore {
       allow create: if request.auth != null;
     }
 
+    // Flashcards - users can read/write their own
+    match /flashcards/{flashcardId} {
+      allow read, write: if request.auth != null &&
+                         resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+    }
+
+    // Animal records for farmers
+    match /animals/{animalId} {
+      allow read, write: if request.auth != null &&
+                         resource.data.ownerId == request.auth.uid;
+      allow create: if request.auth != null;
+    }
+
+    // Health records
+    match /healthRecords/{recordId} {
+      allow read, write: if request.auth != null &&
+                         resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+    }
+
+    // Breeding records
+    match /breedingRecords/{recordId} {
+      allow read, write: if request.auth != null &&
+                         resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+    }
+
+    // Financial records
+    match /financialRecords/{recordId} {
+      allow read, write: if request.auth != null &&
+                         resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+    }
+
+    // Gamification data
+    match /userGameStats/{userId} {
+      allow read, write: if request.auth != null &&
+                         request.auth.uid == userId;
+      allow create: if request.auth != null;
+    }
+
+    match /pointsTransactions/{transactionId} {
+      allow read: if request.auth != null &&
+                  resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+    }
+
+    match /achievements/{achievementId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+    }
+
+    // Quiz data
+    match /quizzes/{quizId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+                   get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userRole == 'admin';
+    }
+
+    match /quizAttempts/{attemptId} {
+      allow read, write: if request.auth != null &&
+                         resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+    }
+
+    // E-books
+    match /ebooks/{ebookId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+                   get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userRole == 'admin';
+    }
+
+    match /readingProgress/{progressId} {
+      allow read, write: if request.auth != null &&
+                         resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+    }
+
+    // Allow all authenticated users to read public data collections
+    match /{document=**} {
+      allow read: if request.auth != null && 
+                  (resource == null || resource.data.isPublished == true);
+    }
+
   }
 }

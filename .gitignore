@@ -1,0 +1,53 @@
+# Heavy modules and dependencies
+node_modules/
+jdk-17.0.2/
+*.tar.gz
+openjdk-17.tar.gz
+
+# Build artifacts
+vet_pathshala/build/
+vet_pathshala/android/build/
+vet_pathshala/ios/build/
+vet_pathshala/web/build/
+vet_pathshala/linux/build/
+vet_pathshala/macos/build/
+vet_pathshala/windows/build/
+
+# Kotlin session files
+vet_pathshala/android/.kotlin/
+
+# Android build files
+vet_pathshala/android/app/build/
+vet_pathshala/android/.gradle/
+vet_pathshala/android/gradle-wrapper.jar
+vet_pathshala/android/local.properties
+
+# iOS build files
+vet_pathshala/ios/Flutter/flutter_export_environment.sh
+vet_pathshala/ios/Runner.xcworkspace/
+vet_pathshala/ios/Runner.xcodeproj/xcuserdata/
+
+# Flutter/Dart related
+vet_pathshala/.dart_tool/
+vet_pathshala/.packages
+vet_pathshala/.pub-cache/
+vet_pathshala/.pub/
+vet_pathshala/pubspec.lock
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
