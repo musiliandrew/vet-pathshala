@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class TestSeries {
   final String id;
   final String title;
@@ -18,6 +20,11 @@ class TestSeries {
   final double averageScore;
   final List<String> tags;
   final String thumbnailUrl;
+  final String targetRole; // doctor, pharmacist, farmer
+  final List<String> testIds; // List of individual test IDs
+  final DateTime startDate;
+  final DateTime endDate;
+  final bool isActive;
 
   TestSeries({
     required this.id,
@@ -39,6 +46,11 @@ class TestSeries {
     this.averageScore = 0.0,
     this.tags = const [],
     this.thumbnailUrl = '',
+    required this.targetRole,
+    this.testIds = const [],
+    required this.startDate,
+    required this.endDate,
+    this.isActive = true,
   });
 
   factory TestSeries.fromJson(Map<String, dynamic> json) {

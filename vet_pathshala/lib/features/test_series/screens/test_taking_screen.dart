@@ -4,6 +4,8 @@ import 'dart:async';
 import '../../../core/theme/unified_theme.dart';
 import '../models/test_series_model.dart';
 import '../providers/test_series_provider.dart';
+import '../../../shared/models/test_series_models.dart';
+import '../widgets/victory_modal.dart';
 
 class TestTakingScreen extends StatefulWidget {
   final TestSeries testSeries;
@@ -435,19 +437,93 @@ class _TestTakingScreenState extends State<TestTakingScreen> {
     if (shouldSubmit == true) {
       _timer.cancel();
       
-      final success = await context.read<TestSeriesProvider>().submitTest();
-      
-      if (success && mounted) {
-        Navigator.pushReplacementNamed(context, '/test-result');
-      } else {
+      try {
+        final provider = context.read<TestSeriesProvider>();
+        
+        // Calculate results
+        final currentAttempt = provider.currentAttempt;
+        if (currentAttempt != null) {
+          final correctAnswers = currentAttempt.correctAnswers;
+          final totalQuestions = currentAttempt.totalQuestions;
+          final finalScore = correctAnswers * 4; // 4 marks per question
+          final totalMarks = totalQuestions * 4;
+          final percentage = (finalScore / totalMarks) * 100;
+          
+          // Calculate XP and coins
+          final xpEarned = _calculateXP(percentage);
+          final coinsEarned = _calculateCoins(percentage, correctAnswers);
+          
+          // Create mock result for victory modal
+          final result = TestResultModel(
+            attemptId: currentAttempt.id,
+            finalScore: finalScore,
+            totalMarks: totalMarks,
+            percentage: percentage,
+            rank: _calculateMockRank(percentage),
+            totalParticipants: 50, // Mock data
+            timeSpent: widget.testSeries.duration * 60 - _remainingSeconds,
+            categoryWiseScores: {
+              'Easy': (correctAnswers * 0.6).round(),
+              'Medium': (correctAnswers * 0.3).round(),
+              'Hard': (correctAnswers * 0.1).round(),
+            },
+            xpEarned: xpEarned,
+            coinsEarned: coinsEarned,
+            isPassed: percentage >= 60,
+            topRankers: [], // Mock empty for now
+          );
+          
+          // Show victory modal
+          if (mounted) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => VictoryModal(
+                result: result,
+                onContinue: () {
+                  Navigator.of(context).pop(); // Close modal
+                  Navigator.of(context).pop(); // Go back to test list
+                },
+              ),
+            );
+          }
+        }
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to submit test. Please try again.'),
+          SnackBar(
+            content: Text('Failed to submit test: $e'),
             backgroundColor: Colors.red,
           ),
         );
       }
     }
+  }
+  
+  int _calculateXP(double percentage) {
+    if (percentage >= 90) return 100;
+    if (percentage >= 80) return 80;
+    if (percentage >= 70) return 60;
+    if (percentage >= 60) return 50;
+    if (percentage >= 50) return 30;
+    return 10;
+  }
+
+  int _calculateCoins(double percentage, int correctAnswers) {
+    int baseCoins = (percentage / 10).round();
+    int bonusCoins = correctAnswers >= 40 ? 10 : correctAnswers >= 30 ? 5 : 0;
+    return baseCoins + bonusCoins;
+  }
+  
+  int _calculateMockRank(double percentage) {
+    if (percentage >= 95) return 1;
+    if (percentage >= 90) return 2;
+    if (percentage >= 85) return 3;
+    if (percentage >= 80) return 5;
+    if (percentage >= 75) return 8;
+    if (percentage >= 70) return 12;
+    if (percentage >= 65) return 18;
+    if (percentage >= 60) return 25;
+    return 35;
   }
 
   Future<bool?> _showExitDialog() {
