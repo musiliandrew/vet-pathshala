@@ -37,6 +37,11 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
   int _timeElapsed = 0;
   bool _isBookmarked = false;
   bool _timerStopped = false;
+  bool _isLiked = false;
+  int _likeCount = 0;
+  int _viewCount = 0;
+  int _reportCount = 0;
+  int _noteCount = 0;
   
   // Sample question data with options
   final Map<String, dynamic> _questionData = {
@@ -56,6 +61,11 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
   void initState() {
     super.initState();
     _isBookmarked = widget.question['isBookmarked'] ?? false;
+    _isLiked = widget.question['isLiked'] ?? false;
+    _likeCount = widget.question['likeCount'] ?? 0;
+    _viewCount = widget.question['viewCount'] ?? 8;
+    _reportCount = widget.question['reportCount'] ?? 0;
+    _noteCount = widget.question['noteCount'] ?? 0;
     
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
@@ -139,6 +149,7 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
           ),
         ),
       ),
+      bottomNavigationBar: _buildFixedActionBar(context),
     );
   }
 
@@ -217,13 +228,10 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Center(
-              child: Text(
-                'TE',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
+              child: Icon(
+                Icons.translate,
+                color: Colors.white,
+                size: 22,
               ),
             ),
           ),
@@ -253,9 +261,6 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
           
           // Question Content
           _buildQuestionContent(context),
-          
-          // Action Bar
-          _buildActionBar(context),
         ],
       ),
     );
@@ -513,49 +518,109 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
     );
   }
 
-  Widget _buildActionBar(BuildContext context) {
+  Widget _buildFixedActionBar(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: UnifiedTheme.borderColor)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildActionButton('Like', 0, () => _handleAction('like')),
-          _buildActionButton('View', widget.question['viewCount'] ?? 8, () => _handleAction('view')),
-          _buildActionButton('Report', 0, () => _handleAction('report')),
-          _buildActionButton('Notes', 0, () => _showStickyNotes),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: const Border(top: BorderSide(color: UnifiedTheme.borderColor)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
         ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildFixedActionButton(
+                icon: _isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                label: 'Like',
+                count: _likeCount,
+                onTap: () => _handleAction('like'),
+                isActive: _isLiked,
+              ),
+              _buildFixedActionButton(
+                icon: Icons.visibility_outlined,
+                label: 'Views',
+                count: _viewCount,
+                onTap: () => _handleAction('view'),
+              ),
+              _buildFixedActionButton(
+                icon: Icons.report_outlined,
+                label: 'Report',
+                count: _reportCount,
+                onTap: () => _handleAction('report'),
+              ),
+              _buildFixedActionButton(
+                icon: Icons.sticky_note_2_outlined,
+                label: 'Notes',
+                count: _noteCount,
+                onTap: _showStickyNotes,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildActionButton(String label, int count, VoidCallback onTap) {
+  Widget _buildFixedActionButton({
+    required IconData icon,
+    required String label,
+    required int count,
+    required VoidCallback onTap,
+    bool isActive = false,
+  }) {
+    final activeColor = isActive ? UnifiedTheme.primaryGreen : UnifiedTheme.primaryGreen.withOpacity(0.8);
+    final bgColor = isActive ? UnifiedTheme.primaryGreen.withOpacity(0.2) : UnifiedTheme.primaryGreen.withOpacity(0.1);
+    
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: UnifiedTheme.lightBackground,
-          borderRadius: BorderRadius.circular(6),
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: activeColor.withOpacity(0.4),
+            width: isActive ? 2 : 1,
+          ),
         ),
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Icon(
+              icon,
+              size: 20,
+              color: activeColor,
+            ),
+            const SizedBox(height: 2),
             Text(
-              label.replaceAll('👍 ', '').replaceAll('👁️ ', '').replaceAll('📋 ', '').replaceAll('📝 ', ''),
-              style: UnifiedTheme.bodySmall.copyWith(
-                color: UnifiedTheme.tertiaryText,
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+                color: activeColor,
               ),
             ),
-            const SizedBox(width: 4),
-            Text(
-              count.toString(),
-              style: UnifiedTheme.bodySmall.copyWith(
-                color: UnifiedTheme.tertiaryText,
+            if (count > 0) ...[
+              const SizedBox(height: 1),
+              Text(
+                count.toString(),
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                  color: activeColor.withOpacity(0.8),
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),
@@ -881,26 +946,40 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
     
     switch (action.toLowerCase()) {
       case 'like':
-        final wasLiked = await interactionService.likeContent(
-          userId: userId,
-          contentId: contentId,
-          contentType: 'question',
-        );
+        setState(() {
+          _isLiked = !_isLiked;
+          _likeCount = _isLiked ? _likeCount + 1 : _likeCount - 1;
+        });
         
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(wasLiked ? 'Question liked!' : 'Like removed'),
-              backgroundColor: UnifiedTheme.primaryGreen,
-              behavior: SnackBarBehavior.floating,
-            ),
+        try {
+          final wasLiked = await interactionService.likeContent(
+            userId: userId,
+            contentId: contentId,
+            contentType: 'question',
           );
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(wasLiked ? 'Question liked!' : 'Like removed'),
+                backgroundColor: UnifiedTheme.primaryGreen,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        } catch (e) {
+          // Revert state if API call fails
+          setState(() {
+            _isLiked = !_isLiked;
+            _likeCount = _isLiked ? _likeCount + 1 : _likeCount - 1;
+          });
         }
         break;
         
       case 'report':
         if (mounted) {
-          showDialog(
+          final result = await showDialog<bool>(
             context: context,
             builder: (context) => ReportDialog(
               contentId: contentId,
@@ -909,10 +988,20 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
               contentTitle: _questionData['questionText'].toString().substring(0, 50) + '...',
             ),
           );
+          
+          if (result == true) {
+            setState(() {
+              _reportCount++;
+            });
+          }
         }
         break;
         
       case 'view':
+        setState(() {
+          _viewCount++;
+        });
+        
         await interactionService.viewContent(
           userId: userId,
           contentId: contentId,
@@ -928,6 +1017,7 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
               content: Text('${action.toUpperCase()} action performed!'),
               backgroundColor: UnifiedTheme.primaryGreen,
               behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
             ),
           );
         }
@@ -935,6 +1025,8 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
   }
 
   void _showStickyNotes() {
+    final TextEditingController notesController = TextEditingController();
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -967,6 +1059,32 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
                     ),
                   ),
                   const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      if (notesController.text.trim().isNotEmpty) {
+                        setState(() {
+                          _noteCount++;
+                        });
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Note saved!'),
+                            backgroundColor: UnifiedTheme.primaryGreen,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(
+                        color: UnifiedTheme.primaryGreen,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.close),
@@ -977,10 +1095,11 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(16),
-                child: const TextField(
+                child: TextField(
+                  controller: notesController,
                   maxLines: null,
                   expands: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Write your notes here...',
                     border: InputBorder.none,
                   ),
@@ -994,7 +1113,24 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
   }
 
   void _previousQuestion() {
-    Navigator.pop(context);
+    if (_questionData['currentQuestionNumber'] > 1) {
+      // In a real app, this would navigate to the previous question
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Going to previous question...'),
+          backgroundColor: UnifiedTheme.primaryGreen,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This is the first question!'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _nextQuestion() {
@@ -1009,14 +1145,24 @@ class _QuestionSolveScreenState extends State<QuestionSolveScreen> with TickerPr
       return;
     }
     
-    // Move to next question - in real app this would navigate to next question
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Moving to next question...'),
-        backgroundColor: UnifiedTheme.primaryGreen,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    if (_questionData['currentQuestionNumber'] < _questionData['totalQuestions']) {
+      // In a real app, this would navigate to the next question
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Moving to next question...'),
+          backgroundColor: UnifiedTheme.primaryGreen,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This is the last question!'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _openQuestionMenu() {

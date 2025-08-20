@@ -4,9 +4,10 @@ import 'dart:convert';
 import 'dart:typed_data';
 import '../../../core/theme/unified_theme.dart';
 import '../../../shared/models/user_model.dart';
-import '../../../shared/widgets/animated_particles_background.dart';
 import '../../../shared/widgets/sliding_banner_widget.dart';
 import '../../../shared/widgets/enhanced_3d_card.dart';
+import '../../../shared/models/category_model.dart';
+import '../../../shared/providers/category_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../coins/providers/coin_provider.dart';
 import '../providers/home_provider.dart';
@@ -17,6 +18,8 @@ import '../../gamification/screens/gamification_screen.dart';
 import '../../drug_center/screens/drug_index_screen.dart';
 import '../../drug_center/screens/enhanced_drug_center_screen.dart';
 import '../../lecture/screens/lecture_bank_screen.dart';
+import '../../pyp/screens/pyp_main_screen.dart';
+import '../../test_series/screens/test_series_main_screen.dart';
 
 class StableInspiredHomeScreen extends StatefulWidget {
   const StableInspiredHomeScreen({super.key});
@@ -69,27 +72,24 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<AuthProvider, HomeProvider>(
-      builder: (context, authProvider, homeProvider, child) {
+    return Consumer3<AuthProvider, HomeProvider, CategoryProvider>(
+      builder: (context, authProvider, homeProvider, categoryProvider, child) {
         final user = authProvider.currentUser;
         if (user == null) return const SizedBox();
 
         return Scaffold(
           backgroundColor: UnifiedTheme.backgroundColor,
-          body: AnimatedParticlesBackground(
-            child: SafeArea(
-              child: RefreshIndicator(
-                onRefresh: () => homeProvider.refresh(user.id),
-                color: UnifiedTheme.primary,
-                child: SingleChildScrollView(
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 480),
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+          body: SafeArea(
+            child: RefreshIndicator(
+              onRefresh: () => homeProvider.refresh(user.id),
+              color: UnifiedTheme.primary,
+              child: SingleChildScrollView(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                           const SizedBox(height: 20),
                           
                           // Enhanced Header
@@ -102,7 +102,7 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
                           _buildSlidingBanners(),
                           
                           // Categories Grid
-                          _buildModernCategoriesSection(),
+                          _buildModernCategoriesSection(categoryProvider),
                           
                           // Popular Ebooks
                           _buildModernEbooksSection(),
@@ -123,9 +123,7 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
                           _buildSocialMediaSection(),
                           
                           const SizedBox(height: 30), // Bottom padding
-                        ],
-                      ),
-                    ),
+                      ],
                   ),
                 ),
               ),
@@ -134,6 +132,20 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
         );
       },
     );
+  }
+
+  // Get time-based greeting
+  String _getTimeBasedGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good Afternoon';
+    } else if (hour >= 17 && hour < 22) {
+      return 'Good Evening';
+    } else {
+      return 'Good Night';
+    }
   }
 
   // Modern Header with animations
@@ -156,9 +168,9 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
                     ),
                   ),
                 ),
-                child: const Text(
-                  'Good Morning',
-                  style: TextStyle(
+                child: Text(
+                  _getTimeBasedGreeting(),
+                  style: const TextStyle(
                     color: UnifiedTheme.dark,
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
@@ -769,6 +781,7 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
       {'name': 'Question Bank', 'icon': '📚', 'iconImage': 'assets/images/q_bank.png', 'color': const Color(0xFF4B5E4A)},
       {'name': 'Short Notes', 'icon': '📝', 'iconImage': 'assets/images/short_notes.png', 'color': const Color(0xFF10B981)},
       {'name': 'Quiz & PYP', 'icon': '🧠', 'iconImage': 'assets/images/quiz.png', 'color': const Color(0xFF34D399)},
+      {'name': 'Test Series', 'icon': '🎯', 'iconImage': 'assets/images/test_series.png', 'color': const Color(0xFFEF4444)},
       {'name': 'Lectures', 'icon': '🎥', 'iconImage': 'assets/images/lecture.png', 'color': const Color(0xFF6EE7B7)},
       {'name': 'Drug Center', 'icon': '💊', 'color': const Color(0xFF3B82F6)},
     ];
@@ -1295,7 +1308,10 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
         screen = const ShortNotesScreen();
         break;
       case 'Quiz & PYP':
-        screen = const QuestionBankScreen();
+        screen = const PYPMainScreen();
+        break;
+      case 'Test Series':
+        screen = const TestSeriesMainScreen();
         break;
       case 'Lectures':
         screen = const LectureBankScreen();
@@ -1323,30 +1339,39 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
   // Modern Methods Implementation
   Widget _buildModernSearchBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 25),
+      margin: const EdgeInsets.only(top: 8, bottom: 16),
       child: Enhanced3DCard(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: UnifiedTheme.white,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.transparent, width: 2),
-          boxShadow: UnifiedTheme.cardShadow,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.transparent, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.search,
               color: UnifiedTheme.secondaryText,
+              size: 18,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             const Expanded(
               child: TextField(
                 decoration: InputDecoration(
                   hintText: 'Search veterinary resources...',
                   hintStyle: TextStyle(
                     color: UnifiedTheme.tertiaryText,
+                    fontSize: 14,
                   ),
                   border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
                 ),
               ),
             ),
@@ -1363,58 +1388,196 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
     );
   }
 
-  Widget _buildModernCategoriesSection() {
+  Widget _buildModernCategoriesSection(CategoryProvider categoryProvider) {
+    final categories = categoryProvider.getActiveCategories() ?? [];
+    
     return Column(
       children: [
-        _buildSectionTitle('Explore Categories', 'See All'),
+        _buildSectionTitle('Explore Categories', ''),
         const SizedBox(height: 20),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 15,
-          crossAxisSpacing: 15,
-          childAspectRatio: 1.3,
-          children: [
-            CategoryCard3D(
-              icon: Icons.quiz,
-              label: 'Q Bank',
-              isSelected: _selectedCategory == 'Q Bank',
-              onTap: () => _navigateToCategory(context, 'Q Bank'),
+        
+        // Show loading state
+        if (categoryProvider.isLoading)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40),
+              child: CircularProgressIndicator(),
             ),
-            CategoryCard3D(
-              icon: Icons.note_alt,
-              label: 'Short Notes',
-              isSelected: _selectedCategory == 'Short Notes',
-              onTap: () => _navigateToCategory(context, 'Short Notes'),
+          )
+        
+        // Show categories grid
+        else if (categories.isNotEmpty)
+          Container(
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 15,
+                crossAxisSpacing: 15,
+                childAspectRatio: 1.3,
+              ),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                if (index >= categories.length) return const SizedBox();
+                final category = categories[index];
+                return _buildCategoryCard(category);
+              },
             ),
-            CategoryCard3D(
-              icon: Icons.video_library,
-              label: 'Lectures',
-              isSelected: _selectedCategory == 'Lectures',
-              onTap: () => _navigateToCategory(context, 'Lectures'),
+          )
+        
+        // Show empty state
+        else
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.category,
+                    size: 48,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'No categories available',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            CategoryCard3D(
-              icon: Icons.gamepad,
-              label: 'Gamification',
-              isSelected: _selectedCategory == 'Gamification',
-              onTap: () => _navigateToCategory(context, 'Gamification'),
-            ),
-            CategoryCard3D(
-              icon: Icons.medication,
-              label: 'Drug Centre',
-              isSelected: _selectedCategory == 'Drug Centre',
-              onTap: () => _navigateToCategory(context, 'Drug Centre'),
-            ),
-            CategoryCard3D(
-              icon: Icons.quiz_outlined,
-              label: 'Quiz & PYP',
-              isSelected: _selectedCategory == 'Quiz & PYP',
-              onTap: () => _navigateToCategory(context, 'Quiz & PYP'),
-            ),
-          ],
-        ),
+          ),
       ],
+    );
+  }
+
+  Widget _buildCategoryCard(CategoryModel category) {
+    return Enhanced3DCard(
+      onTap: () => _navigateToCategory(context, category.name),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: UnifiedTheme.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: _selectedCategory == category.name 
+              ? UnifiedTheme.primary 
+              : UnifiedTheme.borderColor,
+          width: _selectedCategory == category.name ? 2 : 1,
+        ),
+        boxShadow: _selectedCategory == category.name 
+            ? UnifiedTheme.primaryShadow 
+            : UnifiedTheme.cardShadow,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Icon widget that supports different icon types
+          _buildCategoryIcon(category),
+          
+          const SizedBox(height: 12),
+          
+          Text(
+            category.label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: _selectedCategory == category.name 
+                  ? UnifiedTheme.primary 
+                  : UnifiedTheme.dark,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryIcon(CategoryModel category) {
+    // If we have a base64 icon, use it
+    if (category.iconBase64 != null && category.iconBase64!.isNotEmpty) {
+      try {
+        final bytes = base64Decode(category.iconBase64!);
+        return Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: category.color?.withOpacity(0.1) ?? UnifiedTheme.primary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.memory(
+              bytes,
+              width: 24,
+              height: 24,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return _buildFallbackIcon(category);
+              },
+            ),
+          ),
+        );
+      } catch (e) {
+        return _buildFallbackIcon(category);
+      }
+    }
+    
+    // If we have an icon URL, use it
+    if (category.iconUrl != null && category.iconUrl!.isNotEmpty) {
+      return Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: category.color?.withOpacity(0.1) ?? UnifiedTheme.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.network(
+            category.iconUrl!,
+            width: 24,
+            height: 24,
+            fit: BoxFit.contain,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return const Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return _buildFallbackIcon(category);
+            },
+          ),
+        ),
+      );
+    }
+    
+    // Fallback to IconData
+    return _buildFallbackIcon(category);
+  }
+
+  Widget _buildFallbackIcon(CategoryModel category) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: category.color?.withOpacity(0.1) ?? UnifiedTheme.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Icon(
+        category.iconData,
+        size: 24,
+        color: category.color ?? UnifiedTheme.primary,
+      ),
     );
   }
 
@@ -1437,6 +1600,8 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
                 rating: 4.8,
                 coverImage: 'assets/images/veterinary_anatomy.jpeg',
                 badge: 'Bestseller',
+                description: 'Comprehensive guide to animal anatomy with detailed illustrations and clinical applications.',
+                language: 'English',
                 onTap: () => _navigateToEbooks(context),
               ),
               EbookCard3D(
@@ -1446,6 +1611,8 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
                 rating: 4.9,
                 coverImage: 'assets/images/small_animal.jpeg',
                 badge: 'New',
+                description: 'Advanced surgical techniques for dogs and cats with step-by-step procedures and case studies.',
+                language: 'English',
                 onTap: () => _navigateToEbooks(context),
               ),
               EbookCard3D(
@@ -1454,6 +1621,8 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
                 price: '₹449',
                 rating: 4.7,
                 coverImage: 'assets/images/vet_pharma.jpeg',
+                description: 'Essential pharmacology for veterinary practice including drug interactions and dosage calculations.',
+                language: 'Hindi',
                 onTap: () => _navigateToEbooks(context),
               ),
               EbookCard3D(
@@ -1463,6 +1632,8 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
                 rating: 4.8,
                 coverImage: 'assets/images/master_veterinary.jpg',
                 badge: 'Popular',
+                description: 'Complete veterinary reference covering all major species with diagnostic approaches and treatments.',
+                language: 'English',
                 onTap: () => _navigateToEbooks(context),
               ),
             ],
@@ -1519,30 +1690,225 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
           Row(
             children: [
               Expanded(
-                child: PerformanceCard3D(
-                  title: 'Courses',
-                  value: '18',
-                  label: 'Courses',
-                  color: UnifiedTheme.primary,
+                child: Container(
+                  height: 120, // Fixed height for consistency
+                  child: Enhanced3DCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: UnifiedTheme.primary.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.book,
+                            color: UnifiedTheme.primary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _selectedPerformanceTab == 'Q Bank' 
+                              ? '${homeProvider.userStats?.questionsAnswered ?? 0}'
+                              : _selectedPerformanceTab == 'Lectures' 
+                                ? '12' 
+                                : _selectedPerformanceTab == 'Notes'
+                                  ? '24'
+                                  : _selectedPerformanceTab == 'Quiz & PYP'
+                                    ? '6'
+                                    : '${((homeProvider.userStats?.subjectStats?.length ?? 0) + 42)}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: UnifiedTheme.primaryText,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _selectedPerformanceTab == 'Q Bank' 
+                              ? 'Questions'
+                              : _selectedPerformanceTab == 'Lectures' 
+                                ? 'Videos' 
+                                : _selectedPerformanceTab == 'Notes'
+                                  ? 'Topics'
+                                  : _selectedPerformanceTab == 'Quiz & PYP'
+                                    ? 'Tests'
+                                    : 'Courses',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: UnifiedTheme.secondaryText,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 15),
               Expanded(
-                child: PerformanceCard3D(
-                  title: 'Hours',
-                  value: '92',
-                  label: 'Hours',
-                  color: UnifiedTheme.secondary,
+                child: Container(
+                  height: 120, // Fixed height for consistency
+                  child: Enhanced3DCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: UnifiedTheme.secondary.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.access_time,
+                            color: UnifiedTheme.secondary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _selectedPerformanceTab == 'Q Bank' 
+                              ? '${((homeProvider.userStats?.studyTimeMinutes ?? 0) / 60).toStringAsFixed(1)}h'
+                              : _selectedPerformanceTab == 'Lectures' 
+                                ? '8.5h' 
+                                : _selectedPerformanceTab == 'Notes'
+                                  ? '4.2h'
+                                  : _selectedPerformanceTab == 'Quiz & PYP'
+                                    ? '3.1h'
+                                    : '${((homeProvider.userStats?.studyTimeMinutes ?? 0) / 60 + 15.8).toStringAsFixed(1)}h',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: UnifiedTheme.primaryText,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _selectedPerformanceTab == 'Q Bank' 
+                              ? 'Practice'
+                              : _selectedPerformanceTab == 'Lectures' 
+                                ? 'Watch Time' 
+                                : _selectedPerformanceTab == 'Notes'
+                                  ? 'Read Time'
+                                  : _selectedPerformanceTab == 'Quiz & PYP'
+                                    ? 'Test Time'
+                                    : 'Hours',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: UnifiedTheme.secondaryText,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 15),
               Expanded(
-                child: PerformanceCard3D(
-                  title: 'Score',
-                  value: '95%',
-                  label: 'Score',
-                  color: UnifiedTheme.accent,
-                  progress: 95,
+                child: Container(
+                  height: 120, // Fixed height for consistency
+                  child: Enhanced3DCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: UnifiedTheme.accent.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.star,
+                            color: UnifiedTheme.accent,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          () {
+                            if (_selectedPerformanceTab == 'Q Bank') {
+                              final stats = homeProvider.userStats;
+                              return stats?.questionsAnswered != null && stats!.questionsAnswered > 0
+                                  ? '${((stats.correctAnswers / stats.questionsAnswered) * 100).toStringAsFixed(0)}%'
+                                  : '0%';
+                            } else if (_selectedPerformanceTab == 'Lectures') {
+                              return '85%';
+                            } else if (_selectedPerformanceTab == 'Notes') {
+                              return '92%';
+                            } else if (_selectedPerformanceTab == 'Quiz & PYP') {
+                              return '78%';
+                            } else {
+                              final stats = homeProvider.userStats;
+                              final qBankScore = stats?.questionsAnswered != null && stats!.questionsAnswered > 0
+                                  ? ((stats.correctAnswers / stats.questionsAnswered) * 100)
+                                  : 0.0;
+                              final overallScore = (qBankScore + 85 + 92 + 78) / 4;
+                              return '${overallScore.toStringAsFixed(0)}%';
+                            }
+                          }(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: UnifiedTheme.primaryText,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _selectedPerformanceTab == 'Q Bank' 
+                              ? 'Accuracy'
+                              : _selectedPerformanceTab == 'Lectures' 
+                                ? 'Progress' 
+                                : _selectedPerformanceTab == 'Notes'
+                                  ? 'Completed'
+                                  : _selectedPerformanceTab == 'Quiz & PYP'
+                                    ? 'Average'
+                                    : 'Score',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: UnifiedTheme.secondaryText,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 6),
+                        SizedBox(
+                          height: 3,
+                          child: LinearProgressIndicator(
+                            value: () {
+                              if (_selectedPerformanceTab == 'Q Bank') {
+                                final stats = homeProvider.userStats;
+                                return stats?.questionsAnswered != null && stats!.questionsAnswered > 0
+                                    ? (stats.correctAnswers / stats.questionsAnswered)
+                                    : 0.0;
+                              } else if (_selectedPerformanceTab == 'Lectures') {
+                                return 0.85;
+                              } else if (_selectedPerformanceTab == 'Notes') {
+                                return 0.92;
+                              } else if (_selectedPerformanceTab == 'Quiz & PYP') {
+                                return 0.78;
+                              } else {
+                                final stats = homeProvider.userStats;
+                                final qBankScore = stats?.questionsAnswered != null && stats!.questionsAnswered > 0
+                                    ? (stats.correctAnswers / stats.questionsAnswered)
+                                    : 0.0;
+                                return (qBankScore + 0.85 + 0.92 + 0.78) / 4;
+                              }
+                            }(),
+                            backgroundColor: UnifiedTheme.accent.withOpacity(0.2),
+                            valueColor: AlwaysStoppedAnimation<Color>(UnifiedTheme.accent),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -1919,27 +2285,28 @@ class _StableInspiredHomeScreenState extends State<StableInspiredHomeScreen>
             ),
           ),
         ),
-        GestureDetector(
-          onTap: () {},
-          child: Row(
-            children: [
-              Text(
-                actionText,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: UnifiedTheme.secondary,
+        if (actionText.isNotEmpty)
+          GestureDetector(
+            onTap: () => _navigateToEbooks(context),
+            child: Row(
+              children: [
+                Text(
+                  actionText,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: UnifiedTheme.secondary,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 5),
-              const Icon(
-                Icons.chevron_right,
-                color: UnifiedTheme.secondary,
-                size: 16,
-              ),
-            ],
+                const SizedBox(width: 5),
+                const Icon(
+                  Icons.chevron_right,
+                  color: UnifiedTheme.secondary,
+                  size: 16,
+                ),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }
@@ -2438,6 +2805,14 @@ class _AnimatedReferEarnCardState extends State<_AnimatedReferEarnCard>
         );
       },
     );
+  }
+
+}
+
+extension StringCapitalization on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1).toLowerCase();
   }
 }
 

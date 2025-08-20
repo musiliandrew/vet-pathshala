@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/unified_theme.dart';
-import 'subtopic_questions_screen.dart';
+import 'subtopics_screen.dart';
+import 'questions_list_screen.dart';
 
 class SubjectTopicsScreen extends StatefulWidget {
   final Map<String, dynamic> subject;
@@ -172,13 +173,10 @@ class _SubjectTopicsScreenState extends State<SubjectTopicsScreen>
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
-              child: Text(
-                'TE',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
+              child: Icon(
+                Icons.translate,
+                color: Colors.white,
+                size: 20,
               ),
             ),
           ),
@@ -669,7 +667,7 @@ class _SubjectTopicsScreenState extends State<SubjectTopicsScreen>
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => SubtopicQuestionsScreen(
+          builder: (context) => SubtopicsScreen(
             subject: widget.subject,
             topic: topic,
             userRole: widget.userRole,
@@ -680,14 +678,29 @@ class _SubjectTopicsScreenState extends State<SubjectTopicsScreen>
   }
 
   void _navigateToQuestions(BuildContext context, Map<String, dynamic>? subtopic) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => SubtopicQuestionsScreen(
-          subject: widget.subject,
-          topic: subtopic ?? {'title': 'All Questions'},
-          userRole: widget.userRole,
+    if (subtopic == null) {
+      // Navigate directly to all questions for this subject (bypass topics/subtopics)
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => QuestionsListScreen(
+            subject: widget.subject,
+            topic: {'title': 'All Topics', 'description': 'All questions from all topics'},
+            subtopic: {'title': 'All Questions', 'description': 'All questions in ${widget.subject['title']}'},
+            userRole: widget.userRole,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      // Navigate to subtopics for the selected topic
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SubtopicsScreen(
+            subject: widget.subject,
+            topic: subtopic,
+            userRole: widget.userRole,
+          ),
+        ),
+      );
+    }
   }
 }

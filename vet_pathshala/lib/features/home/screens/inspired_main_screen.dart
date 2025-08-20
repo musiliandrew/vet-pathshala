@@ -8,6 +8,7 @@ import '../../drug_center/screens/drug_index_screen.dart';
 import '../../gamification/screens/gamification_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../admin/screens/enhanced_admin_dashboard_screen.dart';
 
 class InspiredMainScreen extends StatefulWidget {
   const InspiredMainScreen({super.key});
@@ -34,6 +35,12 @@ class _InspiredMainScreenState extends State<InspiredMainScreen> {
     // Debug: Print user info in InspiredMainScreen
     print('🔧 InspiredMainScreen: Building with user role = "${user?.userRole}"');
     print('🔧 InspiredMainScreen: User name = "${user?.name}"');
+    
+    // For admins, show admin dashboard directly
+    if (user?.userRole == 'admin') {
+      print('✅ InspiredMainScreen: Detected admin role, showing admin dashboard');
+      return const EnhancedAdminDashboardScreen();
+    }
     
     // For farmers, show farmer-specific home screen and navigation
     if (user?.userRole == 'farmer') {

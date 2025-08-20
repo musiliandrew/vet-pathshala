@@ -111,17 +111,28 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
       backgroundColor: UnifiedTheme.backgroundColor,
       body: Consumer<NotesProvider>(
         builder: (context, notesProvider, child) {
-          return CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              _buildAppBar(context, notesProvider),
-              _buildProgressIndicator(),
-              _buildNoteContent(context, notesProvider),
-              _buildStickyNotes(notesProvider),
+          return Row(
+            children: [
+              // Sidebar
+              _buildSidebar(context, notesProvider),
+              
+              // Main content
+              Expanded(
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    _buildAppBar(context, notesProvider),
+                    _buildProgressIndicator(),
+                    _buildNoteContent(context, notesProvider),
+                    _buildStickyNotes(notesProvider),
+                  ],
+                ),
+              ),
             ],
           );
         },
       ),
+      bottomNavigationBar: _buildFixedActionBar(context),
       floatingActionButton: _buildFloatingActionButtons(),
       bottomSheet: _showActionPanel ? _buildActionPanel() : null,
     );
@@ -563,6 +574,232 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
     );
   }
 
+  Widget _buildSidebar(BuildContext context, NotesProvider notesProvider) {
+    return Container(
+      width: 60,
+      decoration: BoxDecoration(
+        color: UnifiedTheme.cardBackground,
+        border: Border(
+          right: BorderSide(color: UnifiedTheme.borderColor),
+        ),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 80),
+          
+          // Flashcards
+          _buildSidebarButton(
+            icon: Icons.quiz_outlined,
+            label: 'Flashcards',
+            onTap: () => _showFlashcards(),
+          ),
+          
+          // AI Summary
+          _buildSidebarButton(
+            icon: Icons.auto_awesome,
+            label: 'AI Summary',
+            onTap: () => _generateAISummary(notesProvider),
+            isLoading: notesProvider.isGeneratingSummary,
+          ),
+          
+          // Highlights
+          _buildSidebarButton(
+            icon: Icons.highlight_alt,
+            label: 'Highlights',
+            onTap: () => _showHighlights(),
+          ),
+          
+          // Sticky Notes
+          _buildSidebarButton(
+            icon: Icons.sticky_note_2_outlined,
+            label: 'Sticky Notes',
+            onTap: () => _showStickyNotesPanel(),
+          ),
+          
+          // Bookmarks
+          Consumer<AuthProvider>(
+            builder: (context, authProvider, child) {
+              final isBookmarked = notesProvider.currentInteraction?.isBookmarked ?? false;
+              return _buildSidebarButton(
+                icon: isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
+                label: 'Bookmark',
+                onTap: () {
+                  if (authProvider.currentUser != null) {
+                    notesProvider.toggleBookmark(
+                      authProvider.currentUser!.id,
+                      widget.note.id,
+                    );
+                  }
+                },
+                isActive: isBookmarked,
+              );
+            },
+          ),
+          
+          const Spacer(),
+          
+          // Settings
+          _buildSidebarButton(
+            icon: Icons.settings_outlined,
+            label: 'Settings',
+            onTap: () => _showSettings(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSidebarButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool isActive = false,
+    bool isLoading = false,
+  }) {
+    return Tooltip(
+      message: label,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: GestureDetector(
+          onTap: isLoading ? null : onTap,
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: isActive 
+                ? UnifiedTheme.primaryGreen.withOpacity(0.1)
+                : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              border: isActive 
+                ? Border.all(color: UnifiedTheme.primaryGreen)
+                : null,
+            ),
+            child: Center(
+              child: isLoading
+                ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(UnifiedTheme.primaryGreen),
+                    ),
+                  )
+                : Icon(
+                    icon,
+                    size: 20,
+                    color: isActive 
+                      ? UnifiedTheme.primaryGreen
+                      : UnifiedTheme.tertiaryText,
+                  ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFixedActionBar(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: const Border(top: BorderSide(color: UnifiedTheme.borderColor)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildFixedActionButton(
+                icon: Icons.thumb_up_outlined,
+                label: 'Like',
+                count: widget.note.likeCount,
+                onTap: () => _handleAction('like'),
+              ),
+              _buildFixedActionButton(
+                icon: Icons.visibility_outlined,
+                label: 'Views',
+                count: widget.note.readCount,
+                onTap: () => _handleAction('view'),
+              ),
+              _buildFixedActionButton(
+                icon: Icons.report_outlined,
+                label: 'Report',
+                count: 0,
+                onTap: () => _handleAction('report'),
+              ),
+              _buildFixedActionButton(
+                icon: Icons.sticky_note_2_outlined,
+                label: 'Notes',
+                count: 0,
+                onTap: () => _showStickyNotesPanel(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFixedActionButton({
+    required IconData icon,
+    required String label,
+    required int count,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: UnifiedTheme.primaryGreen.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: UnifiedTheme.primaryGreen.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: UnifiedTheme.primaryGreen,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: UnifiedTheme.primaryGreen,
+              ),
+            ),
+            if (count > 0) ...[
+              const SizedBox(height: 1),
+              Text(
+                count.toString(),
+                style: TextStyle(
+                  fontSize: 9,
+                  color: UnifiedTheme.primaryGreen.withOpacity(0.7),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildFloatingActionButtons() {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -850,5 +1087,334 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
     // Estimate reading time based on word count (average 200 words per minute)
     final wordCount = content.split(RegExp(r'\s+')).length;
     return (wordCount / 200).ceil();
+  }
+
+  // Sidebar action methods
+  void _showFlashcards() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: UnifiedTheme.cardBackground,
+        title: const Row(
+          children: [
+            Icon(Icons.quiz, color: UnifiedTheme.primaryGreen),
+            SizedBox(width: 8),
+            Text('Flashcards'),
+          ],
+        ),
+        content: const Text('Flashcards feature will help you review key concepts from this note.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Generate flashcards logic
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: UnifiedTheme.primaryGreen),
+            child: const Text('Generate', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _generateAISummary(NotesProvider notesProvider) {
+    notesProvider.generateAISummary();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Generating AI summary...'),
+        backgroundColor: UnifiedTheme.primaryGreen,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showHighlights() {
+    final notesProvider = context.read<NotesProvider>();
+    final highlights = notesProvider.currentInteraction?.highlights ?? [];
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.6,
+        decoration: const BoxDecoration(
+          color: UnifiedTheme.backgroundColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(top: 12),
+              decoration: BoxDecoration(
+                color: UnifiedTheme.borderColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(Icons.highlight_alt, color: UnifiedTheme.primaryGreen),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Highlights',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: highlights.isEmpty
+                ? const Center(child: Text('No highlights yet'))
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: highlights.length,
+                    itemBuilder: (context, index) {
+                      final highlight = highlights[index];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Color(int.parse(highlight.color.replaceFirst('#', '0xFF'))).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Color(int.parse(highlight.color.replaceFirst('#', '0xFF'))),
+                          ),
+                        ),
+                        child: Text(highlight.selectedText),
+                      );
+                    },
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showStickyNotesPanel() {
+    final notesProvider = context.read<NotesProvider>();
+    final stickyNotes = notesProvider.currentInteraction?.stickyNotes ?? [];
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.8,
+        decoration: const BoxDecoration(
+          color: UnifiedTheme.backgroundColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(top: 12),
+              decoration: BoxDecoration(
+                color: UnifiedTheme.borderColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(Icons.sticky_note_2, color: UnifiedTheme.primaryGreen),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Sticky Notes',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  TextButton.icon(
+                    icon: const Icon(Icons.add, size: 20),
+                    label: const Text('Add Note'),
+                    onPressed: () => _addQuickStickyNote(),
+                    style: TextButton.styleFrom(
+                      foregroundColor: UnifiedTheme.primaryGreen,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: stickyNotes.isEmpty
+                ? const Center(child: Text('No sticky notes yet'))
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: stickyNotes.length,
+                    itemBuilder: (context, index) {
+                      final note = stickyNotes[index];
+                      return StickyNoteWidget(
+                        stickyNote: note,
+                        onDelete: () => _deleteStickyNote(note.id),
+                      );
+                    },
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _addQuickStickyNote() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final TextEditingController controller = TextEditingController();
+        return AlertDialog(
+          backgroundColor: UnifiedTheme.cardBackground,
+          title: const Text('Add Sticky Note'),
+          content: TextField(
+            controller: controller,
+            maxLines: 3,
+            decoration: const InputDecoration(
+              hintText: 'Write your note here...',
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (controller.text.trim().isNotEmpty) {
+                  final authProvider = context.read<AuthProvider>();
+                  final notesProvider = context.read<NotesProvider>();
+                  
+                  if (authProvider.currentUser != null) {
+                    notesProvider.addStickyNote(
+                      authProvider.currentUser!.id,
+                      widget.note.id,
+                      controller.text.trim(),
+                      0, // Position
+                    );
+                  }
+                }
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: UnifiedTheme.primaryGreen),
+              child: const Text('Add', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSettings() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: 300,
+        decoration: const BoxDecoration(
+          color: UnifiedTheme.backgroundColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(top: 12),
+              decoration: BoxDecoration(
+                color: UnifiedTheme.borderColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(Icons.settings, color: UnifiedTheme.primaryGreen),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Settings',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.text_fields),
+              title: const Text('Font Size'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () => _showFontSizeDialog(),
+            ),
+            ListTile(
+              leading: const Icon(Icons.color_lens),
+              title: const Text('Theme'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Theme settings coming soon!')),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.volume_up),
+              title: const Text('Text-to-Speech'),
+              trailing: Switch(
+                value: true,
+                onChanged: (value) {},
+                activeColor: UnifiedTheme.primaryGreen,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleAction(String action) {
+    switch (action) {
+      case 'like':
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Note liked!'),
+            backgroundColor: UnifiedTheme.primaryGreen,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        break;
+      case 'view':
+        // Already tracked
+        break;
+      case 'report':
+        _reportNote();
+        break;
+    }
   }
 }

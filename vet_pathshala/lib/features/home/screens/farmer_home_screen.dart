@@ -112,6 +112,20 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> with TickerProvider
     );
   }
 
+  // Get time-based greeting
+  String _getTimeBasedGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) {
+      return 'GOOD MORNING';
+    } else if (hour >= 12 && hour < 17) {
+      return 'GOOD AFTERNOON';
+    } else if (hour >= 17 && hour < 22) {
+      return 'GOOD EVENING';
+    } else {
+      return 'GOOD NIGHT';
+    }
+  }
+
   Widget _buildFarmHeader(BuildContext context, UserModel user, CoinProvider coinProvider) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
@@ -154,9 +168,9 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> with TickerProvider
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Text(
-                          '🌟 WELCOME BACK, ',
-                          style: TextStyle(
+                        Text(
+                          '🌟 ${_getTimeBasedGreeting()}, ',
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,

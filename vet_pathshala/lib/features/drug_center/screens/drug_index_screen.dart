@@ -578,27 +578,49 @@ class _DrugIndexScreenState extends State<DrugIndexScreen> {
                         ),
                         const SizedBox(width: UnifiedTheme.spacingM),
                         
-                        // Drug name and brand
+                        // Drug salt/generic name
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                drug.name,
+                                drug.genericName.isNotEmpty ? drug.genericName : drug.name,
                                 style: UnifiedTheme.headerSmall.copyWith(
                                   color: UnifiedTheme.primaryText,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
                               ),
-                              if (drug.brandName.isNotEmpty && drug.brandName != drug.name)
-                                Text(
-                                  drug.brandName,
-                                  style: UnifiedTheme.bodyMedium.copyWith(
-                                    color: UnifiedTheme.secondaryText,
-                                    fontSize: 13,
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: UnifiedTheme.blueAccent.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: UnifiedTheme.blueAccent.withOpacity(0.3)),
+                                    ),
+                                    child: Text(
+                                      'Active Salt',
+                                      style: TextStyle(
+                                        color: UnifiedTheme.blueAccent,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  if (drug.classification.isNotEmpty) ...[
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      drug.classification,
+                                      style: UnifiedTheme.bodySmall.copyWith(
+                                        color: UnifiedTheme.secondaryText,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
                             ],
                           ),
                         ),

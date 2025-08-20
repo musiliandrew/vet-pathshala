@@ -28,7 +28,7 @@ class DrugDetailScreen extends StatelessWidget {
             backgroundColor: AppColors.primary,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
-                drug.name,
+                drug.genericName.isNotEmpty ? drug.genericName : drug.name,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -45,12 +45,39 @@ class DrugDetailScreen extends StatelessWidget {
                     end: Alignment.bottomRight,
                   ),
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.medical_services,
-                    size: 60,
-                    color: Colors.white54,
-                  ),
+                child: Stack(
+                  children: [
+                    const Center(
+                      child: Icon(
+                        Icons.science,
+                        size: 60,
+                        color: Colors.white54,
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 16,
+                      left: 16,
+                      right: 16,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white.withOpacity(0.3)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Salt/Generic Information',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -90,23 +117,21 @@ class DrugDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Basic Info Card
+                  // Drug Composition & Salt Information
                   _buildInfoCard(
                     context,
-                    'Basic Information',
-                    Icons.info_outline,
+                    'Drug Composition & Salt Information',
+                    Icons.science,
                     [
-                      _buildInfoRow('Generic Name', drug.genericName),
-                      _buildInfoRow('Brand Name', drug.brandName),
+                      _buildInfoRow('Generic/Salt Name', drug.genericName),
+                      _buildInfoRow('Active Ingredient', drug.genericName),
                       _buildInfoRow('Category', _formatCategoryName(drug.category)),
                       _buildInfoRow('Classification', drug.classification),
                       _buildInfoRow('Dosage Form', drug.dosageForm),
-                      _buildInfoRow('Strength', drug.strength),
-                      _buildInfoRow('Route', drug.route),
-                      if (drug.manufacturer.isNotEmpty)
-                        _buildInfoRow('Manufacturer', drug.manufacturer),
-                      if (drug.price > 0)
-                        _buildInfoRow('Price', '\$${drug.price.toStringAsFixed(2)}'),
+                      _buildInfoRow('Strength/Concentration', drug.strength),
+                      _buildInfoRow('Route of Administration', drug.route),
+                      _buildExpandableInfoRow('Salt Properties', 
+                        'Active pharmaceutical ingredient (API): ${drug.genericName}. This salt is the therapeutically active component responsible for the drug\'s pharmacological effects.'),
                     ],
                   ),
 
@@ -129,16 +154,20 @@ class DrugDetailScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                   ],
 
-                  // Clinical Information
+                  // Clinical & Pharmacological Information
                   _buildInfoCard(
                     context,
-                    'Clinical Information',
+                    'Clinical & Pharmacological Information',
                     Icons.medical_information,
                     [
-                      _buildExpandableInfoRow('Indication', drug.indication),
-                      _buildExpandableInfoRow('Dosage', drug.dosage),
-                      _buildExpandableInfoRow('Mechanism of Action', drug.mechanism),
-                      _buildExpandableInfoRow('Pharmacokinetics', drug.pharmacokinetics),
+                      _buildExpandableInfoRow('Therapeutic Indication', drug.indication),
+                      _buildExpandableInfoRow('Dosage & Administration', drug.dosage),
+                      _buildExpandableInfoRow('Mechanism of Action', drug.mechanism.isNotEmpty 
+                        ? drug.mechanism 
+                        : 'The active salt ${drug.genericName} works through specific molecular pathways to achieve therapeutic effects. Consult veterinary literature for detailed mechanism.'),
+                      _buildExpandableInfoRow('Pharmacokinetics & Bioavailability', drug.pharmacokinetics.isNotEmpty
+                        ? drug.pharmacokinetics
+                        : 'Absorption, distribution, metabolism, and excretion properties of ${drug.genericName}. Individual pharmacokinetic parameters may vary by species.'),
                     ],
                   ),
 
@@ -189,7 +218,7 @@ class DrugDetailScreen extends StatelessWidget {
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.calculate, color: Colors.white),
         label: const Text(
-          'Calculate Dosage',
+          'Calculate Salt Dosage',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,

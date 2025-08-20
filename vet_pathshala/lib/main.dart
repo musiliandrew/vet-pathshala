@@ -4,15 +4,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'core/themes/app_theme.dart';
-import 'core/utils/firebase_debug.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/home/providers/home_provider.dart';
 import 'features/question_bank/providers/question_provider.dart';
 import 'features/drug_center/providers/drug_provider.dart';
 import 'features/coins/providers/coin_provider.dart';
 import 'features/notes/providers/notes_provider.dart';
+import 'features/pyp/providers/pyp_provider.dart';
+import 'features/test_series/providers/test_series_provider.dart';
+import 'shared/providers/category_provider.dart';
+import 'features/admin/providers/admin_auth_provider.dart';
 import 'core/utils/firebase_availability.dart';
-import 'app.dart';
+import 'core/routing/app_router.dart';
+import 'app_wrapper_with_admin.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,6 +61,10 @@ class VetPathshalaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DrugProvider()),
         ChangeNotifierProvider(create: (_) => CoinProvider()),
         ChangeNotifierProvider(create: (_) => NotesProvider()),
+        ChangeNotifierProvider(create: (_) => PYPProvider()),
+        ChangeNotifierProvider(create: (_) => TestSeriesProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => AdminAuthProvider()),
       ],
       child: MaterialApp(
         title: 'Vet-Pathshala',
@@ -74,7 +82,7 @@ class VetPathshalaApp extends StatelessWidget {
             ],
           ),
         ),
-        home: const AppWrapper(),
+        home: const AppWrapperWithAdminCheck(),
         debugShowCheckedModeBanner: false,
       ),
     );

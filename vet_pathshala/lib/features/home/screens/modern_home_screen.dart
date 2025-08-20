@@ -323,28 +323,31 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
   // Enhanced Search Bar
   Widget _buildModernSearchBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 25),
+      margin: const EdgeInsets.symmetric(vertical: 12),
       child: Enhanced3DCard(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: UnifiedTheme.white,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.transparent, width: 2),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.transparent, width: 1.5),
           boxShadow: UnifiedTheme.cardShadow,
         ),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.search,
               color: UnifiedTheme.secondaryText,
+              size: 20,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             const Expanded(
               child: TextField(
+                style: TextStyle(fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: 'Search veterinary resources...',
+                  hintText: 'Search resources...',
                   hintStyle: TextStyle(
                     color: UnifiedTheme.tertiaryText,
+                    fontSize: 14,
                   ),
                   border: InputBorder.none,
                 ),
@@ -440,6 +443,8 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
                 rating: 4.8,
                 coverImage: 'assets/images/veterinary_anatomy.jpeg',
                 badge: 'Bestseller',
+                description: 'Comprehensive guide to animal anatomy with detailed illustrations and clinical applications.',
+                language: 'English',
                 onTap: () => _navigateToEbooks(context),
               ),
               EbookCard3D(
@@ -449,6 +454,8 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
                 rating: 4.9,
                 coverImage: 'assets/images/small_animal.jpeg',
                 badge: 'New',
+                description: 'Advanced surgical techniques for dogs and cats with step-by-step procedures and case studies.',
+                language: 'English',
                 onTap: () => _navigateToEbooks(context),
               ),
               EbookCard3D(
@@ -457,6 +464,8 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
                 price: '₹449',
                 rating: 4.7,
                 coverImage: 'assets/images/vet_pharma.jpeg',
+                description: 'Essential pharmacology for veterinary practice including drug interactions and dosage calculations.',
+                language: 'Hindi',
                 onTap: () => _navigateToEbooks(context),
               ),
               EbookCard3D(
@@ -466,6 +475,8 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
                 rating: 4.8,
                 coverImage: 'assets/images/master_veterinary.jpg',
                 badge: 'Popular',
+                description: 'Complete veterinary reference covering all major species with diagnostic approaches and treatments.',
+                language: 'English',
                 onTap: () => _navigateToEbooks(context),
               ),
             ],
@@ -941,9 +952,7 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
           ),
         ),
         GestureDetector(
-          onTap: () {
-            // Handle see all tap
-          },
+          onTap: () => _navigateToEbooks(context),
           child: Row(
             children: [
               Text(

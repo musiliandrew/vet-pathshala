@@ -311,6 +311,8 @@ class EbookCard3D extends StatelessWidget {
   final LinearGradient? gradient;
   final String? coverImage;
   final String? badge;
+  final String? description;
+  final String? language;
   final VoidCallback? onTap;
 
   const EbookCard3D({
@@ -322,6 +324,8 @@ class EbookCard3D extends StatelessWidget {
     this.gradient,
     this.coverImage,
     this.badge,
+    this.description,
+    this.language,
     this.onTap,
   });
 
@@ -444,13 +448,58 @@ class EbookCard3D extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 5),
-                  Text(
-                    author,
-                    style: const TextStyle(
-                      color: UnifiedTheme.secondaryText,
-                      fontSize: 13,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          author,
+                          style: const TextStyle(
+                            color: UnifiedTheme.secondaryText,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      if (language != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: language!.toLowerCase() == 'hindi' 
+                                ? Colors.orange.shade100 
+                                : Colors.blue.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: language!.toLowerCase() == 'hindi' 
+                                  ? Colors.orange.shade300 
+                                  : Colors.blue.shade300,
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Text(
+                            language!,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: language!.toLowerCase() == 'hindi' 
+                                  ? Colors.orange.shade700 
+                                  : Colors.blue.shade700,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
+                  if (description != null) ...[
+                    const SizedBox(height: 5),
+                    Text(
+                      description!,
+                      style: const TextStyle(
+                        color: UnifiedTheme.secondaryText,
+                        fontSize: 11,
+                        height: 1.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

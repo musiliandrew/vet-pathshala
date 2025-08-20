@@ -3,9 +3,42 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/unified_theme.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../coins/providers/coin_provider.dart';
+import '../../admin/screens/enhanced_admin_dashboard_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  int _tapCount = 0;
+  bool _showAdminAccess = false;
+
+  void _onAvatarTap() {
+    setState(() {
+      _tapCount++;
+      if (_tapCount >= 5) {
+        _showAdminAccess = true;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('🔓 Admin access unlocked!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    });
+  }
+
+  void _openAdminDashboard() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const EnhancedAdminDashboardScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,21 +65,24 @@ class ProfileScreen extends StatelessWidget {
                         child: Column(
                           children: [
                             const SizedBox(height: UnifiedTheme.spacingXL),
-                            // Profile avatar
-                            Container(
-                              width: 100,
-                              height: 100,
-                              decoration: UnifiedTheme.avatarDecoration.copyWith(
-                                borderRadius: BorderRadius.circular(50),
-                                border: Border.all(color: Colors.white, width: 3),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  user.name.isNotEmpty ? user.name[0].toUpperCase() : 'V',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold,
+                            // Profile avatar (tappable for admin access)
+                            GestureDetector(
+                              onTap: _onAvatarTap,
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                decoration: UnifiedTheme.avatarDecoration.copyWith(
+                                  borderRadius: BorderRadius.circular(50),
+                                  border: Border.all(color: Colors.white, width: 3),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    user.name.isNotEmpty ? user.name[0].toUpperCase() : 'V',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -85,6 +121,22 @@ class ProfileScreen extends StatelessWidget {
                                 fontSize: 14,
                               ),
                             ),
+                            // Admin access button (shown after 5 taps)
+                            if (_showAdminAccess) ...[
+                              const SizedBox(height: 16),
+                              ElevatedButton.icon(
+                                onPressed: _openAdminDashboard,
+                                icon: const Icon(Icons.admin_panel_settings),
+                                label: const Text('Admin Dashboard'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade600,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),

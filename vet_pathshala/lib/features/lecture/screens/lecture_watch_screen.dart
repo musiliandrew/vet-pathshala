@@ -103,7 +103,6 @@ class _LectureWatchScreenState extends State<LectureWatchScreen> with TickerProv
                       _buildTopicSection(context),
                       _buildDescription(context),
                       _buildNavigationSection(context),
-                      _buildActionBar(context),
                     ],
                   ),
                 ),
@@ -112,6 +111,7 @@ class _LectureWatchScreenState extends State<LectureWatchScreen> with TickerProv
           ),
         ),
       ),
+      bottomNavigationBar: _buildFixedActionBar(context),
     );
   }
 
@@ -158,7 +158,7 @@ class _LectureWatchScreenState extends State<LectureWatchScreen> with TickerProv
             ),
           ),
           
-          // Translate Button
+          // Language Button
           Container(
             width: 50,
             height: 50,
@@ -167,13 +167,10 @@ class _LectureWatchScreenState extends State<LectureWatchScreen> with TickerProv
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Center(
-              child: Text(
-                'TE',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
+              child: Icon(
+                Icons.translate,
+                color: Colors.white,
+                size: 20,
               ),
             ),
           ),
@@ -684,52 +681,102 @@ class _LectureWatchScreenState extends State<LectureWatchScreen> with TickerProv
     );
   }
 
-  Widget _buildActionBar(BuildContext context) {
+  Widget _buildFixedActionBar(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: UnifiedTheme.spacingL, vertical: UnifiedTheme.spacingM),
-      margin: const EdgeInsets.all(UnifiedTheme.spacingL),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: UnifiedTheme.borderColor),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildActionButton('Like', widget.lecture['likes'] ?? 0, () => _handleAction('like')),
-          _buildActionButton('View', widget.lecture['views'] ?? 0, () => _handleAction('view')),
-          _buildActionButton('Notes', 0, () => _showStickyNotes),
-          _buildActionButton('Share', 0, () => _handleAction('share')),
+        border: const Border(top: BorderSide(color: UnifiedTheme.borderColor)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
         ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildFixedActionButton(
+                icon: Icons.thumb_up_outlined,
+                label: 'Like',
+                count: widget.lecture['likes'] ?? 0,
+                onTap: () => _handleAction('like'),
+              ),
+              _buildFixedActionButton(
+                icon: Icons.visibility_outlined,
+                label: 'Views',
+                count: widget.lecture['views'] ?? 0,
+                onTap: () => _handleAction('view'),
+              ),
+              _buildFixedActionButton(
+                icon: Icons.report_outlined,
+                label: 'Report',
+                count: 0,
+                onTap: () => _handleAction('report'),
+              ),
+              _buildFixedActionButton(
+                icon: Icons.sticky_note_2_outlined,
+                label: 'Notes',
+                count: 0,
+                onTap: _showStickyNotes,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildActionButton(String label, int count, VoidCallback onTap) {
+  Widget _buildFixedActionButton({
+    required IconData icon,
+    required String label,
+    required int count,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: UnifiedTheme.lightBackground,
-          borderRadius: BorderRadius.circular(6),
+          color: UnifiedTheme.primaryGreen.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: UnifiedTheme.primaryGreen.withOpacity(0.3),
+            width: 1,
+          ),
         ),
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Icon(
+              icon,
+              size: 20,
+              color: UnifiedTheme.primaryGreen,
+            ),
+            const SizedBox(height: 2),
             Text(
               label,
-              style: UnifiedTheme.bodySmall.copyWith(
-                color: UnifiedTheme.tertiaryText,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: UnifiedTheme.primaryGreen,
               ),
             ),
-            const SizedBox(width: 4),
-            Text(
-              count > 999 ? '${(count / 1000).toStringAsFixed(1)}k' : count.toString(),
-              style: UnifiedTheme.bodySmall.copyWith(
-                color: UnifiedTheme.tertiaryText,
+            if (count > 0) ...[
+              const SizedBox(height: 1),
+              Text(
+                count > 999 ? '${(count / 1000).toStringAsFixed(1)}k' : count.toString(),
+                style: TextStyle(
+                  fontSize: 9,
+                  color: UnifiedTheme.primaryGreen.withOpacity(0.7),
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),
@@ -890,33 +937,87 @@ class _LectureWatchScreenState extends State<LectureWatchScreen> with TickerProv
   }
 
   void _handleAction(String action) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${action.toUpperCase()} action performed!'),
-        backgroundColor: UnifiedTheme.primaryGreen,
-        duration: const Duration(seconds: 1),
-      ),
-    );
+    switch (action.toLowerCase()) {
+      case 'like':
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Lecture liked!'),
+            backgroundColor: UnifiedTheme.primaryGreen,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        break;
+      case 'view':
+        // View count is automatically tracked
+        break;
+      case 'report':
+        _reportLecture();
+        break;
+      case 'share':
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Sharing lecture...'),
+            backgroundColor: UnifiedTheme.primaryGreen,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        break;
+      default:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${action.toUpperCase()} action performed!'),
+            backgroundColor: UnifiedTheme.primaryGreen,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+    }
   }
 
   void _previousLecture() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Going to previous lecture'),
-        backgroundColor: UnifiedTheme.tertiaryText,
-        duration: Duration(seconds: 1),
-      ),
-    );
+    // In a real app, this would navigate to the previous lecture
+    final currentLectureIndex = 1; // Assuming this is lecture 1
+    
+    if (currentLectureIndex > 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Going to previous lecture...'),
+          backgroundColor: UnifiedTheme.primaryGreen,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This is the first lecture!'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _nextLecture() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Going to next lecture'),
-        backgroundColor: UnifiedTheme.primaryGreen,
-        duration: Duration(seconds: 1),
-      ),
-    );
+    // In a real app, this would navigate to the next lecture
+    final currentLectureIndex = 1; // Assuming this is lecture 1
+    final totalLectures = widget.subject['lecturesCount'] ?? 156;
+    
+    if (currentLectureIndex < totalLectures) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Going to next lecture...'),
+          backgroundColor: UnifiedTheme.primaryGreen,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This is the last lecture!'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _openLectureMenu() {

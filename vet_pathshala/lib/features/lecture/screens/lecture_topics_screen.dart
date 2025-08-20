@@ -169,7 +169,7 @@ class _LectureTopicsScreenState extends State<LectureTopicsScreen>
             ),
           ),
           
-          // Translate Button
+          // Language Button
           Container(
             width: 40,
             height: 40,
@@ -178,13 +178,10 @@ class _LectureTopicsScreenState extends State<LectureTopicsScreen>
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
-              child: Text(
-                'TE',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
+              child: Icon(
+                Icons.translate,
+                color: Colors.white,
+                size: 20,
               ),
             ),
           ),

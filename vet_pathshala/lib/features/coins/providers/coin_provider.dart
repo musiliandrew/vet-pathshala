@@ -1,5 +1,9 @@
 import 'package:flutter/foundation.dart';
 import '../services/coin_service.dart';
+import '../../../shared/services/phase2_integration_service.dart';
+import '../../../shared/models/ebook_models.dart';
+import '../../../shared/models/video_models.dart';
+import '../../../shared/models/gamification_models.dart';
 
 class CoinProvider with ChangeNotifier {
   // State variables
@@ -363,6 +367,252 @@ class CoinProvider with ChangeNotifier {
     _hasClaimedDailyBonus = false;
     _lastDailyBonusCheck = null;
     notifyListeners();
+  }
+
+  // Phase 2 Integration Methods
+
+  // E-book related methods
+  Future<bool> canAccessEbook(String userId, EbookModel ebook) async {
+    return await Phase2IntegrationService.checkEbookAccess(userId, ebook);
+  }
+
+  Future<bool> purchaseEbookAccess(String userId, EbookModel ebook) async {
+    final success = await Phase2IntegrationService.purchaseEbookAccess(userId, ebook);
+    if (success) {
+      await loadUserCoins(userId);
+      await loadTransactions(userId, refresh: true);
+    }
+    return success;
+  }
+
+  Future<void> awardReadingCoins({
+    required String userId,
+    required String ebookId,
+    required double progressIncrement,
+    bool chapterCompleted = false,
+    bool bookCompleted = false,
+  }) async {
+    await Phase2IntegrationService.awardReadingProgressCoins(
+      userId: userId,
+      ebookId: ebookId,
+      progressIncrement: progressIncrement,
+      chapterCompleted: chapterCompleted,
+      bookCompleted: bookCompleted,
+    );
+    
+    await loadUserCoins(userId);
+    await loadTransactions(userId, refresh: true);
+  }
+
+  // Quiz related methods
+  Future<bool> canAccessQuizFeature(String userId, String featureType) async {
+    return await Phase2IntegrationService.checkQuizFeatureAccess(userId, featureType);
+  }
+
+  Future<bool> purchaseQuizFeature(String userId, String featureType) async {
+    final success = await Phase2IntegrationService.purchaseQuizFeatureAccess(userId, featureType);
+    if (success) {
+      await loadUserCoins(userId);
+      await loadTransactions(userId, refresh: true);
+    }
+    return success;
+  }
+
+  Future<void> awardAdvancedQuizCoins({
+    required String userId,
+    required int questionsCorrect,
+    required int totalQuestions,
+    required String quizType,
+    bool isPerfectScore = false,
+  }) async {
+    await Phase2IntegrationService.awardQuizCompletionCoins(
+      userId: userId,
+      questionsCorrect: questionsCorrect,
+      totalQuestions: totalQuestions,
+      quizType: quizType,
+      isPerfectScore: isPerfectScore,
+    );
+    
+    await loadUserCoins(userId);
+    await loadTransactions(userId, refresh: true);
+  }
+
+  // Social features methods
+  Future<bool> canAccessSocialFeature(String userId, String featureType) async {
+    return await Phase2IntegrationService.checkSocialFeatureAccess(userId, featureType);
+  }
+
+  Future<bool> purchaseSocialFeature(String userId, String featureType) async {
+    final success = await Phase2IntegrationService.purchaseSocialFeatureAccess(userId, featureType);
+    if (success) {
+      await loadUserCoins(userId);
+      await loadTransactions(userId, refresh: true);
+    }
+    return success;
+  }
+
+  Future<void> awardSocialCoins({
+    required String userId,
+    required String engagementType,
+    String? targetId,
+    Map<String, dynamic>? metadata,
+  }) async {
+    await Phase2IntegrationService.awardSocialEngagementCoins(
+      userId: userId,
+      engagementType: engagementType,
+      targetId: targetId,
+      metadata: metadata,
+    );
+    
+    await loadUserCoins(userId);
+    await loadTransactions(userId, refresh: true);
+  }
+
+  // Gamification rewards
+  Future<void> awardAchievementCoins(String userId, String achievementType, {Map<String, dynamic>? metadata}) async {
+    await Phase2IntegrationService.awardGamificationCoins(userId, achievementType, metadata: metadata);
+    
+    await loadUserCoins(userId);
+    await loadTransactions(userId, refresh: true);
+  }
+
+  Future<void> awardLeaderboardCoins({
+    required String userId,
+    required int position,
+    required String leaderboardType,
+    required String period,
+  }) async {
+    await Phase2IntegrationService.awardLeaderboardCoins(
+      userId: userId,
+      position: position,
+      leaderboardType: leaderboardType,
+      period: period,
+    );
+    
+    await loadUserCoins(userId);
+    await loadTransactions(userId, refresh: true);
+  }
+
+  Future<void> awardChallengeCoins({
+    required String userId,
+    required String challengeId,
+    required String challengeType,
+    Map<String, dynamic>? challengeData,
+  }) async {
+    await Phase2IntegrationService.awardChallengeCompletionCoins(
+      userId: userId,
+      challengeId: challengeId,
+      challengeType: challengeType,
+      challengeData: challengeData,
+    );
+    
+    await loadUserCoins(userId);
+    await loadTransactions(userId, refresh: true);
+  }
+
+  Future<void> awardStreakCoins({
+    required String userId,
+    required int streakDays,
+    required String streakType,
+  }) async {
+    await Phase2IntegrationService.awardStreakBonus(
+      userId: userId,
+      streakDays: streakDays,
+      streakType: streakType,
+    );
+    
+    await loadUserCoins(userId);
+    await loadTransactions(userId, refresh: true);
+  }
+
+  Future<void> awardBadgeCoins({
+    required String userId,
+    required BadgeModel badge,
+  }) async {
+    await Phase2IntegrationService.awardBadgeUnlockCoins(
+      userId: userId,
+      badge: badge,
+    );
+    
+    await loadUserCoins(userId);
+    await loadTransactions(userId, refresh: true);
+  }
+
+  // Check affordability for any feature
+  Future<bool> canAffordFeature(String userId, String featureType, String category) async {
+    return await Phase2IntegrationService.canAffordFeature(userId, featureType, category);
+  }
+
+  // Get feature costs for display
+  Map<String, Map<String, int>> getFeatureCosts() {
+    return Phase2IntegrationService.getAllFeatureCosts();
+  }
+
+  // Get reward amounts for display
+  Map<String, int> getRewardAmounts() {
+    return Phase2IntegrationService.getAllRewards();
+  }
+
+  // Video-specific methods
+
+  // Check if user can access video
+  Future<bool> canAccessVideo(String userId, VideoLectureModel video) async {
+    return await Phase2IntegrationService.checkVideoAccess(userId, video);
+  }
+
+  // Purchase video access with coins
+  Future<bool> purchaseVideoAccess(String userId, VideoLectureModel video) async {
+    final success = await Phase2IntegrationService.purchaseVideoAccess(userId, video);
+    if (success) {
+      await loadUserCoins(userId);
+      await loadTransactions(userId, refresh: true);
+    }
+    return success;
+  }
+
+  // Award coins for video watching progress
+  Future<void> awardVideoWatchingCoins({
+    required String userId,
+    required String videoId,
+    required double progressIncrement,
+    required String videoTitle,
+    bool chapterCompleted = false,
+    bool videoCompleted = false,
+  }) async {
+    await Phase2IntegrationService.awardVideoWatchingCoins(
+      userId: userId,
+      videoId: videoId,
+      progressIncrement: progressIncrement,
+      videoTitle: videoTitle,
+      chapterCompleted: chapterCompleted,
+      videoCompleted: videoCompleted,
+    );
+    
+    await loadUserCoins(userId);
+    await loadTransactions(userId, refresh: true);
+  }
+
+  // Award coins for video engagement activities
+  Future<void> awardVideoEngagementCoins({
+    required String userId,
+    required String videoId,
+    required String engagementType,
+    Map<String, dynamic>? metadata,
+  }) async {
+    await Phase2IntegrationService.awardVideoEngagementCoins(
+      userId: userId,
+      videoId: videoId,
+      engagementType: engagementType,
+      metadata: metadata,
+    );
+    
+    await loadUserCoins(userId);
+    await loadTransactions(userId, refresh: true);
+  }
+
+  // Check if user can afford a specific video
+  Future<bool> canAffordVideo(String userId, VideoLectureModel video) async {
+    return await Phase2IntegrationService.canAffordVideo(userId, video);
   }
 
   // Simple method to add coins (for farmer module features)

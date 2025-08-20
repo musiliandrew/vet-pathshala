@@ -256,22 +256,24 @@ class _EnhancedDrugCenterScreenState extends State<EnhancedDrugCenterScreen>
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
-              crossAxisSpacing: UnifiedTheme.spacingM,
-              mainAxisSpacing: UnifiedTheme.spacingM,
-              childAspectRatio: 1.0,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.1,
               children: [
-                _buildFeatureCard(
+                _buildEnhancedFeatureCard(
                   'Drug Index',
-                  'All medicines listed',
+                  'Complete database of veterinary medicines',
                   Icons.medical_services,
                   UnifiedTheme.primaryGreen,
+                  '2,500+ drugs',
                   () => _navigateToDrugIndex(),
                 ),
-                _buildFeatureCard(
+                _buildEnhancedFeatureCard(
                   'Drug Calculator',
-                  'Dose & conversion tool',
+                  'Accurate dosage & conversion calculations',
                   Icons.calculate,
                   UnifiedTheme.blueAccent,
+                  'Smart calc',
                   () => _navigateToDrugCalculator(),
                 ),
               ],
@@ -309,78 +311,162 @@ class _EnhancedDrugCenterScreenState extends State<EnhancedDrugCenterScreen>
     );
   }
 
-  Widget _buildFeatureCard(
+  Widget _buildEnhancedFeatureCard(
     String title,
     String description,
     IconData icon,
     Color color,
+    String badge,
     VoidCallback onTap,
   ) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.white.withOpacity(0.95)],
+            colors: [Colors.white, Colors.white.withOpacity(0.98)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(UnifiedTheme.radiusL),
-          border: Border.all(color: UnifiedTheme.borderColor),
-          boxShadow: UnifiedTheme.cardShadow,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withOpacity(0.2), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(UnifiedTheme.spacingL),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 56,
-                height: 56,
+        child: Stack(
+          children: [
+            // Background gradient accent
+            Positioned(
+              top: -20,
+              right: -20,
+              child: Container(
+                width: 80,
+                height: 80,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [color, color.withOpacity(0.8)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                  gradient: RadialGradient(
+                    colors: [color.withOpacity(0.08), Colors.transparent],
                   ),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: color.withOpacity(0.3)),
                     ),
-                  ],
-                ),
-                child: Center(
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 28,
+                    child: Text(
+                      badge,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                ),
+                  
+                  const Spacer(),
+                  
+                  // Icon
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [color, color.withOpacity(0.8)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withOpacity(0.4),
+                          blurRadius: 15,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Icon(
+                        icon,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Title
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: UnifiedTheme.primaryText,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      height: 1.2,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 4),
+                  
+                  // Description
+                  Text(
+                    description,
+                    style: TextStyle(
+                      color: UnifiedTheme.secondaryText,
+                      fontSize: 12,
+                      height: 1.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Arrow indicator
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.arrow_forward_ios,
+                          color: color,
+                          size: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(height: UnifiedTheme.spacingM),
-              Text(
-                title,
-                style: UnifiedTheme.headerSmall.copyWith(
-                  color: UnifiedTheme.primaryText,
-                  fontWeight: FontWeight.w700,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: UnifiedTheme.spacingS),
-              Text(
-                description,
-                style: UnifiedTheme.bodySmall.copyWith(
-                  color: UnifiedTheme.secondaryText,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -392,66 +478,143 @@ class _EnhancedDrugCenterScreenState extends State<EnhancedDrugCenterScreen>
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.white.withOpacity(0.95)],
+            colors: [
+              UnifiedTheme.goldAccent.withOpacity(0.05),
+              UnifiedTheme.goldAccent.withOpacity(0.02),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(UnifiedTheme.radiusL),
-          border: Border.all(color: UnifiedTheme.borderColor),
-          boxShadow: UnifiedTheme.cardShadow,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: UnifiedTheme.goldAccent.withOpacity(0.2), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: UnifiedTheme.goldAccent.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(UnifiedTheme.spacingL),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [UnifiedTheme.goldAccent, UnifiedTheme.goldAccent.withOpacity(0.8)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: UnifiedTheme.goldAccent.withOpacity(0.3),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+              // Video icon with pulse animation
+              TweenAnimationBuilder<double>(
+                duration: const Duration(seconds: 2),
+                tween: Tween(begin: 0.8, end: 1.0),
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [UnifiedTheme.goldAccent, UnifiedTheme.goldAccent.withOpacity(0.8)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: UnifiedTheme.goldAccent.withOpacity(0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.play_arrow,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.play_arrow,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
+                  );
+                },
               ),
-              const SizedBox(width: UnifiedTheme.spacingL),
+              
+              const SizedBox(width: 16),
+              
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      children: [
+                        Text(
+                          'Watch Video',
+                          style: TextStyle(
+                            color: UnifiedTheme.primaryText,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: UnifiedTheme.goldAccent,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            '+5 Coins',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
                     Text(
-                      'Watch Video to Earn Coins',
-                      style: UnifiedTheme.headerSmall.copyWith(
-                        color: UnifiedTheme.primaryText,
-                        fontWeight: FontWeight.w700,
+                      'Watch ads & educational content to earn instant coins',
+                      style: TextStyle(
+                        color: UnifiedTheme.secondaryText,
+                        fontSize: 13,
+                        height: 1.3,
                       ),
                     ),
-                    const SizedBox(height: UnifiedTheme.spacingS),
-                    Text(
-                      'Watch & earn instant coins to unlock features',
-                      style: UnifiedTheme.bodyMedium.copyWith(
-                        color: UnifiedTheme.secondaryText,
-                        height: 1.4,
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: UnifiedTheme.goldAccent.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: UnifiedTheme.goldAccent.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            size: 12,
+                            color: UnifiedTheme.goldAccent,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '~30 seconds',
+                            style: TextStyle(
+                              color: UnifiedTheme.goldAccent,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
+              ),
+              
+              Icon(
+                Icons.arrow_forward_ios,
+                color: UnifiedTheme.goldAccent,
+                size: 16,
               ),
             ],
           ),
@@ -466,51 +629,159 @@ class _EnhancedDrugCenterScreenState extends State<EnhancedDrugCenterScreen>
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.white.withOpacity(0.95)],
+            colors: [
+              UnifiedTheme.primaryGreen.withOpacity(0.05),
+              UnifiedTheme.primaryGreen.withOpacity(0.02),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(UnifiedTheme.radiusL),
-          border: Border.all(color: UnifiedTheme.borderColor),
-          boxShadow: UnifiedTheme.cardShadow,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: UnifiedTheme.primaryGreen.withOpacity(0.2), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: UnifiedTheme.primaryGreen.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(UnifiedTheme.spacingL),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [UnifiedTheme.primaryGreen, UnifiedTheme.lightGreen],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+              // Diamond icon with sparkle effect
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [UnifiedTheme.primaryGreen, UnifiedTheme.lightGreen],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: UnifiedTheme.primaryGreen.withOpacity(0.4),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.diamond,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
                   ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: UnifiedTheme.primaryGreen.withOpacity(0.3),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+                  // Sparkle effect
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: UnifiedTheme.goldAccent,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: UnifiedTheme.goldAccent.withOpacity(0.6),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(width: 16),
+              
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'Coin Store',
+                          style: TextStyle(
+                            color: UnifiedTheme.primaryText,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: UnifiedTheme.primaryGreen,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            'PREMIUM',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Purchase coins to unlock premium drug features',
+                      style: TextStyle(
+                        color: UnifiedTheme.secondaryText,
+                        fontSize: 13,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: UnifiedTheme.primaryGreen.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '₹9 - ₹999',
+                            style: TextStyle(
+                              color: UnifiedTheme.primaryGreen,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '• Instant delivery',
+                          style: TextStyle(
+                            color: UnifiedTheme.secondaryText,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.diamond,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
               ),
-              const SizedBox(width: UnifiedTheme.spacingL),
-              Text(
-                'Buy Coins',
-                style: UnifiedTheme.headerSmall.copyWith(
-                  color: UnifiedTheme.primaryText,
-                  fontWeight: FontWeight.w700,
-                ),
+              
+              Icon(
+                Icons.arrow_forward_ios,
+                color: UnifiedTheme.primaryGreen,
+                size: 16,
               ),
             ],
           ),
