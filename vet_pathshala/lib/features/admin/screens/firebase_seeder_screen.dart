@@ -156,7 +156,7 @@ class _FirebaseSeederScreenState extends State<FirebaseSeederScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Firebase Data Seeder'),
-        backgroundColor: UnifiedTheme.primaryColor,
+        backgroundColor: UnifiedTheme.primary,
         foregroundColor: Colors.white,
       ),
       body: Padding(
@@ -200,7 +200,7 @@ class _FirebaseSeederScreenState extends State<FirebaseSeederScreen> {
                                 : const Icon(Icons.cloud_upload),
                             label: Text(_isSeeding ? 'Seeding...' : 'Seed All Data'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: UnifiedTheme.primaryColor,
+                              backgroundColor: UnifiedTheme.primary,
                               foregroundColor: Colors.white,
                             ),
                           ),

@@ -93,7 +93,7 @@ class _EnhancedAdminDashboardScreenState extends State<EnhancedAdminDashboardScr
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
-        backgroundColor: UnifiedTheme.primaryColor,
+        backgroundColor: UnifiedTheme.primary,
         foregroundColor: Colors.white,
         bottom: TabBar(
           controller: _tabController,
@@ -186,7 +186,7 @@ class _EnhancedAdminDashboardScreenState extends State<EnhancedAdminDashboardScr
             'Platform Overview',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: UnifiedTheme.primaryColor,
+              color: UnifiedTheme.primary,
             ),
           ),
           const SizedBox(height: 16),
@@ -370,7 +370,7 @@ class _EnhancedAdminDashboardScreenState extends State<EnhancedAdminDashboardScr
                       children: [
                         Icon(
                           Icons.add_circle,
-                          color: UnifiedTheme.primaryColor,
+                          color: UnifiedTheme.primary,
                           size: 32,
                         ),
                         const SizedBox(height: 8),
@@ -584,197 +584,6 @@ class _EnhancedAdminDashboardScreenState extends State<EnhancedAdminDashboardScr
     );
   }
 
-  Widget _buildStatsSection(String title, List<Widget> cards) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
-          ),
-        ),
-        const SizedBox(height: 12),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 1.5,
-          children: cards,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(icon, color: color, size: 32),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickActionsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Quick Actions',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
-          ),
-        ),
-        const SizedBox(height: 12),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 2,
-          children: [
-            _buildActionCard('Add Video', Icons.video_call, () => _showAddVideoDialog()),
-            _buildActionCard('Add Question', Icons.quiz, () => _showAddQuestionDialog()),
-            _buildActionCard('Upload E-book', Icons.book, () => _showAddEbookDialog()),
-            _buildActionCard('Search Content', Icons.search, () => _showSearchDialog()),
-            _buildActionCard('Load Sample Data', Icons.upload_file, () => _showDataSeeder()),
-            _buildActionCard('Refresh Analytics', Icons.refresh, () => _refreshAnalytics()),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionCard(String title, IconData icon, VoidCallback onTap) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              Icon(icon, size: 24, color: UnifiedTheme.primary),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUserRoleChart(Map<String, int> roles) {
-    // Handle empty or null roles data
-    if (roles.isEmpty) {
-      roles = {
-        'veterinarian': 0,
-        'pharmacist': 0,
-        'farmer': 0,
-      };
-    }
-    
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'User Distribution by Role',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ...roles.entries.map((entry) => _buildRoleRow(entry.key, entry.value)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRoleRow(String role, int count) {
-    final total = _analytics!['users']['total'] as int;
-    final percentage = total > 0 ? (count / total * 100).round() : 0;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              role.toUpperCase(),
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-          Expanded(
-            child: LinearProgressIndicator(
-              value: percentage / 100,
-              backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(
-                UnifiedTheme.primary,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text('$count ($percentage%)'),
-        ],
-      ),
-    );
-  }
 
   Widget _buildVideoCard(dynamic video) {
     return Card(
@@ -868,7 +677,7 @@ class _EnhancedAdminDashboardScreenState extends State<EnhancedAdminDashboardScr
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: UnifiedTheme.primaryColor,
+          backgroundColor: UnifiedTheme.primary,
           child: const Icon(Icons.quiz, color: Colors.white),
         ),
         title: Text(
