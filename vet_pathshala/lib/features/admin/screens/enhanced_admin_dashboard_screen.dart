@@ -9,6 +9,7 @@ import 'question_creation_screen.dart';
 import 'ebook_upload_screen.dart';
 import 'content_search_screen.dart';
 import 'data_seeder_screen.dart';
+import 'firebase_seeder_screen.dart';
 
 class EnhancedAdminDashboardScreen extends StatefulWidget {
   const EnhancedAdminDashboardScreen({super.key});
@@ -92,7 +93,7 @@ class _EnhancedAdminDashboardScreenState extends State<EnhancedAdminDashboardScr
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
-        backgroundColor: UnifiedTheme.primary,
+        backgroundColor: UnifiedTheme.primaryColor,
         foregroundColor: Colors.white,
         bottom: TabBar(
           controller: _tabController,
@@ -108,12 +109,12 @@ class _EnhancedAdminDashboardScreenState extends State<EnhancedAdminDashboardScr
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.upload_file),
-            tooltip: 'Load Sample Data',
+            icon: const Icon(Icons.cloud_upload),
+            tooltip: 'Fix Loading Issues',
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const DataSeederScreen(),
+                  builder: (context) => const FirebaseSeederScreen(),
                 ),
               );
             },
@@ -185,7 +186,7 @@ class _EnhancedAdminDashboardScreenState extends State<EnhancedAdminDashboardScr
             'Platform Overview',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: UnifiedTheme.primary,
+              color: UnifiedTheme.primaryColor,
             ),
           ),
           const SizedBox(height: 16),
@@ -247,6 +248,255 @@ class _EnhancedAdminDashboardScreenState extends State<EnhancedAdminDashboardScr
           _buildUserRoleChart((users['roles'] as Map<String, dynamic>?)?.cast<String, int>() ?? {}),
         ],
       ),
+    );
+  }
+
+  Widget _buildStatsSection(String title, List<Widget> cards) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: cards.map((card) => Expanded(child: card)).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+    return Card(
+      margin: const EdgeInsets.only(right: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 32),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickActionsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Quick Actions',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: Card(
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const FirebaseSeederScreen(),
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.cloud_upload,
+                          color: Colors.green.shade600,
+                          size: 32,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Fix Loading Issues',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Seed Firebase Data',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey.shade600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Card(
+                child: InkWell(
+                  onTap: _showAddContentDialog,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.add_circle,
+                          color: UnifiedTheme.primaryColor,
+                          size: 32,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Add Content',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Videos, Questions, E-books',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey.shade600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Card(
+                child: InkWell(
+                  onTap: _showSearchDialog,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.search,
+                          color: Colors.blue.shade600,
+                          size: 32,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Search Content',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Find any content',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey.shade600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUserRoleChart(Map<String, int> roleData) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'User Role Distribution',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: roleData.entries.map((entry) {
+                final total = roleData.values.fold(0, (sum, count) => sum + count);
+                final percentage = total > 0 ? (entry.value / total * 100) : 0;
+                
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          entry.key.toLowerCase().replaceFirst(entry.key[0], entry.key[0].toUpperCase()),
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: LinearProgressIndicator(
+                          value: percentage / 100,
+                          backgroundColor: Colors.grey.shade300,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            entry.key == 'doctor' ? Colors.blue :
+                            entry.key == 'pharmacist' ? Colors.green :
+                            Colors.orange,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${entry.value} (${percentage.toStringAsFixed(1)}%)',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -618,7 +868,7 @@ class _EnhancedAdminDashboardScreenState extends State<EnhancedAdminDashboardScr
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: UnifiedTheme.primary,
+          backgroundColor: UnifiedTheme.primaryColor,
           child: const Icon(Icons.quiz, color: Colors.white),
         ),
         title: Text(

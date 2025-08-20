@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import '../models/enhanced_content_models.dart';
 
 class FirebaseDataSeeder {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -10,11 +9,11 @@ class FirebaseDataSeeder {
     
     try {
       await Future.wait([
-        _seedUsers(),
-        _seedVideos(),
-        _seedQuestions(), 
-        _seedEbooks(),
-        _seedUserProgress(),
+        seedUsers(),
+        seedVideos(),
+        seedQuestions(), 
+        seedEbooks(),
+        seedUserProgress(),
       ]);
       
       debugPrint('✅ Firebase data seeding completed successfully!');
@@ -24,7 +23,7 @@ class FirebaseDataSeeder {
     }
   }
 
-  Future<void> _seedUsers() async {
+  Future<void> seedUsers() async {
     debugPrint('👥 Seeding users...');
     
     final users = [
@@ -168,7 +167,7 @@ class FirebaseDataSeeder {
     debugPrint('✅ Seeded ${users.length} users');
   }
 
-  Future<void> _seedVideos() async {
+  Future<void> seedVideos() async {
     debugPrint('🎥 Seeding videos...');
     
     final videos = [
@@ -339,13 +338,13 @@ class FirebaseDataSeeder {
     ];
 
     for (final video in videos) {
-      await _firestore.collection('videos').add(video);
+      await _firestore.collection('video_lectures').add(video);
     }
     
     debugPrint('✅ Seeded ${videos.length} videos');
   }
 
-  Future<void> _seedQuestions() async {
+  Future<void> seedQuestions() async {
     debugPrint('❓ Seeding questions...');
     
     final questions = [
@@ -502,7 +501,7 @@ class FirebaseDataSeeder {
     debugPrint('✅ Seeded ${questions.length} questions');
   }
 
-  Future<void> _seedEbooks() async {
+  Future<void> seedEbooks() async {
     debugPrint('📚 Seeding ebooks...');
     
     final ebooks = [
@@ -651,7 +650,7 @@ class FirebaseDataSeeder {
     debugPrint('✅ Seeded ${ebooks.length} ebooks');
   }
 
-  Future<void> _seedUserProgress() async {
+  Future<void> seedUserProgress() async {
     debugPrint('📈 Seeding user progress...');
     
     final progressEntries = [
