@@ -62,6 +62,20 @@ class TestSeriesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Public method to load test series with role filter
+  Future<void> loadTestSeries(String userRole) async {
+    _setLoading(true);
+    try {
+      await _loadTestSeries();
+      // Filter by role if needed
+      _applyFilters();
+    } catch (e) {
+      _setError('Failed to load test series: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   // Load user attempts
   Future<void> loadUserAttempts(String userId) async {
     try {

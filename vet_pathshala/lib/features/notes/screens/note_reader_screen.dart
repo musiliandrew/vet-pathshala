@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../../core/theme/unified_theme.dart';
 import '../../../shared/models/note_model.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/notes_provider.dart';
-import '../widgets/note_action_panel.dart';
-import '../widgets/sticky_note_widget.dart';
-import '../widgets/ai_summary_widget.dart';
-import '../widgets/text_selection_toolbar.dart';
-import '../widgets/tts_control_widget.dart';
-import '../widgets/flashcard_generator_widget.dart';
+// Simplified widgets replaced with inline implementations
 
 class NoteReaderScreen extends StatefulWidget {
   final NoteModel note;
@@ -108,270 +102,474 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: UnifiedTheme.backgroundColor,
+      backgroundColor: const Color(0xFFFAFBFF), // Soft, cute background
       body: Consumer<NotesProvider>(
         builder: (context, notesProvider, child) {
-          return Row(
+          return Stack(
             children: [
-              // Sidebar
-              _buildSidebar(context, notesProvider),
+              // Cute background pattern
+              _buildBackgroundPattern(),
               
-              // Main content
-              Expanded(
-                child: CustomScrollView(
-                  controller: _scrollController,
-                  slivers: [
-                    _buildAppBar(context, notesProvider),
-                    _buildProgressIndicator(),
-                    _buildNoteContent(context, notesProvider),
-                    _buildStickyNotes(notesProvider),
-                  ],
-                ),
+              // Main content with cute design
+              CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  _buildCuteAppBar(context, notesProvider),
+                  _buildCuteProgressIndicator(),
+                  _buildCuteNoteContent(context, notesProvider),
+                  _buildCuteStickyNotes(notesProvider),
+                  // Add some bottom padding
+                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                ],
               ),
+              
+              // Floating cute action button
+              _buildCuteFloatingActions(context),
             ],
           );
         },
       ),
-      bottomNavigationBar: _buildFixedActionBar(context),
-      floatingActionButton: _buildFloatingActionButtons(),
-      bottomSheet: _showActionPanel ? _buildActionPanel() : null,
     );
   }
 
-  Widget _buildAppBar(BuildContext context, NotesProvider notesProvider) {
+  // Cute background pattern
+  Widget _buildBackgroundPattern() {
+    return Positioned.fill(
+      child: CustomPaint(
+        painter: CuteBackgroundPainter(),
+      ),
+    );
+  }
+
+  // Cute modern app bar
+  Widget _buildCuteAppBar(BuildContext context, NotesProvider notesProvider) {
     return SliverAppBar(
-      expandedHeight: 120,
+      expandedHeight: 160,
       floating: false,
       pinned: true,
-      backgroundColor: UnifiedTheme.backgroundColor,
-      foregroundColor: UnifiedTheme.primaryText,
+      backgroundColor: Colors.transparent,
       elevation: 0,
-      leading: IconButton(
-        onPressed: () => Navigator.pop(context),
-        icon: const Icon(Icons.arrow_back_ios),
-      ),
-      actions: [
-        // Bookmark button
-        Consumer<AuthProvider>(
-          builder: (context, authProvider, child) {
-            if (authProvider.currentUser == null) return const SizedBox.shrink();
-            
-            final isBookmarked = notesProvider.currentInteraction?.isBookmarked ?? false;
-            return IconButton(
-              onPressed: () => notesProvider.toggleBookmark(
-                authProvider.currentUser!.id,
-                widget.note.id,
-              ),
-              icon: Icon(
-                isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                color: isBookmarked ? UnifiedTheme.goldAccent : UnifiedTheme.tertiaryText,
-              ),
-            );
-          },
-        ),
-        
-        // Share button
-        IconButton(
-          onPressed: _shareNote,
-          icon: const Icon(Icons.share_outlined),
-        ),
-        
-        // More options
-        PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert),
-          color: UnifiedTheme.cardBackground,
-          onSelected: _handleMenuSelection,
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'report',
-              child: Row(
+      flexibleSpace: FlexibleSpaceBar(
+        background: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                const Color(0xFF6C5CE7).withOpacity(0.1),
+                const Color(0xFFA29BFE).withOpacity(0.05),
+                Colors.white.withOpacity(0.8),
+              ],
+            ),
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(30),
+              bottomRight: Radius.circular(30),
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.flag_outlined, color: UnifiedTheme.tertiaryText),
-                  SizedBox(width: 12),
-                  Text('Report'),
+                  // Header row with back button and actions
+                  Row(
+                    children: [
+                      // Cute back button
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF6C5CE7).withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new,
+                            color: Color(0xFF6C5CE7),
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                      
+                      const Spacer(),
+                      
+                      // Cute action buttons
+                      _buildCuteActionButton(
+                        Icons.bookmark_outline,
+                        const Color(0xFFFF7675),
+                        () => _toggleBookmark(notesProvider),
+                      ),
+                      const SizedBox(width: 8),
+                      _buildCuteActionButton(
+                        Icons.share_outlined,
+                        const Color(0xFF74B9FF),
+                        () => _shareNote(),
+                      ),
+                      const SizedBox(width: 8),
+                      _buildCuteActionButton(
+                        Icons.more_horiz,
+                        const Color(0xFF6C5CE7),
+                        () => _showCuteMoreActions(),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Title with cute styling
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      widget.note.title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2D3436),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Cute metadata row - Fixed overflow
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF00B894).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.schedule,
+                              size: 12,
+                              color: Color(0xFF00B894),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${_estimateReadingTime(widget.note.content)}m',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Color(0xFF00B894),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE17055).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.favorite_outline,
+                              size: 12,
+                              color: Color(0xFFE17055),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${widget.note.likeCount}',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Color(0xFFE17055),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-            const PopupMenuItem(
-              value: 'font_size',
-              child: Row(
-                children: [
-                  Icon(Icons.text_fields_outlined, color: UnifiedTheme.tertiaryText),
-                  SizedBox(width: 12),
-                  Text('Text Size'),
-                ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Cute progress indicator
+  Widget _buildCuteProgressIndicator() {
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Reading Progress',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF6C5CE7).withOpacity(0.8),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 6,
+              decoration: BoxDecoration(
+                color: const Color(0xFF6C5CE7).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: _readingProgress / 100,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF6C5CE7), Color(0xFFA29BFE)],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF6C5CE7).withOpacity(0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$_readingProgress% complete',
+              style: const TextStyle(
+                fontSize: 10,
+                color: Color(0xFF6C5CE7),
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
-      ],
-      flexibleSpace: FlexibleSpaceBar(
-        title: Text(
-          widget.note.title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: UnifiedTheme.primaryText,
-          ),
-        ),
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                UnifiedTheme.backgroundColor,
-                UnifiedTheme.backgroundColor.withOpacity(0.8),
-              ],
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 80, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.person_outline,
-                      size: 16,
-                      color: UnifiedTheme.tertiaryText,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Dr. ${widget.note.authorId}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: UnifiedTheme.tertiaryText,
-                      ),
-                    ),
-                    const Spacer(),
-                    Icon(
-                      Icons.access_time,
-                      size: 16,
-                      color: UnifiedTheme.tertiaryText,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${_estimateReadingTime(widget.note.content)} min read',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: UnifiedTheme.tertiaryText,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
 
-  Widget _buildProgressIndicator() {
+  // Cute note content design
+  Widget _buildCuteNoteContent(BuildContext context, NotesProvider notesProvider) {
     return SliverToBoxAdapter(
       child: Container(
-        height: 4,
-        color: UnifiedTheme.borderColor,
-        child: FractionallySizedBox(
-          alignment: Alignment.centerLeft,
-          widthFactor: _readingProgress / 100,
-          child: Container(
-            color: UnifiedTheme.primaryGreen,
-          ),
+        margin: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Cute tags section
+            if (widget.note.tags.isNotEmpty) _buildCuteTags(),
+            
+            // AI Summary with cute design
+            Consumer<NotesProvider>(
+              builder: (context, notesProvider, child) {
+                if (notesProvider.aiSummary != null) {
+                  return _buildCuteAISummary(notesProvider.aiSummary!);
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+            
+            // Quick action cards
+            _buildCuteQuickActions(),
+            
+            // Main content card
+            _buildCuteContentCard(notesProvider),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildNoteContent(BuildContext context, NotesProvider notesProvider) {
+  // Original method for reference
+  Widget _buildNoteContentOLD(BuildContext context, NotesProvider notesProvider) {
     return SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: UnifiedTheme.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: UnifiedTheme.borderColor),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF6C5CE7).withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Tags
+            // Clean Tags Display (without # symbols)
             if (widget.note.tags.isNotEmpty) ...[
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: 10,
+                runSpacing: 10,
                 children: widget.note.tags.map((tag) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: UnifiedTheme.primaryGreen.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        UnifiedTheme.primaryGreen.withOpacity(0.1),
+                        UnifiedTheme.primaryGreen.withOpacity(0.05),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: UnifiedTheme.primaryGreen.withOpacity(0.3)),
                   ),
-                  child: Text(
-                    '#$tag',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: UnifiedTheme.primaryGreen,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.label_outline,
+                        size: 12,
+                        color: UnifiedTheme.primaryGreen,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _cleanTag(tag), // Remove # and clean the tag
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: UnifiedTheme.primaryGreen,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 )).toList(),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
             ],
 
-            // AI Summary Section
+            // Enhanced AI Summary Section
             Consumer<NotesProvider>(
               builder: (context, notesProvider, child) {
                 if (notesProvider.aiSummary != null) {
-                  return Column(
-                    children: [
-                      AISummaryWidget(
-                        summary: notesProvider.aiSummary!,
-                        onDismiss: () => setState(() {}),
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: Material(
+                      elevation: 2,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              UnifiedTheme.blueAccent.withOpacity(0.08),
+                              UnifiedTheme.blueAccent.withOpacity(0.04),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: UnifiedTheme.blueAccent.withOpacity(0.2)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: UnifiedTheme.blueAccent.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    Icons.auto_awesome,
+                                    color: UnifiedTheme.blueAccent,
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  'AI Summary',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: UnifiedTheme.blueAccent,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: UnifiedTheme.blueAccent,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Text(
+                                    'AI',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              notesProvider.aiSummary!,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                height: 1.6,
+                                color: UnifiedTheme.primaryText,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                    ],
+                    ),
                   );
                 }
                 return const SizedBox.shrink();
               },
             ),
 
-            // Text-to-Speech Controls
-            TtsControlWidget(
-              noteContent: widget.note.content,
-              selectedText: _selectedText,
-            ),
-            const SizedBox(height: 16),
-
-            // Auto-Flashcard Generator
-            FlashcardGeneratorWidget(
-              note: widget.note,
-              onFlashcardsGenerated: () {
-                // Optionally refresh something or show feedback
-                setState(() {});
-              },
-            ),
+            // This section is now handled in the new cute design - remove this old code
             const SizedBox(height: 20),
 
-            // Note Content with Selection Support
+            // Clean Note Content with Selection Support
             SelectableText.rich(
               TextSpan(
-                children: _buildHighlightedContent(widget.note.content, notesProvider),
+                children: _buildHighlightedContent(_cleanContent(widget.note.content), notesProvider),
               ),
               style: const TextStyle(
                 fontSize: 16,
                 height: 1.6,
                 color: UnifiedTheme.primaryText,
+                letterSpacing: 0.2,
               ),
               onSelectionChanged: (selection, cause) {
                 if (selection.isValid && !selection.isCollapsed) {
-                  final selectedText = widget.note.content.substring(
+                  final cleanedContent = _cleanContent(widget.note.content);
+                  final selectedText = cleanedContent.substring(
                     selection.start,
                     selection.end,
                   );
@@ -406,7 +604,7 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
   List<TextSpan> _buildHighlightedContent(String content, NotesProvider notesProvider) {
     final highlights = notesProvider.currentInteraction?.highlights ?? [];
     if (highlights.isEmpty) {
-      return [TextSpan(text: content)];
+      return [_buildStyledTextSpan(content)];
     }
 
     List<TextSpan> spans = [];
@@ -418,17 +616,16 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
     for (final highlight in highlights) {
       // Add text before highlight
       if (highlight.startPosition > lastEnd) {
-        spans.add(TextSpan(
-          text: content.substring(lastEnd, highlight.startPosition),
-        ));
+        spans.add(_buildStyledTextSpan(content.substring(lastEnd, highlight.startPosition)));
       }
 
       // Add highlighted text
       spans.add(TextSpan(
         text: highlight.selectedText,
         style: TextStyle(
-          backgroundColor: Color(int.parse(highlight.color.replaceFirst('#', '0xFF'))),
+          backgroundColor: Color(int.parse(highlight.color.replaceFirst('#', '0xFF'))).withOpacity(0.3),
           color: UnifiedTheme.primaryText,
+          fontWeight: FontWeight.w500,
         ),
       ));
 
@@ -437,12 +634,39 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
 
     // Add remaining text
     if (lastEnd < content.length) {
-      spans.add(TextSpan(
-        text: content.substring(lastEnd),
-      ));
+      spans.add(_buildStyledTextSpan(content.substring(lastEnd)));
     }
 
     return spans;
+  }
+
+  // Helper function to create styled text spans for different content types
+  TextSpan _buildStyledTextSpan(String text) {
+    // Check if text looks like a heading (starts with capital and is short)
+    if (text.trim().length < 100 && 
+        text.trim().isNotEmpty && 
+        text.trim()[0] == text.trim()[0].toUpperCase() &&
+        !text.contains('.') && 
+        text.trim().split('\n').length == 1) {
+      return TextSpan(
+        text: text,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: UnifiedTheme.primaryGreen,
+          height: 1.4,
+        ),
+      );
+    }
+    
+    return TextSpan(
+      text: text,
+      style: const TextStyle(
+        fontSize: 16,
+        height: 1.6,
+        color: UnifiedTheme.primaryText,
+      ),
+    );
   }
 
   Widget _buildStickyNotes(NotesProvider notesProvider) {
@@ -466,9 +690,25 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
               ),
             ),
             const SizedBox(height: 12),
-            ...stickyNotes.map((note) => StickyNoteWidget(
-              stickyNote: note,
-              onDelete: () => _deleteStickyNote(note.id),
+            ...stickyNotes.map((note) => Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.yellow.shade100,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.yellow.shade300),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.note, color: Colors.yellow.shade700),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(note.content)),
+                  IconButton(
+                    icon: Icon(Icons.close, color: Colors.yellow.shade700),
+                    onPressed: () => _deleteStickyNote(note.id),
+                  ),
+                ],
+              ),
             )),
           ],
         ),
@@ -698,193 +938,255 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
     );
   }
 
-  Widget _buildFixedActionBar(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
+
+  Widget _buildMenuToggle() {
+    return FloatingActionButton(
+      onPressed: () {
+        setState(() {
+          _showActionPanel = !_showActionPanel;
+        });
+        if (_showActionPanel) {
+          Scaffold.of(context).openEndDrawer();
+        } else {
+          Navigator.of(context).pop();
+        }
+      },
+      backgroundColor: _showActionPanel ? UnifiedTheme.goldAccent : UnifiedTheme.primaryGreen,
+      child: Icon(
+        _showActionPanel ? Icons.close : Icons.menu,
         color: Colors.white,
-        border: const Border(top: BorderSide(color: UnifiedTheme.borderColor)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildFixedActionButton(
-                icon: Icons.thumb_up_outlined,
-                label: 'Like',
-                count: widget.note.likeCount,
-                onTap: () => _handleAction('like'),
-              ),
-              _buildFixedActionButton(
-                icon: Icons.visibility_outlined,
-                label: 'Views',
-                count: widget.note.readCount,
-                onTap: () => _handleAction('view'),
-              ),
-              _buildFixedActionButton(
-                icon: Icons.report_outlined,
-                label: 'Report',
-                count: 0,
-                onTap: () => _handleAction('report'),
-              ),
-              _buildFixedActionButton(
-                icon: Icons.sticky_note_2_outlined,
-                label: 'Notes',
-                count: 0,
-                onTap: () => _showStickyNotesPanel(),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
 
-  Widget _buildFixedActionButton({
-    required IconData icon,
-    required String label,
-    required int count,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: UnifiedTheme.primaryGreen.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: UnifiedTheme.primaryGreen.withOpacity(0.3),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: UnifiedTheme.primaryGreen,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: UnifiedTheme.primaryGreen,
-              ),
-            ),
-            if (count > 0) ...[
-              const SizedBox(height: 1),
-              Text(
-                count.toString(),
-                style: TextStyle(
-                  fontSize: 9,
-                  color: UnifiedTheme.primaryGreen.withOpacity(0.7),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFloatingActionButtons() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // AI Summary Button
-        Consumer<NotesProvider>(
-          builder: (context, notesProvider, child) {
-            return FloatingActionButton(
-              heroTag: 'ai_summary',
-              onPressed: notesProvider.isGeneratingSummary 
-                ? null 
-                : () => notesProvider.generateAISummary(),
-              backgroundColor: UnifiedTheme.blueAccent,
-              foregroundColor: Colors.white,
-              mini: true,
-              child: notesProvider.isGeneratingSummary
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : const Icon(Icons.auto_awesome, size: 20),
-            );
-          },
-        ),
-        
-        const SizedBox(height: 8),
-        
-        // Text-to-Speech Button
-        Consumer<NotesProvider>(
-          builder: (context, notesProvider, child) {
-            return FloatingActionButton(
-              heroTag: 'tts',
-              onPressed: notesProvider.isSpeaking 
-                ? null 
-                : () => notesProvider.speakNote(),
-              backgroundColor: UnifiedTheme.primaryGreen,
-              foregroundColor: Colors.white,
-              mini: true,
-              child: notesProvider.isSpeaking
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : const Icon(Icons.volume_up, size: 20),
-            );
-          },
-        ),
-        
-        const SizedBox(height: 8),
-        
-        // Action Panel Toggle
-        FloatingActionButton(
-          heroTag: 'actions',
-          onPressed: () {
-            setState(() {
-              _showActionPanel = !_showActionPanel;
-            });
-          },
-          backgroundColor: _showActionPanel ? UnifiedTheme.goldAccent : UnifiedTheme.tertiaryText,
-          foregroundColor: Colors.white,
-          child: const Icon(Icons.more_horiz),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionPanel() {
+  Widget _buildSlideInMenu(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        if (authProvider.currentUser == null) return const SizedBox.shrink();
-        
-        return NoteActionPanel(
-          note: widget.note,
-          userId: authProvider.currentUser!.id,
-          onClose: () => setState(() => _showActionPanel = false),
+        return Drawer(
+          backgroundColor: UnifiedTheme.cardBackground,
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        UnifiedTheme.primaryGreen,
+                        UnifiedTheme.primaryGreen.withOpacity(0.8),
+                      ],
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.note_outlined,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Note Tools',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Enhance your reading experience',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Menu Items
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    children: [
+                      _buildMenuTile(
+                        icon: Icons.auto_awesome,
+                        title: 'AI Summary',
+                        subtitle: 'Generate intelligent summary',
+                        color: UnifiedTheme.blueAccent,
+                        onTap: () => _generateAISummary(context.read<NotesProvider>()),
+                        isLoading: context.watch<NotesProvider>().isGeneratingSummary,
+                      ),
+                      
+                      _buildMenuTile(
+                        icon: Icons.volume_up,
+                        title: 'Text-to-Speech',
+                        subtitle: 'Listen to the note',
+                        color: UnifiedTheme.primaryGreen,
+                        onTap: () => context.read<NotesProvider>().speakNote(),
+                        isLoading: context.watch<NotesProvider>().isSpeaking,
+                      ),
+                      
+                      _buildMenuTile(
+                        icon: Icons.quiz_outlined,
+                        title: 'Generate Flashcards',
+                        subtitle: 'Create study cards',
+                        color: Colors.orange,
+                        onTap: () => _showFlashcards(),
+                      ),
+                      
+                      _buildMenuTile(
+                        icon: Icons.highlight_alt,
+                        title: 'View Highlights',
+                        subtitle: 'See highlighted text',
+                        color: Colors.amber,
+                        onTap: () => _showHighlights(),
+                      ),
+                      
+                      _buildMenuTile(
+                        icon: Icons.sticky_note_2_outlined,
+                        title: 'Sticky Notes',
+                        subtitle: 'Your personal notes',
+                        color: Colors.yellow.shade700,
+                        onTap: () => _showStickyNotesPanel(),
+                      ),
+                      
+                      Consumer<NotesProvider>(
+                        builder: (context, notesProvider, child) {
+                          final isBookmarked = notesProvider.currentInteraction?.isBookmarked ?? false;
+                          return _buildMenuTile(
+                            icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                            title: isBookmarked ? 'Remove Bookmark' : 'Add Bookmark',
+                            subtitle: 'Save for later',
+                            color: UnifiedTheme.goldAccent,
+                            onTap: () {
+                              if (authProvider.currentUser != null) {
+                                notesProvider.toggleBookmark(
+                                  authProvider.currentUser!.id,
+                                  widget.note.id,
+                                );
+                              }
+                            },
+                          );
+                        },
+                      ),
+                      
+                      const Divider(height: 32),
+                      
+                      _buildMenuTile(
+                        icon: Icons.share_outlined,
+                        title: 'Share Note',
+                        subtitle: 'Share with others',
+                        color: UnifiedTheme.tertiaryText,
+                        onTap: () => _shareNote(),
+                      ),
+                      
+                      _buildMenuTile(
+                        icon: Icons.text_fields_outlined,
+                        title: 'Text Size',
+                        subtitle: 'Adjust font size',
+                        color: UnifiedTheme.tertiaryText,
+                        onTap: () => _showFontSizeDialog(),
+                      ),
+                      
+                      _buildMenuTile(
+                        icon: Icons.flag_outlined,
+                        title: 'Report Note',
+                        subtitle: 'Report inappropriate content',
+                        color: UnifiedTheme.redAccent,
+                        onTap: () => _reportNote(),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildMenuTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+    bool isLoading = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isLoading ? null : onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: color.withOpacity(0.2)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(color),
+                        ),
+                      )
+                    : Icon(icon, color: color, size: 20),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: UnifiedTheme.primaryText,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: UnifiedTheme.tertiaryText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: UnifiedTheme.tertiaryText,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -894,12 +1196,47 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => CustomTextSelectionToolbar(
-        selectedText: _selectedText!,
-        onHighlight: (color) => _highlightText(color),
-        onCreateFlashcard: () => _createFlashcard(),
-        onAddStickyNote: () => _addStickyNote(),
-        onCopy: () => _copyText(),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Selected: "${_selectedText!.length > 50 ? '${_selectedText!.substring(0, 50)}...' : _selectedText!}"',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.highlight),
+                  label: const Text('Highlight'),
+                  onPressed: () => _highlightText(Colors.yellow),
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.quiz),
+                  label: const Text('Flashcard'),
+                  onPressed: () => _createFlashcard(),
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.note_add),
+                  label: const Text('Note'),
+                  onPressed: () => _addStickyNote(),
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.copy),
+                  label: const Text('Copy'),
+                  onPressed: () => _copyText(),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1265,9 +1602,25 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
                     itemCount: stickyNotes.length,
                     itemBuilder: (context, index) {
                       final note = stickyNotes[index];
-                      return StickyNoteWidget(
-                        stickyNote: note,
-                        onDelete: () => _deleteStickyNote(note.id),
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.yellow.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.yellow.shade300),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.note, color: Colors.yellow.shade700),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(note.content)),
+                            IconButton(
+                              icon: Icon(Icons.close, color: Colors.yellow.shade700),
+                              onPressed: () => _deleteStickyNote(note.id),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   ),
@@ -1417,4 +1770,560 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> with TickerProvider
         break;
     }
   }
+
+  // Helper function to clean markdown content
+  String _cleanContent(String content) {
+    // Remove markdown symbols and format cleanly
+    return content
+        .replaceAll(RegExp(r'#{1,6}\s*'), '') // Remove heading markers
+        .replaceAll(RegExp(r'\*{1,2}([^*]+)\*{1,2}'), r'$1') // Remove bold/italic markers
+        .replaceAll(RegExp(r'`([^`]+)`'), r'$1') // Remove code markers
+        .replaceAll(RegExp(r'>\s*'), '') // Remove blockquote markers
+        .replaceAll(RegExp(r'-\s*'), '• ') // Convert dash lists to bullet points
+        .replaceAll(RegExp(r'\n{3,}'), '\n\n') // Clean up excessive line breaks
+        .trim();
+  }
+
+  // Helper function to clean tags
+  String _cleanTag(String tag) {
+    return tag
+        .replaceAll(RegExp(r'^#+\s*'), '') // Remove leading # symbols
+        .replaceAll(RegExp(r'[_-]'), ' ') // Replace underscores and dashes with spaces
+        .split(' ')
+        .map((word) => word.isNotEmpty 
+            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}' 
+            : word)
+        .join(' ')
+        .trim();
+  }
+
+  // Cute action button helper
+  Widget _buildCuteActionButton(IconData icon, Color color, VoidCallback onTap) {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: IconButton(
+        onPressed: onTap,
+        icon: Icon(icon, color: color, size: 16),
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+
+  // Cute tags widget
+  Widget _buildCuteTags() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: widget.note.tags.map((tag) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFF00CEC9).withOpacity(0.2),
+                const Color(0xFF55E6C1).withOpacity(0.1),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFF00CEC9).withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF00CEC9),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                _cleanTag(tag),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF00CEC9),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        )).toList(),
+      ),
+    );
+  }
+
+  // Cute AI summary
+  Widget _buildCuteAISummary(String summary) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF74B9FF),
+            Color(0xFF0984E3),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF74B9FF).withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.auto_awesome,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'AI Summary',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  'AI',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            summary,
+            style: const TextStyle(
+              fontSize: 14,
+              height: 1.6,
+              color: Colors.white,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Cute quick actions - Fixed overflow
+  Widget _buildCuteQuickActions() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildCuteActionCard(Icons.volume_up, 'Listen', 'Audio', const Color(0xFFE17055), () => context.read<NotesProvider>().speakNote()),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildCuteActionCard(Icons.quiz, 'Practice', 'Quiz', const Color(0xFFFD79A8), () => _showFlashcards()),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildCuteActionCard(Icons.highlight, 'Highlights', 'Notes', const Color(0xFFFFB8B8), () => _showHighlights()),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildCuteActionCard(Icons.bookmark, 'Bookmark', 'Save', const Color(0xFF74B9FF), () => _toggleBookmark(context.read<NotesProvider>())),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Cute action card - Compact version
+  Widget _buildCuteActionCard(IconData icon, String title, String subtitle, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.1),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 9,
+                color: Color(0xFF636E72),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Cute content card
+  Widget _buildCuteContentCard(NotesProvider notesProvider) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6C5CE7).withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: SelectableText.rich(
+        TextSpan(
+          children: _buildHighlightedContent(_cleanContent(widget.note.content), notesProvider),
+        ),
+        style: const TextStyle(
+          fontSize: 16,
+          height: 1.8,
+          color: Color(0xFF2D3436),
+          letterSpacing: 0.3,
+        ),
+        onSelectionChanged: (selection, cause) {
+          if (selection.isValid && !selection.isCollapsed) {
+            final cleanedContent = _cleanContent(widget.note.content);
+            final selectedText = cleanedContent.substring(
+              selection.start,
+              selection.end,
+            );
+            setState(() {
+              _selectedText = selectedText;
+              _currentSelection = selection;
+            });
+            _showTextSelectionOptions();
+          } else {
+            setState(() {
+              _selectedText = null;
+              _currentSelection = null;
+            });
+          }
+        },
+      ),
+    );
+  }
+
+  // Cute floating actions
+  Widget _buildCuteFloatingActions(BuildContext context) {
+    return Positioned(
+      right: 20,
+      bottom: 30,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            heroTag: "ai_summary",
+            mini: true,
+            backgroundColor: const Color(0xFF74B9FF),
+            onPressed: () => context.read<NotesProvider>().generateAISummary(),
+            child: const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton(
+            heroTag: "bookmark",
+            backgroundColor: const Color(0xFFFF7675),
+            onPressed: () => _toggleBookmark(context.read<NotesProvider>()),
+            child: Consumer<NotesProvider>(
+              builder: (context, notesProvider, child) {
+                final isBookmarked = notesProvider.currentInteraction?.isBookmarked ?? false;
+                return Icon(
+                  isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
+                  color: Colors.white,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Cute sticky notes
+  Widget _buildCuteStickyNotes(NotesProvider notesProvider) {
+    final stickyNotes = notesProvider.currentInteraction?.stickyNotes ?? [];
+    if (stickyNotes.isEmpty) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '📝 Your Notes',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3436),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...stickyNotes.map((note) => Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFEDB37), Color(0xFFFFD700)],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFFD700).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.sticky_note_2, color: Color(0xFF2D3436), size: 16),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      note.content,
+                      style: const TextStyle(
+                        color: Color(0xFF2D3436),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Color(0xFF2D3436), size: 16),
+                    onPressed: () => _deleteStickyNote(note.id),
+                  ),
+                ],
+              ),
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper methods
+  void _toggleBookmark(NotesProvider notesProvider) {
+    final authProvider = context.read<AuthProvider>();
+    if (authProvider.currentUser != null) {
+      notesProvider.toggleBookmark(authProvider.currentUser!.id, widget.note.id);
+    }
+  }
+
+  void _showCuteMoreActions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const Text(
+              'More Actions',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3436),
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildMoreActionTile(Icons.quiz, 'Generate Flashcards', const Color(0xFFFD79A8), () {
+              Navigator.pop(context);
+              _showFlashcards();
+            }),
+            _buildMoreActionTile(Icons.highlight, 'View Highlights', const Color(0xFFFFB8B8), () {
+              Navigator.pop(context);
+              _showHighlights();
+            }),
+            _buildMoreActionTile(Icons.sticky_note_2, 'Add Sticky Note', const Color(0xFFFEDB37), () {
+              Navigator.pop(context);
+              _showStickyNotesPanel();
+            }),
+            _buildMoreActionTile(Icons.text_fields, 'Font Size', const Color(0xFF74B9FF), () {
+              Navigator.pop(context);
+              _showFontSizeDialog();
+            }),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMoreActionTile(IconData icon, String title, Color color, VoidCallback onTap) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: color, size: 20),
+      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+      onTap: onTap,
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+    );
+  }
+
+  // Background painter
+}
+
+// Cute background painter
+class CuteBackgroundPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..style = PaintingStyle.fill;
+
+    // Draw cute floating shapes
+    _drawFloatingShapes(canvas, size, paint);
+    
+    // Draw subtle gradient overlay
+    _drawGradientOverlay(canvas, size, paint);
+  }
+  
+  void _drawFloatingShapes(Canvas canvas, Size size, Paint paint) {
+    // Cute pastel circles
+    final circles = [
+      {'x': size.width * 0.1, 'y': size.height * 0.15, 'r': 40.0, 'color': const Color(0xFF74B9FF).withOpacity(0.05)},
+      {'x': size.width * 0.8, 'y': size.height * 0.3, 'r': 60.0, 'color': const Color(0xFFFD79A8).withOpacity(0.04)},
+      {'x': size.width * 0.2, 'y': size.height * 0.7, 'r': 30.0, 'color': const Color(0xFF55E6C1).withOpacity(0.06)},
+      {'x': size.width * 0.9, 'y': size.height * 0.8, 'r': 45.0, 'color': const Color(0xFFFFB8B8).withOpacity(0.05)},
+      {'x': size.width * 0.05, 'y': size.height * 0.5, 'r': 25.0, 'color': const Color(0xFFE17055).withOpacity(0.04)},
+    ];
+    
+    for (final circle in circles) {
+      paint.color = circle['color'] as Color;
+      canvas.drawCircle(
+        Offset(circle['x'] as double, circle['y'] as double),
+        circle['r'] as double,
+        paint,
+      );
+    }
+  }
+  
+  void _drawGradientOverlay(Canvas canvas, Size size, Paint paint) {
+    // Subtle top gradient
+    final gradient = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.center,
+      colors: [
+        const Color(0xFFFAFBFF).withOpacity(0.8),
+        const Color(0xFFFAFBFF).withOpacity(0.0),
+      ],
+    );
+    
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height * 0.3);
+    paint.shader = gradient.createShader(rect);
+    canvas.drawRect(rect, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

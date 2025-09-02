@@ -5,14 +5,14 @@ import '../providers/gamification_provider.dart';
 import '../models/gamification_model.dart';
 import '../../auth/providers/auth_provider.dart';
 
-class LeaderboardScreen extends StatefulWidget {
-  const LeaderboardScreen({super.key});
+class GamificationLeaderboardScreen extends StatefulWidget {
+  const GamificationLeaderboardScreen({super.key});
 
   @override
-  State<LeaderboardScreen> createState() => _LeaderboardScreenState();
+  State<GamificationLeaderboardScreen> createState() => _GamificationLeaderboardScreenState();
 }
 
-class _LeaderboardScreenState extends State<LeaderboardScreen>
+class _GamificationLeaderboardScreenState extends State<GamificationLeaderboardScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _selectedPeriod = 'all_time';

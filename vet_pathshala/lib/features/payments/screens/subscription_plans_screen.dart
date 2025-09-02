@@ -14,14 +14,23 @@ class SubscriptionPlansScreen extends StatefulWidget {
   State<SubscriptionPlansScreen> createState() => _SubscriptionPlansScreenState();
 }
 
-class _SubscriptionPlansScreenState extends State<SubscriptionPlansScreen> {
+class _SubscriptionPlansScreenState extends State<SubscriptionPlansScreen> 
+    with SingleTickerProviderStateMixin {
   final PaymentService _paymentService = PaymentService();
   int _selectedTabIndex = 0;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _paymentService.initialize();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -100,7 +109,7 @@ class _SubscriptionPlansScreenState extends State<SubscriptionPlansScreen> {
     return Container(
       color: Colors.white,
       child: TabBar(
-        controller: null,
+        controller: _tabController,
         onTap: (index) {
           setState(() {
             _selectedTabIndex = index;
@@ -126,7 +135,7 @@ class _SubscriptionPlansScreenState extends State<SubscriptionPlansScreen> {
   }
 
   Widget _buildSubscriptionPlans() {
-    final plans = _paymentService.subscriptionPlans.values
+    final plans = _paymentService.subscriptionPlans
         .where((plan) => widget.category == null || plan.category == widget.category)
         .toList();
 

@@ -4,8 +4,8 @@ import 'dart:async';
 import '../../../core/theme/unified_theme.dart';
 import '../models/test_series_model.dart';
 import '../providers/test_series_provider.dart';
-import '../../../shared/models/test_series_models.dart';
 import '../widgets/victory_modal.dart';
+import '../../../shared/models/test_series_models.dart';
 
 class TestTakingScreen extends StatefulWidget {
   final TestSeries testSeries;

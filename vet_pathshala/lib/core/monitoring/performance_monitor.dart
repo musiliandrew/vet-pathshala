@@ -408,7 +408,9 @@ class PerformanceMonitor {
     
     // Frame performance
     if (_frameTimings.isNotEmpty) {
-      final recentFrames = _frameTimings.takeLast(60).toList();
+      final recentFrames = _frameTimings.length > 60 
+          ? _frameTimings.skip(_frameTimings.length - 60).toList()
+          : _frameTimings;
       final avgFrameTime = recentFrames
           .map((f) => f.totalDuration)
           .reduce((a, b) => a + b) / recentFrames.length;
@@ -434,7 +436,9 @@ class PerformanceMonitor {
     
     // Network performance
     if (_networkMetrics.isNotEmpty) {
-      final recentRequests = _networkMetrics.takeLast(20).toList();
+      final recentRequests = _networkMetrics.length > 20 
+          ? _networkMetrics.skip(_networkMetrics.length - 20).toList()
+          : _networkMetrics;
       final avgDuration = recentRequests
           .map((r) => r.duration.inMilliseconds)
           .reduce((a, b) => a + b) / recentRequests.length;
@@ -539,9 +543,9 @@ class PerformanceMonitor {
   Future<void> savePerformanceData() async {
     try {
       final data = {
-        'frameTimings': _frameTimings.takeLast(50).map((f) => f.toJson()).toList(),
-        'memoryUsages': _memoryUsages.takeLast(50).map((m) => m.toJson()).toList(),
-        'networkMetrics': _networkMetrics.takeLast(50).map((n) => n.toJson()).toList(),
+        'frameTimings': (_frameTimings.length > 50 ? _frameTimings.skip(_frameTimings.length - 50) : _frameTimings).map((f) => f.toJson()).toList(),
+        'memoryUsages': (_memoryUsages.length > 50 ? _memoryUsages.skip(_memoryUsages.length - 50) : _memoryUsages).map((m) => m.toJson()).toList(),
+        'networkMetrics': (_networkMetrics.length > 50 ? _networkMetrics.skip(_networkMetrics.length - 50) : _networkMetrics).map((n) => n.toJson()).toList(),
         'customMetrics': _customMetrics.map((k, v) => MapEntry(k, v.toJson())),
         'statistics': getPerformanceStatistics(),
         'savedAt': DateTime.now().toIso8601String(),

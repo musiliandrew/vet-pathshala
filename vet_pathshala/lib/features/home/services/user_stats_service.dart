@@ -174,11 +174,6 @@ class UserStatsService {
 
       return activities.take(limit).toList();
     } catch (e) {
-      // If permission denied, return sample activities
-      if (e.toString().contains('permission-denied') || 
-          e.toString().contains('PERMISSION_DENIED')) {
-        return _getSampleActivities(userId, limit);
-      }
       print('Error loading recent activities: $e');
       return [];
     }
@@ -278,57 +273,4 @@ class UserStatsService {
     }
   }
 
-  /// Get sample activities when Firestore access fails
-  List<Map<String, dynamic>> _getSampleActivities(String userId, int limit) {
-    final now = DateTime.now();
-    final sampleActivities = [
-      {
-        'id': '1',
-        'type': 'question_answered',
-        'title': 'Answered Pharmacology question correctly',
-        'description': 'Pharmacology',
-        'timestamp': now.subtract(const Duration(hours: 2)),
-        'icon': 'quiz',
-        'isPositive': true,
-      },
-      {
-        'id': '2',
-        'type': 'coin_transaction',
-        'title': 'Earned 10 coins',
-        'description': 'Quiz completion bonus',
-        'timestamp': now.subtract(const Duration(hours: 3)),
-        'icon': 'coin',
-        'isPositive': true,
-      },
-      {
-        'id': '3',
-        'type': 'question_answered',
-        'title': 'Attempted Surgery question',
-        'description': 'Surgery',
-        'timestamp': now.subtract(const Duration(days: 1)),
-        'icon': 'quiz',
-        'isPositive': false,
-      },
-      {
-        'id': '4',
-        'type': 'coin_transaction',
-        'title': 'Earned 5 coins',
-        'description': 'Daily login bonus',
-        'timestamp': now.subtract(const Duration(days: 1, hours: 8)),
-        'icon': 'coin',
-        'isPositive': true,
-      },
-      {
-        'id': '5',
-        'type': 'question_answered',
-        'title': 'Answered Anatomy question correctly',
-        'description': 'Anatomy',
-        'timestamp': now.subtract(const Duration(days: 2)),
-        'icon': 'quiz',
-        'isPositive': true,
-      },
-    ];
-    
-    return sampleActivities.take(limit).toList();
-  }
 }

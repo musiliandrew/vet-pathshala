@@ -189,6 +189,92 @@ class VideoLectureModel {
     };
   }
 
+  // JSON methods for caching
+  factory VideoLectureModel.fromJson(Map<String, dynamic> json) {
+    return VideoLectureModel(
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      instructor: json['instructor'] ?? '',
+      instructorBio: json['instructorBio'] ?? '',
+      thumbnailUrl: json['thumbnailUrl'] ?? '',
+      videoUrl: json['videoUrl'] ?? '',
+      targetRoles: List<String>.from(json['targetRoles'] ?? []),
+      category: VideoCategory.values.firstWhere(
+        (e) => e.name == json['category'],
+        orElse: () => VideoCategory.anatomy,
+      ),
+      accessLevel: VideoAccessLevel.values.firstWhere(
+        (e) => e.name == json['accessLevel'],
+        orElse: () => VideoAccessLevel.free,
+      ),
+      status: VideoStatus.values.firstWhere(
+        (e) => e.name == json['status'],
+        orElse: () => VideoStatus.draft,
+      ),
+      duration: json['duration'] ?? 0,
+      coinCost: json['coinCost'] ?? 0,
+      qualityUrls: Map<VideoQuality, String>.from(
+        (json['qualityUrls'] as Map<String, dynamic>? ?? {}).map(
+          (key, value) => MapEntry(
+            VideoQuality.values.firstWhere(
+              (e) => e.name == key,
+              orElse: () => VideoQuality.auto,
+            ),
+            value.toString(),
+          ),
+        ),
+      ),
+      chapters: (json['chapters'] as List<dynamic>? ?? [])
+          .map((chapter) => VideoChapterModel.fromMap(chapter))
+          .toList(),
+      subtitles: (json['subtitles'] as List<dynamic>? ?? [])
+          .map((subtitle) => SubtitleModel.fromMap(subtitle))
+          .toList(),
+      rating: (json['rating'] ?? 0.0).toDouble(),
+      viewCount: json['viewCount'] ?? 0,
+      downloadCount: json['downloadCount'] ?? 0,
+      isDownloadable: json['isDownloadable'] ?? false,
+      metadata: json['metadata'] ?? {},
+      tags: List<String>.from(json['tags'] ?? []),
+      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
+      publishedAt: json['publishedAt'] != null ? DateTime.parse(json['publishedAt']) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'instructor': instructor,
+      'instructorBio': instructorBio,
+      'thumbnailUrl': thumbnailUrl,
+      'videoUrl': videoUrl,
+      'targetRoles': targetRoles,
+      'category': category.name,
+      'accessLevel': accessLevel.name,
+      'status': status.name,
+      'duration': duration,
+      'coinCost': coinCost,
+      'qualityUrls': qualityUrls.map(
+        (key, value) => MapEntry(key.name, value),
+      ),
+      'chapters': chapters.map((chapter) => chapter.toMap()).toList(),
+      'subtitles': subtitles.map((subtitle) => subtitle.toMap()).toList(),
+      'rating': rating,
+      'viewCount': viewCount,
+      'downloadCount': downloadCount,
+      'isDownloadable': isDownloadable,
+      'metadata': metadata,
+      'tags': tags,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'publishedAt': publishedAt?.toIso8601String(),
+    };
+  }
+
   String get formattedDuration {
     final hours = duration ~/ 3600;
     final minutes = (duration % 3600) ~/ 60;

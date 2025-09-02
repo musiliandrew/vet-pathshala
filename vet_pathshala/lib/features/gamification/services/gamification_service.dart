@@ -396,7 +396,7 @@ class GamificationService extends ChangeNotifier {
       );
 
       if (achievement.coinsReward > 0) {
-        await CoinProvider().addCoins(achievement.coinsReward, 'achievement');
+        CoinProvider().addCoins(achievement.coinsReward, 'achievement');
       }
 
       // Update achievement in local list
@@ -447,7 +447,7 @@ class GamificationService extends ChangeNotifier {
       );
 
       if (challenge.coinsReward > 0) {
-        await CoinProvider().addCoins(challenge.coinsReward, 'daily_challenge');
+        CoinProvider().addCoins(challenge.coinsReward, 'daily_challenge');
       }
 
       // Update challenge in local list

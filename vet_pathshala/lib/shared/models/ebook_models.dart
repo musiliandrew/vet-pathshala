@@ -130,6 +130,66 @@ class EbookModel {
     };
   }
 
+  // JSON methods for caching
+  factory EbookModel.fromJson(Map<String, dynamic> json) {
+    return EbookModel(
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      author: json['author'] ?? '',
+      publisher: json['publisher'] ?? '',
+      coverImageUrl: json['coverImageUrl'] ?? '',
+      pdfUrl: json['pdfUrl'] ?? '',
+      category: EbookCategory.values.firstWhere(
+        (e) => e.name == json['category'],
+        orElse: () => EbookCategory.anatomy,
+      ),
+      type: EbookType.values.firstWhere(
+        (e) => e.name == json['type'],
+        orElse: () => EbookType.textbook,
+      ),
+      accessLevel: AccessLevel.values.firstWhere(
+        (e) => e.name == json['accessLevel'],
+        orElse: () => AccessLevel.free,
+      ),
+      coinCost: json['coinCost'] ?? 0,
+      targetRoles: List<String>.from(json['targetRoles'] ?? []),
+      totalPages: json['totalPages'] ?? 0,
+      language: json['language'] ?? 'English',
+      publishedDate: DateTime.parse(json['publishedDate'] ?? DateTime.now().toIso8601String()),
+      uploadedAt: DateTime.parse(json['uploadedAt'] ?? DateTime.now().toIso8601String()),
+      isActive: json['isActive'] ?? true,
+      metadata: json['metadata'] ?? {},
+      rating: (json['rating'] ?? 0.0).toDouble(),
+      downloadCount: json['downloadCount'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'author': author,
+      'publisher': publisher,
+      'coverImageUrl': coverImageUrl,
+      'pdfUrl': pdfUrl,
+      'category': category.name,
+      'type': type.name,
+      'accessLevel': accessLevel.name,
+      'coinCost': coinCost,
+      'targetRoles': targetRoles,
+      'totalPages': totalPages,
+      'language': language,
+      'publishedDate': publishedDate.toIso8601String(),
+      'uploadedAt': uploadedAt.toIso8601String(),
+      'isActive': isActive,
+      'metadata': metadata,
+      'rating': rating,
+      'downloadCount': downloadCount,
+    };
+  }
+
   bool get isPremium => accessLevel != AccessLevel.free;
   bool get isDownloadable => accessLevel == AccessLevel.free || coinCost > 0;
 }

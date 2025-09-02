@@ -4,7 +4,7 @@ import '../../../core/theme/unified_theme.dart';
 import '../../../shared/models/drug_model.dart';
 import '../providers/drug_provider.dart';
 import '../../../features/auth/providers/auth_provider.dart';
-import 'drug_detail_screen.dart';
+import 'enhanced_drug_detail_screen.dart';
 
 class DrugIndexScreen extends StatefulWidget {
   const DrugIndexScreen({super.key});
@@ -547,7 +547,7 @@ class _DrugIndexScreenState extends State<DrugIndexScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DrugDetailScreen(drug: drug),
+                    builder: (context) => EnhancedDrugDetailScreen(drug: drug),
                   ),
                 );
               },
@@ -798,7 +798,7 @@ class _DrugIndexScreenState extends State<DrugIndexScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => DrugDetailScreen(drug: drug),
+                                      builder: (context) => EnhancedDrugDetailScreen(drug: drug),
                                     ),
                                   );
                                 },

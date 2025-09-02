@@ -9,6 +9,7 @@ import '../../question_bank/screens/question_bank_screen.dart';
 import '../../drug_center/screens/drug_index_screen.dart';
 import '../../coins/screens/coin_store_screen.dart';
 import '../../ebooks/screens/ebooks_screen.dart';
+import '../../referral/widgets/refer_earn_widget.dart';
 import 'farmer_home_screen.dart';
 
 class UnifiedHomeScreen extends StatefulWidget {
@@ -489,59 +490,7 @@ class _UnifiedHomeScreenState extends State<UnifiedHomeScreen> {
   Widget _buildReferEarnSection(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(UnifiedTheme.spacingXL),
-      padding: const EdgeInsets.all(UnifiedTheme.spacingXXL),
-      decoration: UnifiedTheme.featureCardDecoration(UnifiedTheme.primaryGreen),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Refer and earn',
-            style: UnifiedTheme.headerLarge.copyWith(
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: UnifiedTheme.spacingL),
-          Text(
-            'Invite friends and earn rewards for every successful referral!',
-            style: UnifiedTheme.bodyMedium.copyWith(
-              color: Colors.white70,
-            ),
-          ),
-          const SizedBox(height: UnifiedTheme.spacingL),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: UnifiedTheme.spacingM, 
-                    horizontal: UnifiedTheme.spacingL
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(UnifiedTheme.radiusS),
-                  ),
-                  child: const Text(
-                    'Share Code: VET2024',
-                    style: UnifiedTheme.buttonText,
-                  ),
-                ),
-              ),
-              const SizedBox(width: UnifiedTheme.spacingM),
-              Container(
-                padding: const EdgeInsets.all(UnifiedTheme.spacingM),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(UnifiedTheme.radiusS),
-                ),
-                child: const Text(
-                  '📤',
-                  style: TextStyle(fontSize: 20),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+      child: const ReferEarnWidget(),
     );
   }
 

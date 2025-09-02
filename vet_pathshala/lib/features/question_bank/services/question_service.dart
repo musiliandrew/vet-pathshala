@@ -14,7 +14,7 @@ class QuestionService {
       final query = await _firestore
           .collection('questions')
           .where('category', isEqualTo: category)
-          .where('targetRole', isEqualTo: userRole)
+          .where('targetRoles', arrayContains: userRole)
           .orderBy('createdAt', descending: true)
           .limit(limit)
           .get();
@@ -37,7 +37,7 @@ class QuestionService {
       final query = await _firestore
           .collection('questions')
           .where('difficulty', isEqualTo: difficulty)
-          .where('targetRole', isEqualTo: userRole)
+          .where('targetRoles', arrayContains: userRole)
           .orderBy('createdAt', descending: true)
           .limit(limit)
           .get();
@@ -61,7 +61,7 @@ class QuestionService {
       // This is a basic implementation - for production, consider using Algolia
       final query = await _firestore
           .collection('questions')
-          .where('targetRole', isEqualTo: userRole)
+          .where('targetRoles', arrayContains: userRole)
           .orderBy('createdAt', descending: true)
           .limit(100) // Get more to filter locally
           .get();
@@ -73,7 +73,7 @@ class QuestionService {
       // Filter by search query locally
       return allQuestions
           .where((question) =>
-              question.questionText.toLowerCase().contains(searchQuery.toLowerCase()) ||
+              question.question.toLowerCase().contains(searchQuery.toLowerCase()) ||
               question.category.toLowerCase().contains(searchQuery.toLowerCase()))
           .take(limit)
           .toList();
@@ -87,7 +87,7 @@ class QuestionService {
     try {
       final query = await _firestore
           .collection('questions')
-          .where('targetRole', isEqualTo: userRole)
+          .where('targetRoles', arrayContains: userRole)
           .get();
 
       final categories = query.docs
@@ -112,7 +112,7 @@ class QuestionService {
     try {
       Query query = _firestore
           .collection('questions')
-          .where('targetRole', isEqualTo: userRole);
+          .where('targetRoles', arrayContains: userRole);
 
       if (category != null && category.isNotEmpty) {
         query = query.where('category', isEqualTo: category);
@@ -165,7 +165,7 @@ class QuestionService {
         'timestamp': FieldValue.serverTimestamp(),
         'category': question.category,
         'difficulty': question.difficulty,
-        'targetRole': question.targetRole,
+        'targetRoles': question.targetRoles,
       });
 
       return isCorrect;

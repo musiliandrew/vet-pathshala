@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../models/gamification_model.dart';
 import '../services/gamification_service.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../payments/services/dynamic_subscription_service.dart';
 
 class GamificationProvider extends ChangeNotifier {
   static final GamificationProvider _instance = GamificationProvider._internal();
@@ -9,32 +10,36 @@ class GamificationProvider extends ChangeNotifier {
   GamificationProvider._internal();
 
   final GamificationService _gamificationService = GamificationService();
+  final DynamicSubscriptionService _subscriptionService = DynamicSubscriptionService();
   
   // Current user ID
   String? _currentUserId;
   bool _isInitialized = false;
+  bool _hasActiveSubscription = false;
 
-  // Getters that delegate to the service
-  UserGameStats? get userStats => _gamificationService.currentUserStats;
-  List<Achievement> get achievements => _gamificationService.achievements;
-  List<DailyChallenge> get dailyChallenges => _gamificationService.dailyChallenges;
-  List<LeaderboardEntry> get leaderboard => _gamificationService.leaderboard;
-  List<PointsTransaction> get recentTransactions => _gamificationService.recentTransactions;
+  // Getters that delegate to the service (with subscription check)
+  UserGameStats? get userStats => _hasActiveSubscription ? _gamificationService.currentUserStats : null;
+  List<Achievement> get achievements => _hasActiveSubscription ? _gamificationService.achievements : [];
+  List<DailyChallenge> get dailyChallenges => _hasActiveSubscription ? _gamificationService.dailyChallenges : [];
+  List<LeaderboardEntry> get leaderboard => _hasActiveSubscription ? _gamificationService.leaderboard : [];
+  List<PointsTransaction> get recentTransactions => _hasActiveSubscription ? _gamificationService.recentTransactions : [];
   bool get isLoading => _gamificationService.isLoading;
   bool get isInitialized => _isInitialized;
+  bool get hasActiveSubscription => _hasActiveSubscription;
+  bool get canAccessGamification => _hasActiveSubscription;
 
-  // Filtered getters
+  // Filtered getters (with subscription check)
   List<Achievement> get unlockedAchievements => 
-      achievements.where((a) => a.isUnlocked).toList();
+      _hasActiveSubscription ? achievements.where((a) => a.isUnlocked).toList() : [];
   
   List<Achievement> get lockedAchievements => 
-      achievements.where((a) => !a.isUnlocked).toList();
+      _hasActiveSubscription ? achievements.where((a) => !a.isUnlocked).toList() : [];
 
   List<DailyChallenge> get activeChallenges => 
-      dailyChallenges.where((c) => !c.isCompleted && c.isValid).toList();
+      _hasActiveSubscription ? dailyChallenges.where((c) => !c.isCompleted && c.isValid).toList() : [];
 
   List<DailyChallenge> get completedChallenges => 
-      dailyChallenges.where((c) => c.isCompleted).toList();
+      _hasActiveSubscription ? dailyChallenges.where((c) => c.isCompleted).toList() : [];
 
   // Initialize for a user
   Future<void> initializeForUser(String userId) async {
@@ -44,10 +49,19 @@ class GamificationProvider extends ChangeNotifier {
     _isInitialized = false;
     notifyListeners();
 
-    // Listen to the service
-    _gamificationService.addListener(_onServiceUpdate);
+    // Check subscription status first
+    await _subscriptionService.initializeForUser(userId);
+    _hasActiveSubscription = _subscriptionService.canAccessGamification(userId);
     
-    await _gamificationService.initializeUser(userId);
+    // Only initialize gamification if user has active subscription
+    if (_hasActiveSubscription) {
+      // Listen to the service
+      _gamificationService.addListener(_onServiceUpdate);
+      
+      await _gamificationService.initializeUser(userId);
+    } else {
+      debugPrint('⚠️ Gamification access denied - No active subscription');
+    }
     
     _isInitialized = true;
     notifyListeners();
@@ -57,9 +71,9 @@ class GamificationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // User progress helpers
+  // User progress helpers (with subscription check)
   double get levelProgress {
-    if (userStats == null) return 0.0;
+    if (!_hasActiveSubscription || userStats == null) return 0.0;
     
     if (userStats!.level >= 10) return 1.0;
     
@@ -130,13 +144,16 @@ class GamificationProvider extends ChangeNotifier {
     return leaderboard.take(count).toList();
   }
 
-  // Action delegates to service
+  // Action delegates to service (with subscription check)
   Future<void> awardPoints({
     required int points,
     required String reason,
     String? referenceId,
   }) async {
-    if (_currentUserId == null) return;
+    if (_currentUserId == null || !_hasActiveSubscription) {
+      debugPrint('⚠️ Cannot award points - No active subscription');
+      return;
+    }
     
     await _gamificationService.awardPoints(
       userId: _currentUserId!,
@@ -147,7 +164,10 @@ class GamificationProvider extends ChangeNotifier {
   }
 
   Future<void> onQuestionAnswered(bool isCorrect, String category) async {
-    if (_currentUserId == null) return;
+    if (_currentUserId == null || !_hasActiveSubscription) {
+      debugPrint('⚠️ Cannot process question answer - No active subscription');
+      return;
+    }
     
     await _gamificationService.onQuestionAnswered(
       _currentUserId!,
@@ -157,29 +177,56 @@ class GamificationProvider extends ChangeNotifier {
   }
 
   Future<void> onLessonCompleted(String category) async {
-    if (_currentUserId == null) return;
+    if (_currentUserId == null || !_hasActiveSubscription) {
+      debugPrint('⚠️ Cannot process lesson completion - No active subscription');
+      return;
+    }
     
     await _gamificationService.onLessonCompleted(_currentUserId!, category);
   }
 
   Future<void> onNoteRead(String category) async {
-    if (_currentUserId == null) return;
+    if (_currentUserId == null || !_hasActiveSubscription) {
+      debugPrint('⚠️ Cannot process note read - No active subscription');
+      return;
+    }
     
     await _gamificationService.onNoteRead(_currentUserId!, category);
   }
 
   Future<void> completeDailyChallenge(String challengeId) async {
-    if (_currentUserId == null) return;
+    if (_currentUserId == null || !_hasActiveSubscription) {
+      debugPrint('⚠️ Cannot complete daily challenge - No active subscription');
+      return;
+    }
     
     await _gamificationService.completeDailyChallenge(_currentUserId!, challengeId);
   }
 
   Future<void> loadLeaderboard({String period = 'all_time', int limit = 50}) async {
+    if (!_hasActiveSubscription) {
+      debugPrint('⚠️ Cannot load leaderboard - No active subscription');
+      return;
+    }
+    
     await _gamificationService.loadLeaderboard(period: period, limit: limit);
   }
 
-  // Quick stats
+  // Quick stats (with subscription check)
   Map<String, dynamic> getQuickStats() {
+    if (!_hasActiveSubscription) {
+      return {
+        'level': 'Subscription Required',
+        'levelTitle': 'Subscribe to unlock gamification',
+        'totalPoints': 0,
+        'rank': 'N/A',
+        'streak': 0,
+        'accuracy': '0%',
+        'achievements': 0,
+        'hasSubscription': false,
+      };
+    }
+    
     if (userStats == null) {
       return {
         'level': 1,
@@ -189,6 +236,7 @@ class GamificationProvider extends ChangeNotifier {
         'streak': 0,
         'accuracy': '0%',
         'achievements': 0,
+        'hasSubscription': true,
       };
     }
 
@@ -200,6 +248,7 @@ class GamificationProvider extends ChangeNotifier {
       'streak': userStats!.currentStreak,
       'accuracy': '${(userStats!.accuracy * 100).toInt()}%',
       'achievements': unlockedAchievements.length,
+      'hasSubscription': true,
     };
   }
 
@@ -272,11 +321,52 @@ class GamificationProvider extends ChangeNotifier {
     return rewards[level] ?? {};
   }
 
+  // Check and refresh subscription status
+  Future<void> refreshSubscriptionStatus() async {
+    if (_currentUserId == null) return;
+    
+    await _subscriptionService.initializeForUser(_currentUserId!);
+    final newSubscriptionStatus = _subscriptionService.canAccessGamification(_currentUserId!);
+    
+    if (newSubscriptionStatus != _hasActiveSubscription) {
+      _hasActiveSubscription = newSubscriptionStatus;
+      
+      if (_hasActiveSubscription) {
+        // Subscription activated - initialize gamification
+        await initializeForUser(_currentUserId!);
+      } else {
+        // Subscription deactivated - reset gamification
+        _gamificationService.removeListener(_onServiceUpdate);
+      }
+      
+      notifyListeners();
+    }
+  }
+  
+  // Get subscription upgrade message
+  Map<String, dynamic> getSubscriptionMessage() {
+    if (_hasActiveSubscription) {
+      return {
+        'hasAccess': true,
+        'message': 'Gamification features are available!',
+        'action': null,
+      };
+    }
+    
+    return {
+      'hasAccess': false,
+      'message': 'Subscribe to unlock gamification features including battles, achievements, leaderboards, and daily challenges!',
+      'action': 'View Subscription Plans',
+    };
+  }
+
   // Reset/cleanup
   void reset() {
     _currentUserId = null;
     _isInitialized = false;
+    _hasActiveSubscription = false;
     _gamificationService.removeListener(_onServiceUpdate);
+    _subscriptionService.reset();
     notifyListeners();
   }
 

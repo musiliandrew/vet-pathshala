@@ -24,8 +24,6 @@ class AdminService extends ChangeNotifier {
   /// Get dashboard statistics
   Future<Map<String, dynamic>> getDashboardStats() async {
     try {
-      // In production, these would be real Firestore queries
-      // For demo, returning mock data
       
       final stats = {
         'totalUsers': await _getUserCount(),
@@ -41,15 +39,7 @@ class AdminService extends ChangeNotifier {
 
     } catch (e) {
       debugPrint('❌ Error loading dashboard stats: $e');
-      // Return mock data on error
-      return {
-        'totalUsers': 1234,
-        'totalQuestions': 15678,
-        'totalNotes': 890,
-        'totalReports': 23,
-        'activeUsers': 456,
-        'newUsersToday': 12,
-      };
+      rethrow;
     }
   }
 
@@ -122,51 +112,17 @@ class AdminService extends ChangeNotifier {
   /// Get recent activity
   Future<List<Map<String, dynamic>>> getRecentActivity({int limit = 10}) async {
     try {
-      // In production, this would aggregate from multiple collections
-      // For demo, returning mock data
-      
-      return [
-        {
-          'type': 'user_registration',
-          'title': 'New user registration',
-          'description': 'Dr. Sarah Johnson joined as Veterinarian',
-          'timestamp': DateTime.now().subtract(const Duration(minutes: 2)),
-          'icon': 'person_add',
-          'color': 'green',
-        },
-        {
-          'type': 'question_added',
-          'title': 'Question added',
-          'description': 'Pathology question submitted for review',
-          'timestamp': DateTime.now().subtract(const Duration(minutes: 15)),
-          'icon': 'quiz',
-          'color': 'blue',
-        },
-        {
-          'type': 'content_reported',
-          'title': 'Content reported',
-          'description': 'Question #1234 reported as inappropriate',
-          'timestamp': DateTime.now().subtract(const Duration(hours: 1)),
-          'icon': 'flag',
-          'color': 'red',
-        },
-        {
-          'type': 'note_updated',
-          'title': 'Note updated',
-          'description': 'Anatomy notes revised and republished',
-          'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
-          'icon': 'note',
-          'color': 'orange',
-        },
-        {
-          'type': 'lecture_uploaded',
-          'title': 'Lecture uploaded',
-          'description': 'New surgical procedure video added',
-          'timestamp': DateTime.now().subtract(const Duration(hours: 3)),
-          'icon': 'video_library',
-          'color': 'purple',
-        },
-      ];
+      // Get recent activities from admin_activities collection
+      final activitiesQuery = await _firestore
+          .collection('admin_activities')
+          .orderBy('timestamp', descending: true)
+          .limit(10)
+          .get();
+
+      return activitiesQuery.docs.map((doc) => {
+        'id': doc.id,
+        ...doc.data(),
+      }).toList();
 
     } catch (e) {
       debugPrint('❌ Error loading recent activity: $e');

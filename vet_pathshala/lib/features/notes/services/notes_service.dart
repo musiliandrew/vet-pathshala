@@ -5,388 +5,83 @@ import '../../../shared/models/note_model.dart';
 class NotesService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Get categories for notes (similar to question bank structure)
+  // Get categories for notes
   Future<List<Map<String, dynamic>>> getCategories(String userRole) async {
-    try {
-      final query = await _firestore
-          .collection('note_categories')
-          .where('targetRoles', arrayContains: userRole)
-          .where('isActive', isEqualTo: true)
-          .orderBy('order')
-          .get();
+    final query = await _firestore
+        .collection('notes')
+        .where('targetRole', isEqualTo: userRole)
+        .get();
 
-      return query.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data(),
-      }).toList();
-    } catch (e) {
-      print('🔴 NotesService: Error getting categories, using sample data: $e');
-      // Return sample data when Firebase is not available
-      return _getSampleCategories();
-    }
-  }
-
-  List<Map<String, dynamic>> _getSampleCategories() {
-    return [
-      {
-        'id': 'cat_01',
-        'title': 'Veterinary Medicine',
-        'description': 'Core veterinary medical knowledge and clinical practices',
-        'icon': 'medicine',
-        'notesCount': 245,
-        'color': '#4B5E4A',
-        'targetRoles': ['doctor', 'pharmacist'],
-        'isActive': true,
-        'order': 1,
-      },
-      {
-        'id': 'cat_02',
-        'title': 'Animal Husbandry',
-        'description': 'Animal care, management, and farming practices',
-        'icon': 'nutrition',
-        'notesCount': 189,
-        'color': '#6B7A69',
-        'targetRoles': ['doctor', 'farmer'],
-        'isActive': true,
-        'order': 2,
-      },
-      {
-        'id': 'cat_03',
-        'title': 'Pharmacology',
-        'description': 'Drug knowledge, interactions, and applications',
-        'icon': 'pharmacology',
-        'notesCount': 156,
-        'color': '#4B5E4A',
-        'targetRoles': ['doctor', 'pharmacist'],
-        'isActive': true,
-        'order': 3,
-      },
-      {
-        'id': 'cat_04',
-        'title': 'Diagnostics & Lab',
-        'description': 'Diagnostic procedures, lab tests, and interpretations',
-        'icon': 'laboratory',
-        'notesCount': 178,
-        'color': '#6B7A69',
-        'targetRoles': ['doctor'],
-        'isActive': true,
-        'order': 4,
-      },
-    ];
-  }
-
-  // Get subjects for a category
-  Future<List<Map<String, dynamic>>> getSubjects(String categoryId, String userRole) async {
-    try {
-      final query = await _firestore
-          .collection('note_subjects')
-          .where('categoryId', isEqualTo: categoryId)
-          .where('targetRoles', arrayContains: userRole)
-          .where('isActive', isEqualTo: true)
-          .orderBy('order')
-          .get();
-
-      return query.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data(),
-      }).toList();
-    } catch (e) {
-      print('🔴 NotesService: Error getting subjects, using sample data: $e');
-      return _getSampleSubjects(categoryId);
-    }
-  }
-
-  List<Map<String, dynamic>> _getSampleSubjects(String categoryId) {
-    final allSubjects = {
-      'cat_01': [
-        {
-          'id': 'sub_01',
-          'categoryId': 'cat_01',
-          'title': 'Veterinary Anatomy',
-          'description': 'Animal body structure and organ systems',
-          'notesCount': 89,
-          'color': '#4B5E4A',
-          'icon': 'anatomy',
-          'targetRoles': ['doctor', 'pharmacist'],
-          'isActive': true,
-          'order': 1,
-        },
-        {
-          'id': 'sub_02',
-          'categoryId': 'cat_01',
-          'title': 'Animal Physiology',
-          'description': 'Body functions and biological processes',
-          'notesCount': 76,
-          'color': '#6B7A69',
-          'icon': 'physiology',
-          'targetRoles': ['doctor'],
-          'isActive': true,
-          'order': 2,
-        },
-        {
-          'id': 'sub_03',
-          'categoryId': 'cat_01',
-          'title': 'Pathology',
-          'description': 'Disease mechanisms and diagnosis',
-          'notesCount': 80,
-          'color': '#4B5E4A',
-          'icon': 'pathology',
-          'targetRoles': ['doctor'],
-          'isActive': true,
-          'order': 3,
-        },
-      ],
-      'cat_02': [
-        {
-          'id': 'sub_04',
-          'categoryId': 'cat_02',
-          'title': 'Livestock Management',
-          'description': 'Care and management of farm animals',
-          'notesCount': 67,
-          'color': '#6B7A69',
-          'icon': 'reproduction',
-          'targetRoles': ['doctor', 'farmer'],
-          'isActive': true,
-          'order': 1,
-        },
-        {
-          'id': 'sub_05',
-          'categoryId': 'cat_02',
-          'title': 'Animal Nutrition',
-          'description': 'Feeding and nutritional requirements',
-          'notesCount': 54,
-          'color': '#4B5E4A',
-          'icon': 'nutrition',
-          'targetRoles': ['farmer'],
-          'isActive': true,
-          'order': 2,
-        },
-        {
-          'id': 'sub_06',
-          'categoryId': 'cat_02',
-          'title': 'Breeding & Genetics',
-          'description': 'Animal breeding and genetic principles',
-          'notesCount': 68,
-          'color': '#6B7A69',
-          'icon': 'reproduction',
-          'targetRoles': ['doctor', 'farmer'],
-          'isActive': true,
-          'order': 3,
-        },
-      ],
-    };
-
-    return allSubjects[categoryId] ?? [];
-  }
-
-  // Get topics for a subject
-  Future<List<Map<String, dynamic>>> getTopics(String subjectId, String userRole) async {
-    try {
-      final query = await _firestore
-          .collection('note_topics')
-          .where('subjectId', isEqualTo: subjectId)
-          .where('targetRoles', arrayContains: userRole)
-          .where('isActive', isEqualTo: true)
-          .orderBy('order')
-          .get();
-
-      return query.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data(),
-      }).toList();
-    } catch (e) {
-      print('🔴 NotesService: Error getting topics, using sample data: $e');
-      return _getSampleTopics(subjectId);
-    }
-  }
-
-  List<Map<String, dynamic>> _getSampleTopics(String subjectId) {
-    final allTopics = {
-      'sub_01': [
-        {
-          'id': 'top_01',
-          'subjectId': 'sub_01',
-          'title': 'Musculoskeletal System',
-          'description': 'Bones, muscles, and joints',
-          'notesCount': 23,
-          'color': '#4B5E4A',
-          'targetRoles': ['doctor'],
-          'isActive': true,
-          'order': 1,
-        },
-        {
-          'id': 'top_02',
-          'subjectId': 'sub_01',
-          'title': 'Cardiovascular System',
-          'description': 'Heart and blood vessels',
-          'notesCount': 19,
-          'color': '#6B7A69',
-          'targetRoles': ['doctor'],
-          'isActive': true,
-          'order': 2,
-        },
-        {
-          'id': 'top_03',
-          'subjectId': 'sub_01',
-          'title': 'Nervous System',
-          'description': 'Brain, spinal cord, and nerves',
-          'notesCount': 25,
-          'color': '#4B5E4A',
-          'targetRoles': ['doctor'],
-          'isActive': true,
-          'order': 3,
-        },
-        {
-          'id': 'top_04',
-          'subjectId': 'sub_01',
-          'title': 'Digestive System',
-          'description': 'Organs of digestion and absorption',
-          'notesCount': 22,
-          'color': '#6B7A69',
-          'targetRoles': ['doctor'],
-          'isActive': true,
-          'order': 4,
-        },
-      ],
-    };
-
-    return allTopics[subjectId] ?? [];
-  }
-
-  // Get notes for a topic
-  Future<List<NoteModel>> getNotes(String topicId, String userRole) async {
-    try {
-      final query = await _firestore
-          .collection('notes')
-          .where('topicId', isEqualTo: topicId)
-          .where('targetRoles', arrayContains: userRole)
-          .where('isPublished', isEqualTo: true)
-          .orderBy('createdAt', descending: true)
-          .get();
-
-      return query.docs.map((doc) => NoteModel.fromFirestore(doc)).toList();
-    } catch (e) {
-      print('🔴 NotesService: Error getting notes, using sample data: $e');
-      return _getSampleNotes(topicId);
-    }
-  }
-
-  List<NoteModel> _getSampleNotes(String topicId) {
-    final now = DateTime.now();
+    // Extract unique categories from notes
+    final categorySet = <String>{};
+    final categoryMap = <String, Map<String, dynamic>>{};
     
-    if (topicId == 'top_01') {
-      return [
-        NoteModel(
-          id: 'note_01',
-          title: 'Introduction to Bone Structure',
-          content: '''# Introduction to Bone Structure
+    for (var doc in query.docs) {
+      final data = doc.data();
+      final category = data['category'] ?? '';
+      if (category.isNotEmpty && !categorySet.contains(category)) {
+        categorySet.add(category);
+        categoryMap[category] = {
+          'id': category.toLowerCase().replaceAll(' ', '_'),
+          'title': category,
+          'description': 'Notes for $category',
+          'notesCount': 0, // Could be calculated
+        };
+      }
+    }
+    
+    return categoryMap.values.toList();
+  }
 
-## Overview
-Bones are complex living tissues that provide structural support, protect internal organs, and serve as sites for muscle attachment. Understanding bone structure is fundamental to veterinary medicine.
 
-## Bone Composition
-Bones consist of:
-- **Organic matrix (35%)**: Primarily collagen fibers
-- **Inorganic minerals (65%)**: Mainly calcium phosphate and calcium carbonate
+  // Get subjects for a category (using actual notes data)
+  Future<List<Map<String, dynamic>>> getSubjects(String categoryId, String userRole) async {
+    final categoryName = categoryId.replaceAll('_', ' ');
+    final query = await _firestore
+        .collection('notes')
+        .where('category', isEqualTo: categoryName)
+        .where('targetRole', isEqualTo: userRole)
+        .get();
 
-## Types of Bone Tissue
-### Compact Bone
-Dense, hard tissue that forms the outer layer of bones. It provides strength and protection.
+    return query.docs.map((doc) => {
+      'id': doc.id,
+      'title': doc.data()['title'] ?? 'Untitled',
+      'content': doc.data()['content'] ?? '',
+      'category': doc.data()['category'] ?? '',
+      'authorId': doc.data()['authorId'] ?? '',
+      'downloadUrl': doc.data()['downloadUrl'] ?? '',
+      'createdAt': doc.data()['createdAt'],
+    }).toList();
+  }
 
-### Spongy Bone
-Lighter, trabecular tissue found inside bones. It contains bone marrow and provides structural support.
 
-## Bone Cells
-1. **Osteoblasts**: Bone-building cells
-2. **Osteocytes**: Mature bone cells
-3. **Osteoclasts**: Bone-resorbing cells
-
-## Clinical Significance
-Understanding bone structure is crucial for:
-- Diagnosing fractures
-- Understanding bone diseases
-- Planning surgical procedures
-- Interpreting radiographs
-
-## Key Points to Remember
-- Bones are living, dynamic tissues
-- They constantly remodel throughout life
-- Proper nutrition is essential for bone health
-- Age affects bone density and strength''',
-          categoryId: 'cat_01',
-          subjectId: 'sub_01',
-          topicId: 'top_01',
-          targetRoles: ['doctor', 'pharmacist'],
-          tags: ['anatomy', 'bones', 'structure', 'fundamentals'],
-          createdAt: now.subtract(const Duration(days: 5)),
-          updatedAt: now.subtract(const Duration(days: 2)),
-          authorId: 'author_01',
-        ),
-        NoteModel(
-          id: 'note_02',
-          title: 'Joint Classification and Function',
-          content: '''# Joint Classification and Function
-
-## Introduction
-Joints, also called articulations, are the connections between bones. They allow movement and provide mechanical support.
-
-## Classification by Structure
-### Fibrous Joints
-- Connected by fibrous connective tissue
-- Generally immovable (synarthroses)
-- Examples: Skull sutures
-
-### Cartilaginous Joints
-- Connected by cartilage
-- Slightly movable (amphiarthroses)
-- Examples: Intervertebral discs
-
-### Synovial Joints
-- Most common and movable joints
-- Have a joint cavity filled with synovial fluid
-- Examples: Knee, shoulder, hip
-
-## Synovial Joint Components
-1. **Articular cartilage**: Smooth surface for movement
-2. **Joint capsule**: Surrounds the joint
-3. **Synovial membrane**: Lines the joint capsule
-4. **Synovial fluid**: Lubricates the joint
-5. **Ligaments**: Stabilize the joint
-
-## Types of Synovial Joints
-- **Ball and socket**: Hip, shoulder
-- **Hinge**: Elbow, knee
-- **Pivot**: Atlas-axis
-- **Gliding**: Carpals, tarsals
-- **Saddle**: Thumb
-- **Condyloid**: Wrist
-
-## Movement Types
-- Flexion/Extension
-- Abduction/Adduction
-- Rotation
-- Circumduction
-
-## Clinical Applications
-Joint knowledge is essential for:
-- Lameness evaluation
-- Arthritis diagnosis
-- Surgical planning
-- Physical therapy''',
-          categoryId: 'cat_01',
-          subjectId: 'sub_01',
-          topicId: 'top_01',
-          targetRoles: ['doctor'],
-          tags: ['anatomy', 'joints', 'movement', 'classification'],
-          createdAt: now.subtract(const Duration(days: 3)),
-          updatedAt: now.subtract(const Duration(days: 1)),
-          authorId: 'author_02',
-        ),
-      ];
+  // Get topics (simplified - return subject as single topic)
+  Future<List<Map<String, dynamic>>> getTopics(String subjectId, String userRole) async {
+    // Since your notes don't have separate topics, return the note itself as a topic
+    final doc = await _firestore.collection('notes').doc(subjectId).get();
+    
+    if (doc.exists) {
+      return [{
+        'id': doc.id,
+        ...doc.data()!,
+      }];
     }
     
     return [];
   }
+
+
+  // Get notes for a topic
+  Future<List<NoteModel>> getNotes(String topicId, String userRole) async {
+    final query = await _firestore
+        .collection('notes')
+        .where('targetRole', isEqualTo: userRole)
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    return query.docs.map((doc) => NoteModel.fromFirestore(doc)).toList();
+  }
+
 
   // Get a specific note by ID
   Future<NoteModel?> getNote(String noteId) async {
@@ -415,7 +110,7 @@ Joint knowledge is essential for:
       }
       return null;
     } catch (e) {
-      print('🔴 NotesService: Error getting user interaction: $e');
+      // Silently handle Firebase permission errors - return empty interaction instead
       return null;
     }
   }
@@ -428,8 +123,7 @@ Joint knowledge is essential for:
           .doc(interaction.id)
           .set(interaction.toFirestore(), SetOptions(merge: true));
     } catch (e) {
-      print('🔴 NotesService: Error updating user interaction: $e');
-      // Don't throw exception - gracefully handle Firebase permission errors
+      // Silently handle Firebase permission errors in demo mode
       // In production, could implement local storage fallback here
     }
   }
@@ -466,7 +160,7 @@ Joint knowledge is essential for:
         await updateUserNoteInteraction(newInteraction);
       }
     } catch (e) {
-      print('🔴 NotesService: Error toggling bookmark: $e');
+      // Silently handle Firebase permission errors
       // Don't throw exception - gracefully handle Firebase permission errors
     }
   }
@@ -558,7 +252,7 @@ Joint knowledge is essential for:
         }
       }
     } catch (e) {
-      print('🔴 NotesService: Error marking as read: $e');
+      // Silently handle Firebase permission errors
       // Don't throw exception - gracefully handle Firebase permission errors
     }
   }

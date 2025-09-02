@@ -8,7 +8,7 @@ import '../../../features/pyp/models/pyp_model.dart';
 import '../widgets/test_series_card.dart';
 import '../widgets/pyp_card.dart';
 import 'test_series_detail_screen.dart';
-import 'pyp_year_selection_screen.dart';
+import '../../pyp/screens/pyp_year_selection_screen.dart';
 
 class TestSeriesPYPMainScreen extends StatefulWidget {
   const TestSeriesPYPMainScreen({super.key});
@@ -315,7 +315,7 @@ class _TestSeriesPYPMainScreenState extends State<TestSeriesPYPMainScreen>
     );
   }
 
-  void _navigateToTestSeriesDetail(TestSeries testSeries) {
+  void _navigateToTestSeriesDetail(dynamic testSeries) {
     Navigator.push(
       context,
       MaterialPageRoute(

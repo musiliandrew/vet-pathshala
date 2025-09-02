@@ -74,11 +74,35 @@ class QuizService extends ChangeNotifier {
     }
   }
 
+  // Check if user has already attempted this quiz
+  Future<bool> hasUserAttemptedQuiz(String userId, String quizId) async {
+    try {
+      final snapshot = await _firestore
+          .collection('quiz_attempts')
+          .where('userId', isEqualTo: userId)
+          .where('quizId', isEqualTo: quizId)
+          .where('status', isEqualTo: 'completed')
+          .limit(1)
+          .get();
+
+      return snapshot.docs.isNotEmpty;
+    } catch (e) {
+      debugPrint('❌ Error checking quiz attempt: $e');
+      return false;
+    }
+  }
+
   // Start a quiz
   Future<bool> startQuiz(String quizId, String userId) async {
     try {
       _isLoading = true;
       notifyListeners();
+
+      // Check if user has already attempted this quiz
+      final hasAttempted = await hasUserAttemptedQuiz(userId, quizId);
+      if (hasAttempted) {
+        throw Exception('You have already completed this quiz. Each quiz can only be attempted once.');
+      }
 
       // Load quiz
       final quizDoc = await _firestore.collection('quizzes').doc(quizId).get();

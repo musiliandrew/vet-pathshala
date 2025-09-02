@@ -4,6 +4,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/subscription_model.dart';
 import '../models/payment_model.dart';
+import 'dynamic_subscription_service.dart';
 
 class PaymentService extends ChangeNotifier {
   static final PaymentService _instance = PaymentService._internal();
@@ -11,6 +12,7 @@ class PaymentService extends ChangeNotifier {
   PaymentService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final DynamicSubscriptionService _subscriptionService = DynamicSubscriptionService();
   late Razorpay _razorpay;
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
 
@@ -30,7 +32,7 @@ class PaymentService extends ChangeNotifier {
   List<ProductDetails> get products => _products;
   bool get isAvailable => _isAvailable;
 
-  // Subscription plans
+  // Legacy subscription plans (kept for backward compatibility)
   final Map<String, SubscriptionPlan> _subscriptionPlans = {
     'notes_monthly': SubscriptionPlan(
       id: 'notes_monthly',
@@ -41,6 +43,7 @@ class PaymentService extends ChangeNotifier {
       duration: 30,
       features: ['All Notes', 'AI Summaries', 'Offline Access'],
       category: 'notes',
+      createdAt: DateTime.now(),
     ),
     'quiz_monthly': SubscriptionPlan(
       id: 'quiz_monthly',
@@ -51,6 +54,7 @@ class PaymentService extends ChangeNotifier {
       duration: 30,
       features: ['All Quizzes', 'Previous Year Papers', 'Detailed Analysis'],
       category: 'quiz',
+      createdAt: DateTime.now(),
     ),
     'premium_monthly': SubscriptionPlan(
       id: 'premium_monthly',
@@ -61,6 +65,7 @@ class PaymentService extends ChangeNotifier {
       duration: 30,
       features: ['All Features', 'Priority Support', 'Ad-Free Experience', 'Unlimited Coins'],
       category: 'premium',
+      createdAt: DateTime.now(),
     ),
     'premium_yearly': SubscriptionPlan(
       id: 'premium_yearly',
@@ -72,6 +77,7 @@ class PaymentService extends ChangeNotifier {
       features: ['All Features', 'Priority Support', 'Ad-Free Experience', 'Unlimited Coins'],
       category: 'premium',
       isPopular: true,
+      createdAt: DateTime.now(),
     ),
   };
 
@@ -150,17 +156,25 @@ class PaymentService extends ChangeNotifier {
     }
   }
 
-  // Purchase subscription using Razorpay
+  // Purchase subscription using Razorpay with dynamic plans
   Future<bool> purchaseSubscription({
     required String planId,
     required String userId,
     required Map<String, dynamic> userDetails,
+    String? deviceId,
   }) async {
     try {
-      final plan = _subscriptionPlans[planId];
-      if (plan == null) {
-        throw Exception('Subscription plan not found');
+      // Check device limit before payment
+      if (deviceId != null) {
+        final canLogin = await _subscriptionService.canLoginFromDevice(userId, deviceId);
+        if (!canLogin) {
+          throw Exception('Device limit exceeded. Please logout from another device.');
+        }
       }
+
+      // Get plan from dynamic service
+      final plans = _subscriptionService.plans;
+      final plan = plans.firstWhere((p) => p.id == planId);
 
       _isProcessing = true;
       _currentPaymentId = _generatePaymentId();
@@ -168,7 +182,7 @@ class PaymentService extends ChangeNotifier {
 
       var options = {
         'key': 'rzp_test_1DP5mmOlF5G5ag', // Replace with your Razorpay key
-        'amount': plan.price * 100, // Amount in paise
+        'amount': (plan.price * 100).round(), // Amount in paise
         'name': 'Vet-Pathshala',
         'description': plan.description,
         'order_id': _currentPaymentId,
@@ -185,6 +199,11 @@ class PaymentService extends ChangeNotifier {
           'wallet': true,
           'upi': true,
         },
+        'notes': {
+          'planId': planId,
+          'userId': userId,
+          'deviceId': deviceId ?? '',
+        },
       };
 
       _razorpay.open(options);
@@ -198,7 +217,55 @@ class PaymentService extends ChangeNotifier {
     }
   }
 
-  // Purchase coins using Razorpay
+  // Purchase individual feature subscription
+  Future<bool> purchaseFeatureSubscription({
+    required String featureId,
+    required String userId,
+    required Map<String, dynamic> userDetails,
+    String? deviceId,
+  }) async {
+    try {
+      final featureSub = _subscriptionService.getFeatureSubscription(featureId);
+      if (featureSub == null) {
+        throw Exception('Feature subscription not found');
+      }
+
+      _isProcessing = true;
+      _currentPaymentId = _generatePaymentId();
+      notifyListeners();
+
+      var options = {
+        'key': 'rzp_test_1DP5mmOlF5G5ag', // Replace with your Razorpay key
+        'amount': (featureSub.price * 100).round(), // Amount in paise
+        'name': 'Vet-Pathshala',
+        'description': featureSub.description,
+        'order_id': _currentPaymentId,
+        'prefill': {
+          'contact': userDetails['phone'] ?? '',
+          'email': userDetails['email'] ?? '',
+        },
+        'theme': {
+          'color': '#4CAF50',
+        },
+        'notes': {
+          'featureId': featureId,
+          'userId': userId,
+          'type': 'feature_subscription',
+        },
+      };
+
+      _razorpay.open(options);
+      return true;
+    } catch (e) {
+      _isProcessing = false;
+      _lastPaymentStatus = PaymentStatus.failed;
+      notifyListeners();
+      debugPrint('❌ Error initiating feature purchase: $e');
+      return false;
+    }
+  }
+
+  // Purchase coins using Razorpay (kept for backward compatibility)
   Future<bool> purchaseCoins({
     required String packageId,
     required String userId,
@@ -216,7 +283,7 @@ class PaymentService extends ChangeNotifier {
 
       var options = {
         'key': 'rzp_test_1DP5mmOlF5G5ag', // Replace with your Razorpay key
-        'amount': package.price * 100, // Amount in paise
+        'amount': (package.price * 100).round(), // Amount in paise
         'name': 'Vet-Pathshala',
         'description': package.description,
         'order_id': _currentPaymentId,
@@ -226,6 +293,11 @@ class PaymentService extends ChangeNotifier {
         },
         'theme': {
           'color': '#4CAF50',
+        },
+        'notes': {
+          'packageId': packageId,
+          'userId': userId,
+          'type': 'coin_package',
         },
       };
 
@@ -272,10 +344,100 @@ class PaymentService extends ChangeNotifier {
         status: 'success',
       );
 
+      // Create user subscription based on payment notes
+      await _processSuccessfulPayment(response);
+
       debugPrint('✅ Payment successful: ${response.paymentId}');
       notifyListeners();
     } catch (e) {
       debugPrint('❌ Error handling payment success: $e');
+    }
+  }
+
+  Future<void> _processSuccessfulPayment(PaymentSuccessResponse response) async {
+    try {
+      // Get payment details from Razorpay
+      final paymentDoc = await _firestore
+          .collection('payments')
+          .doc(response.paymentId!)
+          .get();
+
+      if (!paymentDoc.exists) return;
+
+      final paymentData = paymentDoc.data()!;
+      final notes = paymentData['notes'] ?? {};
+      final userId = notes['userId'];
+      final planId = notes['planId'];
+      final featureId = notes['featureId'];
+      final deviceId = notes['deviceId'];
+      final type = notes['type'] ?? 'subscription';
+
+      if (type == 'feature_subscription' && featureId != null) {
+        // Create individual feature subscription
+        await _createFeatureUserSubscription(
+          userId: userId,
+          featureId: featureId,
+          paymentId: response.paymentId!,
+          deviceId: deviceId,
+        );
+      } else if (planId != null) {
+        // Create full subscription
+        await _subscriptionService.createUserSubscription(
+          userId: userId,
+          planId: planId,
+          paymentId: response.paymentId!,
+          amount: paymentData['amount'] / 100, // Convert from paise
+          deviceId: deviceId,
+        );
+
+        // Create device session if provided
+        if (deviceId != null && deviceId.isNotEmpty) {
+          await _subscriptionService.createDeviceSession(
+            userId: userId,
+            deviceId: deviceId,
+            deviceInfo: 'Mobile Device', // You can get actual device info
+            ipAddress: '0.0.0.0', // You can get actual IP
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error processing successful payment: $e');
+    }
+  }
+
+  Future<void> _createFeatureUserSubscription({
+    required String userId,
+    required String featureId,
+    required String paymentId,
+    String? deviceId,
+  }) async {
+    try {
+      final featureSub = _subscriptionService.getFeatureSubscription(featureId);
+      if (featureSub == null) return;
+
+      final now = DateTime.now();
+      final endDate = now.add(Duration(days: featureSub.duration));
+
+      final userSub = UserSubscription(
+        id: '',
+        userId: userId,
+        planId: featureSub.id,
+        category: featureSub.featureId,
+        featureIds: [featureSub.featureId],
+        startDate: now,
+        endDate: endDate,
+        status: 'active',
+        paymentId: paymentId,
+        amount: featureSub.price,
+        createdAt: now,
+        currentDeviceId: deviceId,
+        activeDeviceCount: deviceId != null ? 1 : 0,
+      );
+
+      await _firestore.collection('user_subscriptions').add(userSub.toFirestore());
+      debugPrint('✅ Created feature subscription for: $featureId');
+    } catch (e) {
+      debugPrint('❌ Error creating feature subscription: $e');
     }
   }
 
@@ -298,6 +460,7 @@ class PaymentService extends ChangeNotifier {
     required String status,
   }) async {
     try {
+      // Get the order details from Razorpay to include notes
       await _firestore.collection('payments').doc(paymentId).set({
         'paymentId': paymentId,
         'orderId': orderId,
@@ -311,44 +474,61 @@ class PaymentService extends ChangeNotifier {
     }
   }
 
-  // Get user's active subscriptions
+  // Get user's active subscriptions (delegated to dynamic service)
   Future<List<UserSubscription>> getUserSubscriptions(String userId) async {
-    try {
-      final snapshot = await _firestore
-          .collection('user_subscriptions')
-          .where('userId', isEqualTo: userId)
-          .where('status', isEqualTo: 'active')
-          .get();
-
-      return snapshot.docs
-          .map((doc) => UserSubscription.fromFirestore(doc))
-          .toList();
-    } catch (e) {
-      debugPrint('❌ Error getting user subscriptions: $e');
-      return [];
-    }
+    await _subscriptionService.loadUserSubscriptions(userId);
+    return _subscriptionService.getActiveSubscriptions();
   }
 
-  // Check if user has active subscription for category
-  Future<bool> hasActiveSubscription(String userId, String category) async {
-    try {
-      final subscriptions = await getUserSubscriptions(userId);
-      return subscriptions.any((sub) => 
-          sub.category == category || sub.category == 'premium');
-    } catch (e) {
-      debugPrint('❌ Error checking subscription: $e');
-      return false;
-    }
+  // Check if user has active subscription for category (delegated to dynamic service)
+  Future<bool> hasActiveSubscription(String userId, String category, {String? featureId}) async {
+    await _subscriptionService.initializeForUser(userId);
+    return _subscriptionService.hasActiveSubscription(category, featureId: featureId);
   }
 
-  // Get available subscription plans
-  Map<String, SubscriptionPlan> get subscriptionPlans => _subscriptionPlans;
+  // Get available subscription plans from dynamic service
+  List<SubscriptionPlan> get subscriptionPlans => _subscriptionService.plans;
   
-  // Get available coin packages
+  // Get available coin packages (kept for backward compatibility)
   Map<String, CoinPackage> get coinPackages => _coinPackages;
+  
+  // Get feature subscriptions
+  List<FeatureSubscription> get featureSubscriptions => _subscriptionService.featureSubscriptions;
+  
+  // Initialize payment service with user
+  Future<void> initializeForUser(String userId) async {
+    await _subscriptionService.initializeForUser(userId);
+  }
 
   String _generatePaymentId() {
     return 'order_${DateTime.now().millisecondsSinceEpoch}';
+  }
+
+  // Device session management methods
+  Future<bool> canLoginFromDevice(String userId, String deviceId) async {
+    return await _subscriptionService.canLoginFromDevice(userId, deviceId);
+  }
+
+  Future<void> createDeviceSession({
+    required String userId,
+    required String deviceId,
+    required String deviceInfo,
+    required String ipAddress,
+  }) async {
+    await _subscriptionService.createDeviceSession(
+      userId: userId,
+      deviceId: deviceId,
+      deviceInfo: deviceInfo,
+      ipAddress: ipAddress,
+    );
+  }
+
+  Future<void> endDeviceSession(String userId, String deviceId) async {
+    await _subscriptionService.endDeviceSession(userId, deviceId);
+  }
+
+  Future<void> updateDeviceActivity(String userId, String deviceId) async {
+    await _subscriptionService.updateDeviceActivity(userId, deviceId);
   }
 
   @override

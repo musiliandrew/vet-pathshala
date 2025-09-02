@@ -71,13 +71,34 @@ class _ViewAllAnimalsScreenState extends State<ViewAllAnimalsScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF2E7D32),
         foregroundColor: Colors.white,
-        title: const Row(
-          children: [
-            Text('🐄 ALL ANIMALS (50)'),
-            Spacer(),
-            Icon(Icons.search, size: 20),
-          ],
+        title: const Text(
+          '🐄 ALL ANIMALS (50)',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            onPressed: () => _showSearch(context),
+            icon: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.search, color: Colors.white, size: 20),
+                SizedBox(width: 4),
+                Text('Search', style: TextStyle(color: Colors.white, fontSize: 12)),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('🏡', style: TextStyle(fontSize: 16)),
+                Icon(Icons.arrow_back, color: Colors.white, size: 16),
+                Text('Back', style: TextStyle(color: Colors.white, fontSize: 10)),
+              ],
+            ),
+          ),
+        ],
         elevation: 0,
       ),
       body: Column(
@@ -85,8 +106,50 @@ class _ViewAllAnimalsScreenState extends State<ViewAllAnimalsScreen> {
           // Filter Section
           _buildFilterSection(),
           
-          // Action Buttons
-          _buildActionButtons(),
+          // Action Buttons  
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () => _showFilters(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2E7D32),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                  child: const Text('Filter', style: TextStyle(fontSize: 12)),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () => _showQRScanner(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                  child: const Text('QR Scan', style: TextStyle(fontSize: 12)),
+                ),
+                const Spacer(),
+                ElevatedButton.icon(
+                  onPressed: () => _showDownloadDialog(context),
+                  icon: const Text('📤', style: TextStyle(fontSize: 12)),
+                  label: const Text('Download animal lists (3 Coins)', style: TextStyle(fontSize: 10)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  ),
+                ),
+              ],
+            ),
+          ),
           
           // Animals List
           Expanded(
@@ -529,6 +592,141 @@ class _ViewAllAnimalsScreenState extends State<ViewAllAnimalsScreen> {
           ],
         );
       },
+    );
+  }
+
+  void _showFilters(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('🔍 Filter Animals', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            Text('Current Filters:', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 8),
+            Text('• Type: $selectedType', style: const TextStyle(fontSize: 12)),
+            Text('• Status: $selectedStatus', style: const TextStyle(fontSize: 12)),
+            Text('• Age: $selectedAge', style: const TextStyle(fontSize: 12)),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
+                child: const Text('Apply Filters', style: TextStyle(color: Colors.white)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSearch(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('🔍 Search Animals'),
+        content: const TextField(
+          decoration: InputDecoration(
+            hintText: 'Search by name, tag, breed...',
+            border: OutlineInputBorder(),
+            prefixIcon: Icon(Icons.search),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
+            child: const Text('Search', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showQRScanner(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('📱 QR Scanner'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.qr_code_scanner, size: 64, color: Colors.blue),
+            SizedBox(height: 16),
+            Text('QR code scanner will open camera to scan animal tags.'),
+            SizedBox(height: 8),
+            Text('Compatible with all Vet-Pathshala animal QR codes.', 
+                 style: TextStyle(fontSize: 12, color: Colors.grey)),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('QR Scanner opening...'),
+                  backgroundColor: Colors.blue,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+            child: const Text('Open Scanner', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDownloadDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('📤 Download Animal Lists'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Download complete animal records (3 coins)'),
+            SizedBox(height: 12),
+            Text('Export includes:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('• All animal profiles with photos'),
+            Text('• Health and vaccination records'),
+            Text('• Breeding and pregnancy data'),
+            Text('• Milk production history'),
+            Text('• Financial transaction records'),
+            SizedBox(height: 8),
+            Text('Format: PDF + Excel spreadsheet', style: TextStyle(fontSize: 12, color: Colors.grey)),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Download starting... (3 coins deducted)'),
+                  backgroundColor: Colors.amber,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: const Text('Download (3 Coins)', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 

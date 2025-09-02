@@ -8,6 +8,10 @@ import '../providers/home_provider.dart';
 import '../../farmer/screens/view_all_animals_screen.dart';
 import '../../farmer/screens/daily_milk_log_screen.dart';
 import '../../farmer/screens/add_animal_screen.dart';
+import '../../drug_center/screens/drug_index_screen.dart';
+import '../../notes/screens/notes_categories_screen.dart';
+import '../../ebooks/screens/ebooks_screen.dart';
+import '../../payments/screens/subscription_plans_screen.dart';
 
 class FarmerHomeScreen extends StatefulWidget {
   const FarmerHomeScreen({super.key});
@@ -101,6 +105,9 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> with TickerProvider
                   
                   // Coin Rewards Center
                   _buildCoinRewards(context, coinProvider),
+                  
+                  // Study & Training Center
+                  _buildStudyTrainingCenter(context),
                   
                   const SizedBox(height: 20),
                 ],
@@ -892,6 +899,505 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> with TickerProvider
           ),
         );
       },
+    );
+  }
+
+  Widget _buildStudyTrainingCenter(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                '📚 STUDY & TRAINING CENTER',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2E7D32),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  // Settings
+                },
+                icon: const Text('⚙️', style: TextStyle(fontSize: 16)),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Subscription Status
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.1),
+              border: Border.all(color: Colors.grey.withOpacity(0.3)),
+            ),
+            child: const Center(
+              child: Text(
+                '░░░░░░░░░░░░░░░ SUBSCRIPTION STATUS ░░░░░░░░░░░░░░░',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Subscription Status Card
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '🔒 Premium Content Locked',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SubscriptionPlansScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                        ),
+                        child: const Text('Subscribe Now', style: TextStyle(fontSize: 12)),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          _showSubscriptionInfo(context);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.orange,
+                          side: const BorderSide(color: Colors.orange),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                        ),
+                        child: const Text('Learn More', style: TextStyle(fontSize: 12)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Premium Resources Section
+          const Text(
+            '▼ PREMIUM RESOURCES (Requires Subscription)',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Premium Resource Cards
+          _buildPremiumResourceCard('📚 Notes', '🔒', () {
+            _showPremiumDialog(context, 'Notes');
+          }),
+          const SizedBox(height: 8),
+          _buildPremiumResourceCard('🎥 Video Lectures', '🔒', () {
+            _showPremiumDialog(context, 'Video Lectures');
+          }),
+          const SizedBox(height: 8),
+          _buildPremiumResourceCard('📕 eBooks', '🔒', () {
+            _showPremiumDialog(context, 'eBooks');
+          }),
+          
+          const SizedBox(height: 16),
+          
+          // Free Tools Section
+          const Text(
+            '▼ FREE TOOLS',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.green,
+            ),
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Drug Index Card
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.green.withOpacity(0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '💉 Drug Index (Search 100+ Medications)',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DrugIndexScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                        ),
+                        child: const Text('Browse Alphabetically', style: TextStyle(fontSize: 11)),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DrugIndexScreen(),
+                            ),
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.green,
+                          side: const BorderSide(color: Colors.green),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                        ),
+                        child: const Text('Search', style: TextStyle(fontSize: 11)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // Dosage Calculator Card
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.amber.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.amber.withOpacity(0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '📱 Dosage Calculator (1 Coin per Use)',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Text('Animal: ', style: TextStyle(fontSize: 12)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('[▾]', style: TextStyle(fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    const Text(' | Weight: ', style: TextStyle(fontSize: 12)),
+                    Container(
+                      width: 40,
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text('[__]', style: TextStyle(fontSize: 12)),
+                    ),
+                    const Text(' | Drug: ', style: TextStyle(fontSize: 12)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text('[▾]', style: TextStyle(fontSize: 12)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _showDosageCalculator(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    child: const Text('Calculate', style: TextStyle(fontSize: 12)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPremiumResourceCard(String title, String lockIcon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              lockIcon,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPremiumDialog(BuildContext context, String feature) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Text('🔒', style: TextStyle(fontSize: 24)),
+            const SizedBox(width: 8),
+            Text('$feature Locked', style: const TextStyle(fontSize: 16)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Access to $feature requires a Premium subscription.',
+              style: const TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              '✅ Unlimited access to all content\n'
+              '✅ Offline downloads\n'
+              '✅ Expert support\n'
+              '✅ No ads',
+              style: TextStyle(fontSize: 12, color: Colors.green),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SubscriptionPlansScreen(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            child: const Text('Subscribe', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSubscriptionInfo(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Text('💎', style: TextStyle(fontSize: 24)),
+            SizedBox(width: 8),
+            Text('Premium Benefits', style: TextStyle(fontSize: 16)),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('🎓 Complete Study Materials', style: TextStyle(fontSize: 14)),
+            Text('📚 500+ Notes & Guides', style: TextStyle(fontSize: 14)),
+            Text('🎥 HD Video Lectures', style: TextStyle(fontSize: 14)),
+            Text('📕 Digital eBook Library', style: TextStyle(fontSize: 14)),
+            Text('💬 Expert Q&A Support', style: TextStyle(fontSize: 14)),
+            Text('📱 Offline Access', style: TextStyle(fontSize: 14)),
+            SizedBox(height: 8),
+            Text('Starting at ₹99/month', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.orange)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SubscriptionPlansScreen(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            child: const Text('Get Premium', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDosageCalculator(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Text('📱', style: TextStyle(fontSize: 24)),
+            SizedBox(width: 8),
+            Text('Dosage Calculator', style: TextStyle(fontSize: 16)),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'This feature requires 1 coin per calculation.',
+              style: TextStyle(fontSize: 14),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Features:\n'
+              '• Accurate drug dosing\n'
+              '• Animal weight-based calculations\n'
+              '• Safety recommendations\n'
+              '• Drug interaction warnings',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Navigate to drug calculator with coin check
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Drug calculator coming soon!'),
+                  backgroundColor: Colors.amber,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: const Text('Use (1 Coin)', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -8,6 +8,8 @@ import '../../coins/providers/coin_provider.dart';
 import '../../coins/screens/coin_store_screen.dart';
 import '../providers/home_provider.dart';
 import '../../question_bank/screens/question_bank_screen.dart';
+import '../../referral/widgets/refer_earn_widget.dart';
+import '../widgets/success_stories_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -63,6 +65,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // Quick Actions
                     _buildQuickActions(context, user),
+                    const SizedBox(height: 32),
+
+                    // Refer & Earn Section
+                    const ReferEarnWidget(),
+                    const SizedBox(height: 32),
+
+                    // Success Stories
+                    const SuccessStoriesWidget(),
                     const SizedBox(height: 32),
 
                     // Recent Activity

@@ -95,43 +95,110 @@ class UserModel {
 // Data models for existing collections
 class QuestionModel {
   final String id;
-  final String authorId;
+  final String createdBy;
   final String category;
-  final int correctAnswer;
+  final String correctAnswer;
   final DateTime createdAt;
   final String difficulty;
   final List<String> options;
-  final String questionText;
+  final String question;
   final String questionType;
-  final String targetRole;
+  final List<String> targetRoles;
+  final String explanation;
+  final String subject;
+  final String subcategory;
+  final String topic;
+  final List<String> tags;
+  final bool isActive;
+  final Map<String, dynamic> stats;
 
   QuestionModel({
     required this.id,
-    required this.authorId,
+    required this.createdBy,
     required this.category,
     required this.correctAnswer,
     required this.createdAt,
     required this.difficulty,
     required this.options,
-    required this.questionText,
+    required this.question,
     required this.questionType,
-    required this.targetRole,
+    required this.targetRoles,
+    required this.explanation,
+    required this.subject,
+    required this.subcategory,
+    required this.topic,
+    required this.tags,
+    required this.isActive,
+    required this.stats,
   });
 
   factory QuestionModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return QuestionModel(
       id: doc.id,
-      authorId: data['authorId'] ?? '',
+      createdBy: data['createdBy'] ?? '',
       category: data['category'] ?? '',
-      correctAnswer: data['correctAnswer'] ?? 0,
+      correctAnswer: data['correctAnswer'] ?? '',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
-      difficulty: data['difficulty'] ?? 'beginner',
+      difficulty: data['difficulty'] ?? 'easy',
       options: List<String>.from(data['options'] ?? []),
-      questionText: data['questionText'] ?? '',
-      questionType: data['questionType'] ?? 'multiple_choice',
-      targetRole: data['targetRole'] ?? 'doctor',
+      question: data['question'] ?? '',
+      questionType: data['questionType'] ?? 'mcq',
+      targetRoles: List<String>.from(data['targetRoles'] ?? []),
+      explanation: data['explanation'] ?? '',
+      subject: data['subject'] ?? '',
+      subcategory: data['subcategory'] ?? '',
+      topic: data['topic'] ?? '',
+      tags: List<String>.from(data['tags'] ?? []),
+      isActive: data['isActive'] ?? true,
+      stats: Map<String, dynamic>.from(data['stats'] ?? {}),
     );
+  }
+
+  factory QuestionModel.fromJson(Map<String, dynamic> json) {
+    return QuestionModel(
+      id: json['id'] ?? '',
+      createdBy: json['createdBy'] ?? '',
+      category: json['category'] ?? '',
+      correctAnswer: json['correctAnswer'] ?? '',
+      createdAt: json['createdAt'] is Timestamp 
+          ? (json['createdAt'] as Timestamp).toDate()
+          : DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      difficulty: json['difficulty'] ?? 'easy',
+      options: List<String>.from(json['options'] ?? []),
+      question: json['question'] ?? '',
+      questionType: json['questionType'] ?? 'mcq',
+      targetRoles: List<String>.from(json['targetRoles'] ?? []),
+      explanation: json['explanation'] ?? '',
+      subject: json['subject'] ?? '',
+      subcategory: json['subcategory'] ?? '',
+      topic: json['topic'] ?? '',
+      tags: List<String>.from(json['tags'] ?? []),
+      isActive: json['isActive'] ?? true,
+      stats: Map<String, dynamic>.from(json['stats'] ?? {}),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'createdBy': createdBy,
+      'category': category,
+      'correctAnswer': correctAnswer,
+      'createdAt': createdAt.toIso8601String(),
+      'difficulty': difficulty,
+      'options': options,
+      'question': question,
+      'questionType': questionType,
+      'targetRoles': targetRoles,
+      'explanation': explanation,
+      'subject': subject,
+      'subcategory': subcategory,
+      'topic': topic,
+      'tags': tags,
+      'isActive': isActive,
+      'stats': stats,
+    };
   }
 }
 

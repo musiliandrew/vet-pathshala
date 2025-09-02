@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../shared/models/video_models.dart';
 import '../../../shared/models/ebook_models.dart';
 import '../../../shared/models/question_bank_models.dart';
+import '../../../shared/models/user_model.dart';
 
 /// Comprehensive offline cache manager for the application
 class OfflineCacheManager {
@@ -451,11 +452,11 @@ class OfflineCacheManager {
         'expired': 0,
       };
 
-      typeStats[entry.type]!['count'] = typeStats[entry.type]!['count'] as int + 1;
-      typeStats[entry.type]!['size'] = typeStats[entry.type]!['size'] as int + entry.size;
+      typeStats[entry.type]!['count'] = (typeStats[entry.type]!['count'] as int) + 1;
+      typeStats[entry.type]!['size'] = (typeStats[entry.type]!['size'] as int) + entry.size;
       
       if (entry.isExpired()) {
-        typeStats[entry.type]!['expired'] = typeStats[entry.type]!['expired'] as int + 1;
+        typeStats[entry.type]!['expired'] = (typeStats[entry.type]!['expired'] as int) + 1;
       }
     }
 

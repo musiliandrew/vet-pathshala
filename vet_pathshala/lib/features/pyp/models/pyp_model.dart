@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class PYPPaper {
   final String id;
   final String title;
@@ -39,6 +41,14 @@ class PYPPaper {
     this.rating = 0.0,
   });
 
+  factory PYPPaper.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return PYPPaper.fromJson({
+      'id': doc.id,
+      ...data,
+    });
+  }
+
   factory PYPPaper.fromJson(Map<String, dynamic> json) {
     return PYPPaper(
       id: json['id'] ?? '',
@@ -56,7 +66,9 @@ class PYPPaper {
       maxMarks: json['maxMarks'] ?? 100,
       isPremium: json['isPremium'] ?? false,
       coinCost: json['coinCost'] ?? 0,
-      uploadDate: DateTime.parse(json['uploadDate'] ?? DateTime.now().toIso8601String()),
+      uploadDate: json['uploadDate'] is Timestamp 
+          ? (json['uploadDate'] as Timestamp).toDate()
+          : DateTime.parse(json['uploadDate'] ?? DateTime.now().toIso8601String()),
       downloads: json['downloads'] ?? 0,
       rating: (json['rating'] ?? 0.0).toDouble(),
     );
@@ -100,6 +112,17 @@ class PYPCategory {
     required this.subjects,
     this.totalPapers = 0,
   });
+
+  factory PYPCategory.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return PYPCategory(
+      id: doc.id,
+      name: data['name'] ?? '',
+      icon: data['icon'] ?? '📚',
+      subjects: (data['subjects'] as List<dynamic>?)?.map((s) => PYPSubject.fromJson(s)).toList() ?? [],
+      totalPapers: data['totalPapers'] ?? 0,
+    );
+  }
 }
 
 class PYPSubject {
@@ -118,4 +141,15 @@ class PYPSubject {
     required this.yearWisePapers,
     this.totalPapers = 0,
   });
+
+  factory PYPSubject.fromJson(Map<String, dynamic> json) {
+    return PYPSubject(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      categoryId: json['categoryId'] ?? '',
+      topics: List<String>.from(json['topics'] ?? []),
+      yearWisePapers: Map<int, int>.from(json['yearWisePapers'] ?? {}),
+      totalPapers: json['totalPapers'] ?? 0,
+    );
+  }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/unified_theme.dart';
 import '../providers/pyp_provider.dart';
-import '../models/pyp_model.dart';
+import '../../../shared/models/test_series_models.dart';
 import '../widgets/pyp_paper_card.dart';
 import 'pyp_paper_detail_screen.dart';
 

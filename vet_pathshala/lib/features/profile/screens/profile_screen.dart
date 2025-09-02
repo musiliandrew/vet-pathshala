@@ -4,6 +4,11 @@ import '../../../core/theme/unified_theme.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../coins/providers/coin_provider.dart';
 import '../../admin/screens/enhanced_admin_dashboard_screen.dart';
+import '../../analytics/screens/detailed_performance_screen.dart';
+import '../screens/edit_profile_screen.dart';
+import '../screens/preferences_screen.dart';
+import '../screens/notifications_screen.dart';
+import '../../gamification/screens/gamification_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -55,12 +60,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Header with profile info
-                      UnifiedTheme.buildGradientContainer(
+                      // Header with profile info - Green background like battle page
+                      Container(
                         padding: const EdgeInsets.all(UnifiedTheme.spacingXXL),
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(32),
-                          bottomRight: Radius.circular(32),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              UnifiedTheme.primaryGreen,
+                              UnifiedTheme.primaryGreen.withOpacity(0.8),
+                              UnifiedTheme.blueAccent.withOpacity(0.6),
+                            ],
+                          ),
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(32),
+                            bottomRight: Radius.circular(32),
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -181,19 +197,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 'Edit Profile',
                                 'Update your personal information',
                                 Icons.edit_outlined,
-                                () => _showComingSoon(context, 'Edit Profile'),
+                                () => Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileScreen())),
                               ),
                               _buildMenuItem(
                                 'Preferences',
                                 'App settings and preferences',
                                 Icons.settings_outlined,
-                                () => _showComingSoon(context, 'Preferences'),
+                                () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PreferencesScreen())),
                               ),
                               _buildMenuItem(
                                 'Notifications',
                                 'Manage notification settings',
                                 Icons.notifications_outlined,
-                                () => _showComingSoon(context, 'Notifications'),
+                                () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen())),
                               ),
                             ]),
 
@@ -204,19 +220,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 'Progress Report',
                                 'View your learning analytics',
                                 Icons.analytics_outlined,
-                                () => _showComingSoon(context, 'Progress Report'),
+                                () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailedPerformanceScreen())),
                               ),
                               _buildMenuItem(
                                 'Achievements',
                                 'View badges and milestones',
                                 Icons.military_tech_outlined,
-                                () => _showComingSoon(context, 'Achievements'),
+                                () => Navigator.push(context, MaterialPageRoute(builder: (context) => const GamificationScreen())),
                               ),
                               _buildMenuItem(
                                 'Study Streak',
                                 'Track your daily learning',
                                 Icons.local_fire_department_outlined,
-                                () => _showComingSoon(context, 'Study Streak'),
+                                () => _showStudyStreakDialog(context),
                               ),
                             ]),
 
@@ -438,6 +454,69 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Text('• E-books Library'),
             Text('• Gamification System'),
             Text('• Progress Tracking'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showStudyStreakDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: UnifiedTheme.cardBackground,
+        title: const Row(
+          children: [
+            Icon(Icons.local_fire_department, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Study Streak'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.orange.withOpacity(0.2), Colors.red.withOpacity(0.2)],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Column(
+                children: [
+                  Icon(Icons.local_fire_department, color: Colors.orange, size: 48),
+                  SizedBox(height: 12),
+                  Text(
+                    '12 Days',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange,
+                    ),
+                  ),
+                  Text(
+                    'Current Streak',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: UnifiedTheme.tertiaryText,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Keep learning daily to maintain your streak! Complete at least one quiz or read one note each day.',
+              style: TextStyle(fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
         actions: [

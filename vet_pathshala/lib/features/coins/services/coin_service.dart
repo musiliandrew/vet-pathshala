@@ -185,11 +185,6 @@ class CoinService {
               }))
           .toList();
     } catch (e) {
-      // If permission denied, return sample transactions
-      if (e.toString().contains('permission-denied') || 
-          e.toString().contains('PERMISSION_DENIED')) {
-        return _getSampleTransactions(userId, limit);
-      }
       throw Exception('Failed to get transaction history: $e');
     }
   }
@@ -380,74 +375,6 @@ class CoinService {
     } catch (e) {
       throw Exception('Failed to get coin statistics: $e');
     }
-  }
-  // Get sample transactions when Firestore access fails
-  static List<CoinTransaction> _getSampleTransactions(String userId, int limit) {
-    final now = DateTime.now();
-    final sampleTransactions = [
-      CoinTransaction(
-        id: '1',
-        userId: userId,
-        type: transactionTypeEarn,
-        amount: 5,
-        reason: earnReasonDailyLogin,
-        description: 'Daily login bonus',
-        balanceBefore: 45,
-        balanceAfter: 50,
-        metadata: {'date': now.toIso8601String()},
-        createdAt: now.subtract(const Duration(hours: 2)),
-      ),
-      CoinTransaction(
-        id: '2',
-        userId: userId,
-        type: transactionTypeEarn,
-        amount: 10,
-        reason: earnReasonQuizComplete,
-        description: 'Completed quiz: Basic Veterinary Medicine',
-        balanceBefore: 35,
-        balanceAfter: 45,
-        metadata: {'questionsCorrect': 8, 'totalQuestions': 10},
-        createdAt: now.subtract(const Duration(days: 1)),
-      ),
-      CoinTransaction(
-        id: '3',
-        userId: userId,
-        type: transactionTypeSpend,
-        amount: 5,
-        reason: spendReasonDrugCalculator,
-        description: 'Used drug calculator',
-        balanceBefore: 40,
-        balanceAfter: 35,
-        metadata: {'drugName': 'Amoxicillin'},
-        createdAt: now.subtract(const Duration(days: 2)),
-      ),
-      CoinTransaction(
-        id: '4',
-        userId: userId,
-        type: transactionTypeEarn,
-        amount: 2,
-        reason: 'watch_ad',
-        description: 'Watched rewarded video ad',
-        balanceBefore: 38,
-        balanceAfter: 40,
-        metadata: {'adProvider': 'admob'},
-        createdAt: now.subtract(const Duration(days: 3)),
-      ),
-      CoinTransaction(
-        id: '5',
-        userId: userId,
-        type: transactionTypeEarn,
-        amount: 5,
-        reason: earnReasonDailyLogin,
-        description: 'Daily login bonus',
-        balanceBefore: 33,
-        balanceAfter: 38,
-        metadata: {'date': now.subtract(const Duration(days: 3)).toIso8601String()},
-        createdAt: now.subtract(const Duration(days: 3, hours: 8)),
-      ),
-    ];
-    
-    return sampleTransactions.take(limit).toList();
   }
 }
 

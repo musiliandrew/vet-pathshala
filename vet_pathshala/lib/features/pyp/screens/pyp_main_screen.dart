@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/unified_theme.dart';
 import '../providers/pyp_provider.dart';
-import '../models/pyp_model.dart';
+import '../../../shared/models/test_series_models.dart';
 import 'pyp_paper_detail_screen.dart';
 
 class PYPMainScreen extends StatefulWidget {
@@ -168,7 +168,7 @@ class _PYPMainScreenState extends State<PYPMainScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildCategoryCard(PYPCategory category) {
+  Widget _buildCategoryCard(dynamic category) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -247,7 +247,7 @@ class _PYPMainScreenState extends State<PYPMainScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildYearCard(int year, List<PYPPaper> papers) {
+  Widget _buildYearCard(int year, List<PYPModel> papers) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -310,8 +310,9 @@ class _PYPMainScreenState extends State<PYPMainScreen> with SingleTickerProvider
         // Sort papers by downloads and rating
         final popularPapers = [...provider.papers];
         popularPapers.sort((a, b) {
-          final aScore = a.downloads * 0.6 + a.rating * 100;
-          final bScore = b.downloads * 0.6 + b.rating * 100;
+          // Sort by year (newer first) and total marks (higher first)
+          final aScore = a.year * 100 + a.totalMarks;
+          final bScore = b.year * 100 + b.totalMarks;
           return bScore.compareTo(aScore);
         });
 
@@ -327,15 +328,13 @@ class _PYPMainScreenState extends State<PYPMainScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildPaperCard(PYPPaper paper, {int? showRank}) {
+  Widget _buildPaperCard(PYPModel paper, {int? showRank}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: paper.isPremium 
-          ? Border.all(color: UnifiedTheme.goldAccent, width: 2)
-          : Border.all(color: UnifiedTheme.borderColor),
+        border: Border.all(color: UnifiedTheme.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
@@ -389,41 +388,40 @@ class _PYPMainScreenState extends State<PYPMainScreen> with SingleTickerProvider
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (paper.isPremium)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: UnifiedTheme.goldAccent,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '${paper.coinCost} 🪙',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: UnifiedTheme.goldAccent,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                paper.examType,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
+            ),
           ],
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
-            Text('${paper.subject} • ${paper.year}'),
+            Text('${paper.category} • ${paper.year}'),
             const SizedBox(height: 4),
             Row(
               children: [
                 Icon(Icons.star, size: 16, color: Colors.amber[600]),
                 const SizedBox(width: 4),
-                Text('${paper.rating}'),
+                Text('4.5'), // Mock rating
                 const SizedBox(width: 12),
                 const Icon(Icons.download, size: 16, color: UnifiedTheme.secondaryText),
                 const SizedBox(width: 4),
-                Text('${paper.downloads}'),
+                Text('${paper.totalQuestions * 10}'), // Mock downloads
                 const SizedBox(width: 12),
-                Text('${paper.questions} Q • ${paper.duration}min'),
+                Text('${paper.totalQuestions} Q • ${paper.duration}min'),
               ],
             ),
           ],

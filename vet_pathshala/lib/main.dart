@@ -12,6 +12,7 @@ import 'features/coins/providers/coin_provider.dart';
 import 'features/notes/providers/notes_provider.dart';
 import 'features/pyp/providers/pyp_provider.dart';
 import 'features/test_series/providers/test_series_provider.dart';
+import 'features/gamification/providers/gamification_provider.dart';
 import 'shared/providers/category_provider.dart';
 import 'features/admin/providers/admin_auth_provider.dart';
 import 'core/utils/firebase_availability.dart';
@@ -63,6 +64,7 @@ class VetPathshalaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NotesProvider()),
         ChangeNotifierProvider(create: (_) => PYPProvider()),
         ChangeNotifierProvider(create: (_) => TestSeriesProvider()),
+        ChangeNotifierProvider(create: (_) => GamificationProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => AdminAuthProvider()),
       ],

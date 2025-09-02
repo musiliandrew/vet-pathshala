@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/unified_theme.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../coins/providers/coin_provider.dart';
+import '../providers/gamification_provider.dart';
 import 'battle_screen.dart';
+import 'subscription_required_screen.dart';
 
 class GamificationScreen extends StatefulWidget {
   const GamificationScreen({super.key});
@@ -91,8 +93,19 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
         final user = authProvider.currentUser;
         if (user == null) return const SizedBox();
 
-        return Consumer<CoinProvider>(
-          builder: (context, coinProvider, child) {
+        return Consumer<GamificationProvider>(
+          builder: (context, gamificationProvider, child) {
+            // Check if user has active subscription for gamification
+            if (!gamificationProvider.canAccessGamification) {
+              return const SubscriptionRequiredScreen(
+                featureName: 'Gamification',
+                description: 'Access battles, achievements, leaderboards, and daily challenges',
+                icon: Icons.sports_esports,
+              );
+            }
+
+            return Consumer<CoinProvider>(
+              builder: (context, coinProvider, child) {
             return Scaffold(
               backgroundColor: UnifiedTheme.backgroundColor,
               body: SafeArea(
@@ -133,6 +146,8 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
                   ),
                 ),
               ),
+            );
+              },
             );
           },
         );

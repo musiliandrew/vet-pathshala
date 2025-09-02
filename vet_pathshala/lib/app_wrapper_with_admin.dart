@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:html' as html;
 import 'features/admin/providers/admin_auth_provider.dart';
 import 'features/admin/screens/admin_login_screen.dart';
 import 'features/admin/screens/enhanced_admin_dashboard_screen.dart';
@@ -20,22 +20,13 @@ class _AppWrapperWithAdminCheckState extends State<AppWrapperWithAdminCheck> {
   void initState() {
     super.initState();
     _checkCurrentRoute();
-    
-    // Listen for URL changes
-    html.window.onPopState.listen((event) {
-      _checkCurrentRoute();
-    });
   }
 
   void _checkCurrentRoute() {
-    final currentUrl = html.window.location.href;
-    final currentPath = html.window.location.pathname;
-    final currentHash = html.window.location.hash;
-    
+    // For mobile platforms, admin route checking is not needed since
+    // admin functionality is web-only
     setState(() {
-      _isAdminRoute = (currentPath?.contains('/admin') ?? false) || 
-                     (currentHash?.contains('admin') ?? false) ||
-                     (currentUrl?.contains('/admin') ?? false);
+      _isAdminRoute = false;
     });
   }
 

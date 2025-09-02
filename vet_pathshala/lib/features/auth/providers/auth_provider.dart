@@ -2,11 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../../../shared/models/user_model.dart';
+import '../../../core/services/device_restriction_service.dart';
 
 enum AuthState { initial, loading, authenticated, unauthenticated, error }
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
+  final DeviceRestrictionService _deviceRestriction = DeviceRestrictionService();
   
   AuthState _state = AuthState.initial;
   UserModel? _currentUser;
@@ -39,7 +41,21 @@ class AuthProvider extends ChangeNotifier {
           try {
             _currentUser = await _authService.getCurrentUserData();
             if (_currentUser != null) {
-              print('✅ AuthProvider: User data loaded successfully, setting authenticated state');
+              print('✅ AuthProvider: User data loaded successfully, checking device restriction');
+              
+              // Check device restriction
+              final isDeviceAllowed = await _deviceRestriction.isDeviceAllowedForUser(_currentUser!.id);
+              if (!isDeviceAllowed) {
+                print('🔴 AuthProvider: Device not allowed for this user');
+                await _authService.signOut();
+                _setError('This account is already active on another device. Only one device per account is allowed.');
+                return;
+              }
+              
+              // Register/update device for this user
+              await _deviceRestriction.registerDeviceForUser(_currentUser!.id);
+              await _deviceRestriction.updateLastLoginTime(_currentUser!.id);
+              
               print('🚀 AuthProvider: User role from loaded data = "${_currentUser!.userRole}"');
               _setState(AuthState.authenticated);
             } else {
@@ -433,5 +449,16 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = error;
     _isPhoneAuthInProgress = false;
     notifyListeners();
+  }
+
+  Future<bool> requestDeviceChange(String reason) async {
+    if (_currentUser == null) return false;
+    
+    try {
+      return await _deviceRestriction.requestDeviceChange(_currentUser!.id, reason);
+    } catch (e) {
+      print('🔴 AuthProvider: Error requesting device change: $e');
+      return false;
+    }
   }
 }

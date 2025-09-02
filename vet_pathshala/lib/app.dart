@@ -14,6 +14,7 @@ import 'features/coins/screens/coin_store_screen.dart';
 import 'features/ebooks/screens/ebooks_screen.dart';
 import 'features/gamification/screens/gamification_screen.dart';
 import 'features/profile/screens/profile_screen.dart';
+import 'features/farmer/screens/farmer_records_screen.dart';
 
 class AppWrapper extends StatelessWidget {
   const AppWrapper({super.key});
@@ -309,7 +310,7 @@ class _MainAppState extends State<MainApp> {
       const UnifiedHomeScreen(),    // Home (shows FarmerHomeScreen)
       const EBooksScreen(),         // E-books  
       const DrugIndexScreen(),      // Drugs
-      const GamificationScreen(),   // Files/Gamification
+      const FarmerRecordsScreen(),  // Records
       const ProfileScreen(),        // Profile
     ];
 
@@ -356,7 +357,7 @@ class _MainAppState extends State<MainApp> {
             BottomNavigationBarItem(
               icon: Text('📁', style: TextStyle(fontSize: 20)),
               activeIcon: Text('📁', style: TextStyle(fontSize: 22)),
-              label: 'Files',
+              label: 'Records',
             ),
             BottomNavigationBarItem(
               icon: Text('👤', style: TextStyle(fontSize: 20)),
